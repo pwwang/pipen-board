@@ -1,0 +1,25 @@
+{
+  "name": "pipen-board-ui",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^2.0.3",
+    "svelte": "^3.56.0",
+    "vite": "^4.2.0",
+    "vite-plugin-node-polyfills": "^0.7.0"
+  },
+  "dependencies": {
+    "@cfworker/json-schema": "^1.12.5",
+    "@iarna/toml": "^2.2.5",
+    "carbon-components-svelte": "^0.73.5",
+    "carbon-icons-svelte": "^11.4.0",
+    "clipboard-copy": "^4.0.1",
+    "marked": "^4.3.0"
+  }
+}

@@ -1,0 +1,133 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "/schema/pipeline-schema.json",
+    "title": "Pipeline data schema",
+    "description": "Schema for pipeline data",
+    "type": "object",
+    "properties": {
+        "ADDITIONAL_OPTIONS": {
+            "type": "object",
+            "patternProperties": {
+                "^.*$": {
+                    "type": "object",
+                    "$ref": "#/$defs/arg"
+                }
+            }
+        },
+        "PIPELINE_OPTIONS": {
+            "type": "object",
+            "patternProperties": {
+                "^.*$": {
+                    "type": "object",
+                    "$ref": "#/$defs/arg"
+                }
+            }
+        },
+        "PROCGROUPS": {
+            "type": "object",
+            "patternProperties": {
+                "^.*$": {
+                    "type": "object",
+                    "properties": {
+                        "ARGUMENTS": {
+                            "type": "object",
+                            "patternProperties": {
+                                "^.*$": {
+                                    "type": "object",
+                                    "$ref": "#/$defs/arg"
+                                }
+                            }
+                        },
+                        "PROCESSES": {
+                            "type": "object",
+                            "patternProperties": {
+                                "^.*$": {
+                                    "type": "object",
+                                    "$ref": "#/$defs/process"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "PROCESSES": {
+            "type": "object",
+            "patternProperties": {
+                "^.*$": {
+                    "type": "object",
+                    "$ref": "#/$defs/process"
+                }
+            }
+        },
+        "RUNNING_OPTIONS": {
+            "type": "object",
+            "patternProperties": {
+                "^.*$": {
+                    "type": "object",
+                    "properties": {
+                        "desc": { "type": "string" },
+                        "command": { "type": "string" },
+                        "value": {
+                            "type": "object",
+                            "patternProperties": {
+                                "^.*$": { "$ref": "#/$defs/arg" }
+                            }
+                        }
+                    },
+                    "required": [ "command" ]
+                }
+            }
+        }
+    },
+
+    "$defs": {
+        "arg": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "description": "Type of the argument",
+                    "type": "string"
+                },
+                "desc": {
+                    "description": "Description of the argument",
+                    "type": "string"
+                },
+                "required": {
+                    "description": "Is the argument required",
+                    "type": "boolean"
+                },
+                "value": {},
+                "choices": {
+                    "description": "Choices of the argument",
+                    "type": "array",
+                    "items": {
+
+                    }
+                },
+                "placeholder": {
+                    "description": "Placeholder of the argument",
+                    "type": ["string", "null"]
+                }
+            }
+        },
+        "process": {
+            "type": "object",
+            "properties": {
+                "desc": { "type": "string" },
+                "value": {
+                    "type": "object",
+                    "patternProperties": {
+                        "^.*$": {
+                            "type": "object",
+                            "$ref": "#/$defs/arg"
+                        }
+                    }
+                }
+            },
+            "required": [
+                "desc"
+            ]
+        }
+    }
+}

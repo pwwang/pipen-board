@@ -1,0 +1,89 @@
+.description pre {
+    padding: .5rem;
+    line-height: 1.25;
+    overflow-x: auto;
+    background-color: white;
+  }
+  .description a,
+  .description a:visited {
+    color: #3498db;
+  }
+  .description a:hover,
+  .description a:focus,
+  .description a:active {
+    color: #2980b9;
+  }
+  .description .modest-no-decoration {
+    text-decoration: none;
+  }
+  .description {
+    font-size: 14px;
+  }
+  .description p,
+  .description .modest-p {
+    margin-top: .4rem;
+    margin-bottom: .2rem;
+  }
+  .description h1,
+  .description .modest-h1,
+  .description h2,
+  .description .modest-h2,
+  .description h3,
+  .description .modest-h3,
+  .description h4,
+  .description .modest-h4 {
+    margin: 1.414rem 0 .5rem;
+    font-weight: inherit;
+  }
+  .description h1,
+  .description .modest-h1 {
+    margin-top: 0;
+    font-size: 1.4rem;
+  }
+  .description h2,
+  .description .modest-h2 {
+    font-size: 1.2rem;
+  }
+  .description h3,
+  .description .modest-h3 {
+    font-size: 1rem;
+  }
+  .description h4,
+  .description .modest-h4 {
+    font-size: .8rem;
+  }
+  .description small,
+  .description .modest-small {
+    font-size: .707em;
+  }
+  /* https://github.com/mrmrs/fluidity */
+  .description img,
+  .description canvas,
+  .description iframe,
+  .description video,
+  .description svg,
+  .description select,
+  .description textarea {
+    max-width: 100%;
+  }
+
+  .description ul,
+  .description ol {
+      list-style-type: square;
+      list-style-position: inside;
+      padding-left: .2rem;
+      margin-bottom: 1.3rem;
+  }
+
+  .description ul ul,
+  .description ul ol,
+  .description ol ol,
+  .description ol ul {
+      margin: 1rem 0;
+      font-size: 1rem;
+  }
+
+  .description li {
+      margin-bottom: .5rem;
+      line-height: 1.2;
+  }

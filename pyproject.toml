@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "pipen-board"
+version = "0.0.0"
+description = "Visualization configuration and running of pipen pipelines on the web"
+authors = ["pwwang <pwwang@pwwang.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [
+    { include = "pipen_board/**/*.py" },
+]
+include = ["pipen_board/frontend/dist"]
+
+[tool.poetry.build]
+generate-setup-file = true
+
+[tool.poetry.dependencies]
+python = "^3.7.1"
+
+[tool.poetry.plugins.pipen]
+board = "pipen_board:PipenBoardPlugin"
+
+[tool.poetry.plugins.pipen_cli]
+cli-board = "pipen_board:PipenCliBoardPlugin"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

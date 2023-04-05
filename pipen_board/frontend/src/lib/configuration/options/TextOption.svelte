@@ -1,0 +1,83 @@
+<script>
+// @ts-nocheck
+
+    import { onMount } from "svelte";
+    import TextArea from "carbon-components-svelte/src/TextArea/TextArea.svelte";
+    import OptionFrame from "./OptionFrame.svelte";
+    import { validateData, autoHeight, insertTab } from "../../utils";
+    import { setError, removeError } from "../../store";
+
+    export let key;
+    export let value;
+    export let placeholder;
+    export let required = false;
+    export let activeNavItem;
+    export let storeError = true;
+    export let readonly = false;
+
+    let setErrorFun;
+    let removeErrorFun;
+    if (!storeError) {
+        setErrorFun = (key, value) => {};
+        removeErrorFun = (key) => {};
+    } else {
+        setErrorFun = setError;
+        removeErrorFun = removeError;
+    }
+
+    let validator = [];
+    let invalid = false;
+    let invalidText = "";
+    let origValue = value;
+    let textarea = null;
+
+    if (required) {
+        validator = ["required", ...validator]
+    }
+
+    const validateValue = (v) => {
+        if (
+            (origValue === null || origValue === undefined)
+            && (v === "" || v === null || v === undefined)
+        ) {
+            value = origValue;
+            return;
+        }
+        const error = validateData(v, validator);
+        invalid = error !== null;
+        invalidText = error;
+        if (invalid) {
+            setErrorFun(`${activeNavItem} / ${key}`, invalidText);
+        } else {
+            removeErrorFun(`${activeNavItem} / ${key}`);
+        }
+        autoHeight(textarea);
+    };
+
+    onMount(() => {
+        if (!readonly) {
+            validateValue(value);
+        }
+    });
+</script>
+
+<OptionFrame on:mouseenter on:mouseleave>
+    <div slot="label">{key} {readonly ? '(readonly)' : ''}</div>
+    <div slot="field">
+        <TextArea
+            on:focus
+            on:blur
+            on:input={e => validateValue(e.target.value)}
+            on:keydown={insertTab}
+            {invalid}
+            {invalidText}
+            {readonly}
+            {placeholder}
+            labelText={key}
+            hideLabel
+            rows={1}
+            bind:ref={textarea}
+            bind:value={value}
+        />
+    </div>
+</OptionFrame>

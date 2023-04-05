@@ -1,0 +1,238 @@
+#app {
+    overflow-x: hidden;
+}
+
+.model-error .bx--modal-close {
+    display: none;
+}
+
+.model-error .bx--modal-container {
+    background-color: rgb(255, 236, 229);
+}
+
+.model-error .bx--modal-header {
+    background-color: lightsalmon;
+}
+
+.model-error h3 {
+    margin-bottom: 0.8rem;
+}
+
+input::placeholder {
+    color: #b6b6b6;
+}
+
+.bx--text-area {
+    line-height: 1.2rem !important;
+    min-height: auto !important;
+}
+
+.bx--toast-notification {
+    position: fixed;
+    bottom: 0.5rem;
+    right: 0.1rem;
+    z-index: 1000;
+}
+
+.bx--text-input__label-helper-wrapper {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    /* max-width: 10rem; */
+    min-width: 8rem;
+}
+
+button.navitem.errored {
+    color: rgb(211, 0, 0);
+}
+
+button.show-hidden {
+    margin-top: 0.5rem;
+    background-color: #bbcfff;
+    font-size: .8rem;
+    padding: 0 1.8rem;
+}
+
+div.draggable {
+    background-color: #dcdcdc;
+    background-image: linear-gradient(to bottom,#333 100%, #333 100%);
+    background-size: 100% 2rem;
+    background-position: 100% 50%;
+    background-repeat: no-repeat;
+    cursor: col-resize;
+}
+div.draggable.row {
+    background-image: linear-gradient(to right,#333 100%, #333 100%);
+    background-size: 2rem 100%;
+    background-position: 50% 100%;
+    cursor: row-resize;
+}
+div.draggable:hover {
+    background-color: #868686;
+}
+
+div.joblist button.bx--tag span {
+    font-family: IBM Plex Mono,Menlo,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier,monospace;
+}
+
+div.joblist button.bx--tag.selected {
+    box-shadow: inset 0 0 0 1px #393939;
+}
+
+div.joblist button.bx--tag.bx--tag--gray {
+    background-color: #d1d1d1;
+}
+
+div.joblist button.bx--tag:first-child {
+    margin-left: 0;
+}
+
+div.tree .bx--tree-node {
+    cursor: default;
+}
+
+.bx--text-input-wrapper.bx--text-input-wrapper--inline {
+    flex-flow: row nowrap !important;
+    align-items: baseline;
+    min-height: 2rem;
+}
+
+.bx--toast-notification {
+    width: 33% !important;
+}
+
+.ns-wrapper .bx--text-input__label-helper-wrapper {
+    margin-right: 0;
+}
+
+.bx--toast-notification ul {
+    list-style-type: disc;
+    list-style-position: inside;
+    margin-top: .5rem;
+}
+
+.bx--multi-select__wrapper.bx--list-box__wrapper {
+    min-width: 12rem;
+}
+
+.pipen-cli-config-loading.bx--loading-overlay::after {
+    content: var(--content);
+    position: absolute;
+    top: calc(50% + 5.5rem / 2 + 1rem);
+    color: white;
+}
+
+.ns-desc * {font-size: .8rem;}
+.ns-desc code {
+    background-color: white;
+}
+.ns-desc p {
+    line-height: 1rem;
+}
+.ns-desc pre {
+    background-color: white;
+    padding: 0.2rem 0.5rem;
+    margin: 0.2rem 0;
+}
+div.description code {
+    font-size: .8rem;
+    background-color: #333;
+    color: #eeeeee;
+    padding: 0.1rem 0.4rem;
+    border-radius: 0.4rem;
+}
+
+div.pipen-tabs a.bx--tabs__nav-link{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+div.pipen-tabs .bx--tab-content{
+    padding: 0;
+}
+
+button.pr-status-success > span::after {
+    content: "✔";
+    padding-left: 5px;
+    color: #008d00;
+    vertical-align: middle;
+    font-size: .8rem;
+}
+
+button.pr-status-failure > span::after {
+    content: "✘";
+    padding-left: 5px;
+    color: #8d0000;
+    vertical-align: middle;
+    font-size: .8rem;
+}
+
+button.pr-status-unrun > span::after {
+    /* question mark */
+    content: "❓";
+    padding-left: 5px;
+    font-size: .8rem;
+    margin-left: -.2rem;
+}
+
+div.pipen-tabs li.prev-run-tab {
+    background-image: linear-gradient(
+        90deg,
+        #cfffda var(--n_succ),
+        #ffdad9 var(--n_succ),
+        #ffdad9 calc(var(--n_succ) + var(--n_fail)),
+        transparent calc(var(--n_succ) + var(--n_fail))
+    );
+}
+
+div.center-wrapper {
+    margin: 2rem auto;
+    width: fit-content;
+}
+
+div.center-wrapper .bx--inline-loading {
+    width: fit-content;
+}
+
+/* Place the scroll bar on the left side */
+aside.left, aside.pr-nav {
+    direction: rtl;
+}
+
+aside.left *, aside.pr-nav * {
+    direction: ltr;
+}
+
+@media (min-width: 640px) {
+    .accordion-less-padding-right .bx--accordion__content {
+        padding-right: 3rem;
+    }
+}
+
+/* .bx--form-item:has(.bx--form-requirement) {
+    position: relative;
+}
+
+.bx--form-item .bx--form-requirement {
+    background-color: rgb(221, 1, 1);
+    position: absolute;
+    bottom: -1.4rem;
+    z-index: 1001;
+    color: white !important;
+    padding: 0 0.8rem;
+    border-radius: 3px;
+}
+
+.bx--form-item .bx--form-requirement::before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: calc(-100% + 0.8rem - 9px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 7px solid transparent;
+    border-bottom-color: rgb(221, 1, 1);
+} */
+
