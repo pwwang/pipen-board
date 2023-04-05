@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 from quart import Quart, Request
 
-from .defaults import logger
 from .apis import GETS, POSTS
 
 if TYPE_CHECKING:
@@ -13,10 +12,6 @@ if TYPE_CHECKING:
 
 def get_app(args: Namespace):
     """Get the Quart app."""
-    if args.dev:
-        logger.setLevel("DEBUG")
-    else:
-        logger.setLevel("INFO")
 
     class PipenBoardRequrest(Request):
         def __init__(self, *ags, **kwargs) -> None:
@@ -29,6 +24,15 @@ def get_app(args: Namespace):
         static_url_path="/",
     )
     app.request_class = PipenBoardRequrest
+
+    @app.after_request
+    def _(r):
+        if args.dev:
+            r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+            r.headers["Pragma"] = "no-cache"
+            r.headers["Expires"] = "0"
+            r.headers['Cache-Control'] = 'public, max-age=0'
+        return r
 
     for route, handler in GETS.items():
         app.route(route, methods=["GET"])(handler)

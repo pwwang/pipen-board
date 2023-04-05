@@ -1,7 +1,4 @@
 from pathlib import Path
-from pipen.utils import get_logger
-
-logger = get_logger("board")
 
 # Cached/saved pipeline data
 PIPEN_BOARD_DIR = Path("~/.pipen-board").expanduser()

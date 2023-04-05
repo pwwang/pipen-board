@@ -91,13 +91,13 @@ async def history():
 
 async def history_get():
     configfile = (await request.get_json())["configfile"]
-    print(" * [API] Getting history from: %s", configfile)
+    print(" * [API] Getting history from: %s" % configfile)
     return PIPEN_BOARD_DIR.joinpath(configfile).read_text()
 
 
 async def history_del():
     configfile = (await request.get_json())["configfile"]
-    print(" * [API] Deleting history: %s", configfile)
+    print(" * [API] Deleting history: %s" % configfile)
     PIPEN_BOARD_DIR.joinpath(configfile).unlink()
     return "OK"
 

@@ -55,7 +55,7 @@ class PipenCliBoardPlugin(CLIPlugin):
                 "Run the pipeline in development/debug mode. "
                 "This will reload the server when changes are made to this "
                 "package and reload the pipeline when page reloads for new "
-                "configurations."
+                "configurations. Page cache is also disabled in this mode."
             ),
         )
         subparser.add_argument(

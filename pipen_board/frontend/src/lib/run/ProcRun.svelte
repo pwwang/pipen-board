@@ -16,6 +16,11 @@
     let job;
     // job tree
     let jobTree = [];
+    // selected tree nodes
+    // let treeActiveId = "";
+    // let treeSelectedIds = [];
+    // let treeExpandedIds = [];
+    // $: console.table({treeActiveId, treeSelectedIds, treeExpandedIds})
     // error
     let toastNotify = { kind: undefined, subtitle: undefined };
     // loading
@@ -64,6 +69,10 @@
     const loadJobTree = async function (jobid) {
         // unload previous job tree
         jobTree = [];
+        // reset tree selection does not work
+        // treeActiveId = "";
+        // treeSelectedIds = [];
+        // treeExpandedIds = [];
         fileDetails = undefined;
         toastNotify.kind = "info";
         toastNotify.subtitle = "Loading job details...";
@@ -262,8 +271,10 @@
         grid-area: details;
         height: 100%;
         background-color: #f7f7f7;
+        display: flex;
     }
     div.procrun-wrap div.jobdetail {
         height: 100%;
+        width: 100%;
     }
 </style>
