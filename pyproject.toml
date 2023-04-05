@@ -15,6 +15,9 @@ generate-setup-file = true
 
 [tool.poetry.dependencies]
 python = "^3.7.1"
+pipen = "^0.7"
+quart = "^0.18"
+pipen-annotate = "^0.6"
 
 [tool.poetry.plugins.pipen]
 board = "pipen_board:PipenBoardPlugin"

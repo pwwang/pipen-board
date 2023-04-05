@@ -1,15 +1,13 @@
 """Provides PipenCliConfigPlugin"""
 from __future__ import annotations
 
-import socketserver
 import sys
-from pathlib import Path
 from typing import TYPE_CHECKING
 
+from rich import print
 from pipen.cli import CLIPlugin
 
-from .defaults import logger
-from .http_handler import http_handler
+from .quart_app import get_app
 
 if TYPE_CHECKING:  # pragma: no cover
     from argx import ArgumentParser, Namespace
@@ -54,24 +52,16 @@ class PipenCliBoardPlugin(CLIPlugin):
             "--dev",
             action="store_true",
             help=(
-                "Run the pipeline in development mode. "
-                "This will print verbosal logging information and reload "
-                "the pipeline if a new instantce starts when page reloads."
+                "Run the pipeline in development/debug mode. "
+                "This will reload the server when changes are made to this "
+                "package and reload the pipeline when page reloads for new "
+                "configurations."
             ),
         )
         subparser.add_argument(
             "--root",
             help="The root directory of the pipeline.",
             default=".",
-        )
-        subparser.add_argument(
-            "--loglevel",
-            help=(
-                "Logging level. If `auto`, "
-                "set to `debug` if `--dev` is set, otherwise `info`"
-            ),
-            choices=("auto", "debug", "info", "warning", "error", "critical"),
-            default="auto",
         )
         subparser.add_argument(
             "pipeline",
@@ -99,30 +89,11 @@ class PipenCliBoardPlugin(CLIPlugin):
 
     def exec_command(self, args: Namespace) -> None:
         """Execute the command"""
-        if args.loglevel == "auto":
-            args.loglevel = "debug" if args.dev else "info"
-        logger.setLevel(args.loglevel.upper())
 
-        logger.info(
-            f"[bold]pipen-{self.name}: [/bold]{self.__doc__}"
-        )
-        logger.info(f"[bold]version: [/bold]{self.__version__}")
-        logger.info("")
+        app = get_app(args)
+        print(" * ")
+        print(f" * [bold]pipen-{self.name}: [/bold]{self.__doc__}")
+        print(f" * [bold]version: [/bold]{self.__version__}")
+        print(" * ")
 
-        socketserver.TCPServer.allow_reuse_address = True
-        with socketserver.TCPServer(
-            ("", args.port),
-            http_handler(
-                Path(__file__).parent.joinpath("frontend", "build"),
-                args,
-            ),
-        ) as httpd:
-            port = httpd.server_address[1]
-            url = f"Serving UI at http://localhost:{port}"
-            logger.info(f"{url}?dev=1" if args.dev else url)
-            logger.info("Press Ctrl+C to exit")
-            logger.info("")
-            try:
-                httpd.serve_forever()
-            except KeyboardInterrupt:
-                logger.error("Stopping the server")
+        app.run(port=args.port, debug=args.dev, use_reloader=args.dev)

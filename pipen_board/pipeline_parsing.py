@@ -1,5 +1,4 @@
 from __future__ import annotations
-from curses.ascii import isdigit
 
 import sys
 import json
@@ -25,7 +24,6 @@ from .defaults import (
     SECTION_PROCESSES,
     SECTION_PROCGROUPS,
     PIPELINE_OPTIONS,
-    logger,
 )
 
 if TYPE_CHECKING:
@@ -247,7 +245,7 @@ async def get_pipeline_data(args: Namespace) -> Mapping[str, Any]:
     """Get the pipeline data"""
     old_argv = sys.argv
     sys.argv = ["from-pipen-cli-config"] + args.pipeline_args
-    logger.info("Fetching pipeline data ...")
+    print(" * [DBG] Fetching pipeline data ...")
     try:
         pipeline = parse_pipeline(args.pipeline)
         # Initialize the pipeline so that the arguments definied by
@@ -258,7 +256,7 @@ async def get_pipeline_data(args: Namespace) -> Mapping[str, Any]:
         sys.argv = old_argv
 
     if args.additional:
-        logger.info("Loading additional configuration items ...")
+        print(" * [DBG] Loading additional configuration items ...")
         data = load_additional(
             args.additional,
             pipeline=args.pipeline,
@@ -296,7 +294,7 @@ async def get_pipeline_data(args: Namespace) -> Mapping[str, Any]:
     data[SECTION_PROCESSES] = {}
     pg_sec = {}
     for proc in pipeline.procs:
-        logger.debug("Parsing process %s ..." % proc.name)
+        print(" * [DBG] Parsing process %s ..." % proc.name)
 
         pg = proc.__meta__["procgroup"]
         if pg:
