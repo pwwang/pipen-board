@@ -2,7 +2,6 @@
     import { onMount } from "svelte";
     import MultiSelect from "carbon-components-svelte/src/MultiSelect/MultiSelect.svelte";
     import OptionFrame from "./OptionFrame.svelte";
-    import { setError, removeError } from "../../store";
 
     export let key;
     export let value;
@@ -10,18 +9,9 @@
     export let choicesDesc;
     export let required = false;
     export let activeNavItem;
-    export let storeError = false;
     export let readonly = false;
-
-    let setErrorFun;
-    let removeErrorFun;
-    if (!storeError) {
-        setErrorFun = (key, value) => {};
-        removeErrorFun = (key) => {};
-    } else {
-        setErrorFun = setError;
-        removeErrorFun = removeError;
-    }
+    export let setError;
+    export let removeError;
 
     let invalid = false;
     let invalidText = "";
@@ -43,11 +33,11 @@
         if (required && value.length === 0) {
             invalid = true;
             invalidText = "At least one choice must be selected.";
-            setErrorFun(`${activeNavItem} / ${key}`, invalidText);
+            setError(`${activeNavItem} / ${key}`, invalidText);
         } else {
             invalid = false;
             invalidText = "";
-            removeErrorFun(`${activeNavItem} / ${key}`);
+            removeError(`${activeNavItem} / ${key}`);
         }
     };
 

@@ -5,25 +5,15 @@
     import TextArea from "carbon-components-svelte/src/TextArea/TextArea.svelte";
     import OptionFrame from "./OptionFrame.svelte";
     import { validateData, autoHeight, insertTab } from "../../utils";
-    import { setError, removeError } from "../../store";
 
     export let key;
     export let value;
     export let placeholder;
     export let required = false;
     export let activeNavItem;
-    export let storeError = true;
     export let readonly = false;
-
-    let setErrorFun;
-    let removeErrorFun;
-    if (!storeError) {
-        setErrorFun = (key, value) => {};
-        removeErrorFun = (key) => {};
-    } else {
-        setErrorFun = setError;
-        removeErrorFun = removeError;
-    }
+    export let setError;
+    export let removeError;
 
     let validator = [];
     let invalid = false;
@@ -47,9 +37,9 @@
         invalid = error !== null;
         invalidText = error;
         if (invalid) {
-            setErrorFun(`${activeNavItem} / ${key}`, invalidText);
+            setError(`${activeNavItem} / ${key}`, invalidText);
         } else {
-            removeErrorFun(`${activeNavItem} / ${key}`);
+            removeError(`${activeNavItem} / ${key}`);
         }
         autoHeight(textarea);
     };

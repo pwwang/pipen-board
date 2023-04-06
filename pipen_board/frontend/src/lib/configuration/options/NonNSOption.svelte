@@ -15,8 +15,9 @@
     export let data;
     export let activeNavItem;
     export let description;
-    export let storeError = true;
     export let readonly = false;
+    export let setError;
+    export let removeError;
 
     const focusTail = "                    "
     let oldDescription = description || "";
@@ -77,7 +78,8 @@
     placeholder={data.placeholder}
     readonly={readonly || data.readonly}
     {activeNavItem}
-    {storeError}
+    {setError}
+    {removeError}
     {key}
     bind:value={data.value}
     />
@@ -102,7 +104,8 @@
     on:mouseleave={onMouseLeave}
     {key}
     {activeNavItem}
-    {storeError}
+    {setError}
+    {removeError}
     required={data.required}
     readonly={readonly || data.readonly}
     choices={data.choices}
@@ -120,7 +123,8 @@
     readonly={readonly || data.readonly}
     {key}
     {activeNavItem}
-    {storeError}
+    {setError}
+    {removeError}
     bind:value={data.value}
     />
 {:else if data.type === 'auto'}
@@ -134,7 +138,8 @@
     placeholder={data.placeholder}
     {key}
     {activeNavItem}
-    {storeError}
+    {setError}
+    {removeError}
     bind:value={data.value}
     />
 {:else if data.type === 'list' || data.type === 'array'}
@@ -148,7 +153,8 @@
     itype={data.itype}
     {key}
     {activeNavItem}
-    {storeError}
+    {setError}
+    {removeError}
     bind:value={data.value}
     />
 {:else}
@@ -162,7 +168,8 @@
     readonly={readonly || data.readonly}
     {activeNavItem}
     {key}
-    {storeError}
+    {setError}
+    {removeError}
     placeholder={data.placeholder}
     bind:value={data.value}
     />

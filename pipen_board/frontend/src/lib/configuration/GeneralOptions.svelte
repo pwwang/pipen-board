@@ -6,6 +6,7 @@
     import ChevronUp from "carbon-icons-svelte/lib/ChevronUp.svelte";
     import ChevronDown from "carbon-icons-svelte/lib/ChevronDown.svelte";
     import Option from "./options/Option.svelte";
+    import { setError, removeError } from "../store.js";
 
     export let title = "General Options";
     export let data;
@@ -19,11 +20,11 @@
 <Accordion align="start">
     <AccordionItem open title={title}>
         {#each getKeysUnhidden(data, activeNavItem).filter(general_filter) as key}
-            <Option {key} {activeNavItem} bind:data={data[key]} bind:description />
+            <Option {setError} {removeError} {key} {activeNavItem} bind:data={data[key]} bind:description />
         {/each}
         {#if showHiddens.general}
             {#each getKeysHidden(data, activeNavItem).filter(general_filter) as key}
-                <Option {key} {activeNavItem} bind:data={data[key]} bind:description />
+                <Option {setError} {removeError} {key} {activeNavItem} bind:data={data[key]} bind:description />
             {/each}
         {/if}
         {#if hasHidden(data, activeNavItem)}
@@ -40,11 +41,11 @@
     {#each Object.keys(data).filter((k) => !general_filter(k)) as key}
         <AccordionItem open title="{key}: {data[key].desc}">
             {#each getKeysUnhidden(data[key].value, `${activeNavItem}/${key}`) as k}
-                <Option {activeNavItem} key={k} bind:data={data[key].value[k]} bind:description />
+                <Option {setError} {removeError} {activeNavItem} key={k} bind:data={data[key].value[k]} bind:description />
             {/each}
             {#if showHiddens[key]}
                 {#each getKeysHidden(data[key].value, `${activeNavItem}/${key}`) as k}
-                    <Option {activeNavItem} key={k} bind:data={data[key].value[k]} bind:description />
+                    <Option {setError} {removeError} {activeNavItem} key={k} bind:data={data[key].value[k]} bind:description />
                 {/each}
             {/if}
             {#if hasHidden(data[key].value, `${activeNavItem}/${key}`)}

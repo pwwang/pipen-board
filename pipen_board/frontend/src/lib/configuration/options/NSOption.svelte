@@ -9,9 +9,10 @@
     // the description bound to the parent
     export let description;
     export let activeNavItem;
-    export let storeError = true;
     export let level = 0;
     export let readonly = false;
+    export let setError;
+    export let removeError;
 
 </script>
 
@@ -30,13 +31,15 @@
             readonly={readonly || value[k].readonly}
             bind:description
             {activeNavItem}
-            {storeError}
+            {setError}
+            {removeError}
             bind:value={value[k].value}
         />
     {:else}
         <NonNSOption
             key={k}
-            {storeError}
+            {setError}
+            {removeError}
             {activeNavItem}
             readonly={readonly || value[k].readonly}
             bind:data={value[k]}

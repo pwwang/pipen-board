@@ -6,7 +6,6 @@
     import Add from "carbon-icons-svelte/lib/Add.svelte";
     import OptionFrame from "./OptionFrame.svelte";
     import { applyAtomicType, validateData } from "../../utils";
-    import { setError, removeError } from "../../store";
 
     export let key;
     export let value;
@@ -14,18 +13,9 @@
     export let required;
     // item type
     export let itype;
-    export let storeError = true;
     export let readonly = false;
-
-    let setErrorFun;
-    let removeErrorFun;
-    if (!storeError) {
-        setErrorFun = (key, value) => {};
-        removeErrorFun = (key) => {};
-    } else {
-        setErrorFun = setError;
-        removeErrorFun = removeError;
-    }
+    export let setError;
+    export let removeError;
 
     let currValue = readonly ? "(readonly)" : "";
     let strValues = value || [];
@@ -41,9 +31,9 @@
         invalid = error !== null;
         invalidText = error;
         if (invalid) {
-            setErrorFun(`${activeNavItem} / ${key}`, invalidText);
+            setError(`${activeNavItem} / ${key}`, invalidText);
         } else {
-            removeErrorFun(`${activeNavItem} / ${key}`);
+            removeError(`${activeNavItem} / ${key}`);
         }
     };
 
@@ -52,9 +42,9 @@
         invalid = error !== null;
         invalidText = error;
         if (invalid) {
-            setErrorFun(`${activeNavItem} / ${key}`, invalidText);
+            setError(`${activeNavItem} / ${key}`, invalidText);
         } else {
-            removeErrorFun(`${activeNavItem} / ${key}`);
+            removeError(`${activeNavItem} / ${key}`);
             // In case there is still no values
             if (validateVals) validateValues(strValues);
         }

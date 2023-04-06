@@ -5,7 +5,6 @@
     import TextArea from "carbon-components-svelte/src/TextArea/TextArea.svelte";
     import OptionFrame from "./OptionFrame.svelte";
     import { validateData, applyAtomicType, autoHeight, insertTab } from "../../utils";
-    import { setError, removeError } from "../../store";
 
     export let key;
     export let value;
@@ -13,17 +12,8 @@
     export let required = false;
     export let readonly = false;
     export let activeNavItem;
-    export let storeError = true;
-
-    let setErrorFun;
-    let removeErrorFun;
-    if (!storeError) {
-        setErrorFun = (key, value) => {};
-        removeErrorFun = (key) => {};
-    } else {
-        setErrorFun = setError;
-        removeErrorFun = removeError;
-    }
+    export let setError;
+    export let removeError;
 
     let validator = [];
     let invalid = false;
@@ -51,11 +41,11 @@
         invalid = error !== null;
         invalidText = error;
         if (invalid) {
-            setErrorFun(`${activeNavItem} / ${key}`, invalidText);
+            setError(`${activeNavItem} / ${key}`, invalidText);
             // keep it
             value = v;
         } else {
-            removeErrorFun(`${activeNavItem} / ${key}`);
+            removeError(`${activeNavItem} / ${key}`);
             if (!onmount) {
                 value = applyAtomicType(v, "auto");
             }

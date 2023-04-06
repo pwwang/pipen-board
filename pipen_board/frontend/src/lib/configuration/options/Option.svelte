@@ -8,7 +8,8 @@
     // bound description
     export let description;
     export let activeNavItem;
-    export let storeError = true;
+    export let setError;
+    export let removeError;
 </script>
 
 {#if data.type === 'ns' || data.type === 'namespace'}
@@ -16,7 +17,8 @@
     {key}
     desc={data.desc}
     {activeNavItem}
-    {storeError}
+    {setError}
+    {removeError}
     readonly={data.readonly}
     bind:description
     bind:value={data.value}
@@ -27,6 +29,7 @@
     bind:description
     {key}
     {activeNavItem}
-    {storeError}
+    {setError}
+    {removeError}
     />
 {/if}

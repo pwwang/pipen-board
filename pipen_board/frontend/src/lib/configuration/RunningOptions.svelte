@@ -3,6 +3,8 @@
     import AccordionItem from "carbon-components-svelte/src/Accordion/AccordionItem.svelte";
     import Button from "carbon-components-svelte/src/Button/Button.svelte";
     import TextArea from "carbon-components-svelte/src/TextArea/TextArea.svelte";
+    import ToastNotification from "carbon-components-svelte/src/Notification/ToastNotification.svelte";
+    import TooltipDefinition from "carbon-components-svelte/src/TooltipDefinition/TooltipDefinition.svelte";
     import ChevronUp from "carbon-icons-svelte/lib/ChevronUp.svelte";
     import ChevronDown from "carbon-icons-svelte/lib/ChevronDown.svelte";
     import Cicsplex from "carbon-icons-svelte/lib/Cicsplex.svelte";
@@ -19,8 +21,29 @@
 
     let showHiddens = {};
     let generatedCommand = '';
+    let toastNotify = { kind: undefined, subtitle: undefined };
+    let errors = {};
+
+    const setError = (key, value) => {
+        errors[key] = value;
+    }
+    const removeError = (key) => {
+        delete errors[key];
+    }
 
     const generateCommand = () => {
+        if (Object.keys(errors).length > 0) {
+            const errkeys = Object.keys(errors);
+            toastNotify.kind = "error";
+            toastNotify.subtitle = `
+                There are errors in the configuration. Please fix them before generating the command:
+                <br />
+                <ul>
+                    ${errkeys.map(k => `<li>${k}: ${errors[k]}</li>`).join("")}
+                </ul>
+            `;
+            return;
+        }
         let obj = {};
         for (let key in data.value) {
             obj[key] = data.value[key].value;
@@ -41,11 +64,11 @@
 <Accordion align="start">
     <AccordionItem open title="Options">
         {#each getKeysUnhidden(data.value, activeNavItem) as key}
-            <Option {key} {activeNavItem} storeError={false} bind:data={data.value[key]} bind:description />
+            <Option {key} {activeNavItem} {setError} {removeError} bind:data={data.value[key]} bind:description />
         {/each}
         {#if showHiddens.general}
             {#each getKeysHidden(data, activeNavItem) as key}
-                <Option {key} {activeNavItem} storeError={false} bind:data={data.value[key]} bind:description />
+                <Option {key} {activeNavItem} {setError} {removeError} bind:data={data.value[key]} bind:description />
             {/each}
         {/if}
         {#if hasHidden(data.value, activeNavItem)}
@@ -66,14 +89,19 @@
             value={generatedCommand}
             on:input={e => autoHeight(e.target)} />
         <br />
-        <Button
-            size="small"
-            kind="tertiary"
-            icon={Cicsplex}
-            iconDescription="Generate Command based on the options"
-            on:click={generateCommand}>
-            Generate Command
-        </Button>
+        <TooltipDefinition
+            direction="bottom"
+            align="center"
+            tooltipText="Save the configurations to '<{data.configfile}>' and generate command for running the pipeline.">
+            <Button
+                size="small"
+                kind="tertiary"
+                icon={Cicsplex}
+                iconDescription="Generate Command based on the options"
+                on:click={generateCommand}>
+                Generate Command
+            </Button>
+        </TooltipDefinition>
         <Button
             size="small"
             kind="danger-tertiary"
@@ -84,3 +112,15 @@
         </Button>
     </AccordionItem>
 </Accordion>
+
+{#if toastNotify.kind}
+    <ToastNotification
+        lowContrast
+        kind={toastNotify.kind}
+        timeout={3000}
+        on:close={() => (toastNotify.kind = undefined)}
+        caption={new Date().toLocaleString()}
+    >
+    <div slot="subtitle">{@html toastNotify.subtitle}</div>
+    </ToastNotification>
+{/if}
