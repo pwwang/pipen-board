@@ -5,12 +5,12 @@ from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from rich import print
 from quart import request, redirect
 from slugify import slugify
 
-from .defaults import JOB_STATUS, PIPEN_BOARD_DIR
-from .pipeline_parsing import get_pipeline_data_process, parse_perv_run
+from .defaults import JOB_STATUS, PIPEN_BOARD_DIR, logger
+from .data_manager import data_manager
+
 
 if TYPE_CHECKING:
     from typing import Mapping, Any
@@ -60,7 +60,7 @@ async def index():
 
 
 async def history():
-    print(" * [API] Getting histories")
+    logger.info("API Getting histories")
     args = request.cli_args
     out = {}
     out["pipeline"] = args.pipeline
@@ -89,24 +89,17 @@ async def history():
     return out
 
 
-async def history_get():
-    configfile = (await request.get_json())["configfile"]
-    print(" * [API] Getting history from: %s" % configfile)
-    return PIPEN_BOARD_DIR.joinpath(configfile).read_text()
-
-
 async def history_del():
     configfile = (await request.get_json())["configfile"]
-    print(" * [API] Deleting history: %s" % configfile)
+    logger.info("API Deleting history: %s", configfile)
     PIPEN_BOARD_DIR.joinpath(configfile).unlink()
-    return "OK"
+    return {"ok": True}
 
 
-async def config_pipeline_data():
-    print(" * [API] Getting a fresh pipeline data")
-    # Use multiprocessing to get a clean environment
-    # to load the pipeline to avoid conflicts
-    return get_pipeline_data_process(request.cli_args)
+async def pipeline_data():
+    logger.info("API Getting pipeline data")
+    configfile = (await request.get_json()).get("configfile")
+    return data_manager.get_data(request.cli_args, configfile)
 
 
 async def config_save():
@@ -123,27 +116,20 @@ async def config_save():
             f"{now.replace(' ', '_').replace(':', '-')}.json"
         )
         out["ctime"] = now
-        print(f" * [API] Saving config to a new file: {configfile}")
+        logger.info(f"API Saving config to a new file: {configfile}")
     else:
         configfile = PIPEN_BOARD_DIR.joinpath(configfile)
-        print(f" * [API] Saving config to: {configfile}")
+        logger.info(f"API Saving config to: {configfile}")
 
     out["configfile"] = configfile.name
     configfile.write_text(configdata)
     return out
 
 
-async def run_prev():
-    print(" * [API] Fetching previous run data")
-    data = await request.get_json()
-    configfile = data.get("configfile")
-    return parse_perv_run(request.cli_args, configfile)
-
-
 async def job_get_tree():
     args = request.cli_args
     data = await request.get_json()
-    print(f" * [API] Fetching tree for: {data['proc']}/{data['job']}")
+    logger.info(f"API Fetching tree for: {data['proc']}/{data['job']}")
     jobdir = Path(args.root).joinpath(
         ".pipen",
         slugify(args.name),
@@ -164,14 +150,14 @@ async def job_get_file():
     how = data.get("how", "full")
     path = Path(data["path"])
     if how != "full":
-        print(
-            " * [API] Fetching file for "
+        logger.info(
+            "API Fetching file for "
             f"{data['proc']}/{data['job']}: {path} ({how})"
         )
         return {"type": "bigtext-part", "content": _get_file_content(path, how)}
 
-    print(
-        " * [API] Fetching file for "
+    logger.info(
+        "API Fetching file for "
         f"{data['proc']}/{data['job']}: {path}"
     )
     if (
@@ -213,17 +199,62 @@ async def job_get_file():
     return {"type": "binary"}
 
 
+async def ws_web(data, clients):
+    logger.info(f"WS/WEB Received: {data}")
+
+
+async def ws_pipeline(data, clients):
+    logdata = str(data)
+    # if len(logdata) > 100:
+    #     logdata = logdata[:100] + "..."
+
+    logger.info(f"WS/PIPELINE Received: {logdata}")
+    type = data.get("type")
+    if (
+        type
+        and type.startswith("on_")
+        and callable(getattr(data_manager, type, None))
+    ):
+        await getattr(data_manager, type)(data["data"], clients.get("web"))
+
+
+async def ws_web_conn(clients):
+    logger.info(f"WS/WEB Client 'web' connected.")
+    # send the current run data, to let UI know the current status
+    await data_manager.send_run_data(clients["web"], True)
+
+
+async def ws_pipeline_conn(clients):
+    logger.info(f"WS/PIPELINE Client 'pipeline' connected.")
+
+
+async def ws_web_disconn(clients):
+    logger.info(f"WS/WEB Client 'web' disconnected.")
+
+
+async def ws_pipeline_disconn(clients):
+    logger.info(f"WS/PIPELINE Client 'pipeline' disconnected.")
+    data_manager.running = False
+
+
 GETS = {
     "/": index,
     "/api/history": history,
-    "/api/config/pipeline": config_pipeline_data,
 }
 
 POSTS = {
-    "/api/run/prev": run_prev,
+    "/api/pipeline": pipeline_data,
     "/api/history/del": history_del,
-    "/api/history/get": history_get,
     "/api/config/save": config_save,
     "/api/job/get_tree": job_get_tree,
     "/api/job/get_file": job_get_file,
+}
+
+WS = {
+    "web": ws_web,
+    "pipeline": ws_pipeline,
+    "web/conn": ws_web_conn,
+    "pipeline/conn": ws_pipeline_conn,
+    "web/disconn": ws_web_disconn,
+    "pipeline/disconn": ws_pipeline_disconn,
 }

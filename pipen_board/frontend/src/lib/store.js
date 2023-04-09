@@ -4,6 +4,7 @@ export const storedErrors = writable({});
 export const storedConfigfile = writable(
     localStorage.getItem("configfile") || ""
 );
+export const storedCommand = writable(undefined);
 export const descFocused = writable(false);
 
 export const setError = (key, error) => {
@@ -22,6 +23,10 @@ export const removeError = (key) => {
 
 export const updateErrors = (errors) => {
     storedErrors.set(errors);
+}
+
+export const setCommand = (command) => {
+    storedCommand.set(command);
 }
 
 export const updateConfigfile = (configfile) => {

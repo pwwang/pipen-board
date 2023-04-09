@@ -1,5 +1,6 @@
 from pipen import Pipen, Proc, ProcGroup
 from pipen.utils import mark
+from pipen_args import install
 
 
 @mark(board_config_no_input=True)
@@ -24,7 +25,8 @@ class MyGroup(ProcGroup):
             input = "infile:file"
             output = "outfile:file:{{in.infile | split: '/' | last | split: '.' | first}}.out"
             lang = "bash"
-            script = "cat {{in.infile}} > {{out.outfile}}; echo P2 >> {{out.outfile}}"
+            cache = False
+            script = "cat {{in.infile}} > {{out.outfile}}; sleep 30; echo P2 >> {{out.outfile}}"
         return P2
 
     @ProcGroup.add_proc
@@ -66,6 +68,7 @@ class ExamplePipeline(Pipen):
     """An example pipeline showing how pipen-cli-config works."""
     starts = P1
     data = [["123"] * 10]
+    loglevel = "debug"
 
 
 if __name__ == "__main__":

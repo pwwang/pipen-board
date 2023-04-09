@@ -20,11 +20,23 @@
 <Accordion align="start">
     <AccordionItem open title={title}>
         {#each getKeysUnhidden(data, activeNavItem).filter(general_filter) as key}
-            <Option {setError} {removeError} {key} {activeNavItem} bind:data={data[key]} bind:description />
+            <Option
+                {setError}
+                {removeError}
+                {key}
+                {activeNavItem}
+                bind:data={data[key]}
+                bind:description />
         {/each}
         {#if showHiddens.general}
             {#each getKeysHidden(data, activeNavItem).filter(general_filter) as key}
-                <Option {setError} {removeError} {key} {activeNavItem} bind:data={data[key]} bind:description />
+                <Option
+                    {setError}
+                    {removeError}
+                    {key}
+                    {activeNavItem}
+                    bind:data={data[key]}
+                    bind:description />
             {/each}
         {/if}
         {#if hasHidden(data, activeNavItem)}

@@ -4,9 +4,9 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING
 
-from rich import print
 from pipen.cli import CLIPlugin
 
+from .defaults import NAME, logger
 from .quart_app import get_app
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -16,7 +16,7 @@ if TYPE_CHECKING:  # pragma: no cover
 class PipenCliBoardPlugin(CLIPlugin):
     """Visualize configuration and running of pipen pipelines on the web"""
 
-    name = "board"
+    name = NAME
 
     def __init__(
         self,
@@ -46,6 +46,15 @@ class PipenCliBoardPlugin(CLIPlugin):
                 "Additional arguments for the pipeline, "
                 "in YAML, INI, JSON or TOML format. "
                 "Can have sections `ADDITIONAL_OPTIONS` and `RUNNING_OPTIONS`"
+            ),
+        )
+        subparser.add_argument(
+            "--loglevel",
+            default="auto",
+            choices=["auto", "debug", "info", "warning", "error", "critical"],
+            help=(
+                "The logging level. If `auto`, it will be set to `debug` "
+                "if `--dev` is set, otherwise `info`."
             ),
         )
         subparser.add_argument(
@@ -89,11 +98,20 @@ class PipenCliBoardPlugin(CLIPlugin):
 
     def exec_command(self, args: Namespace) -> None:
         """Execute the command"""
+        if args.loglevel == "auto":
+            logger.setLevel("DEBUG" if args.dev else "INFO")
+        else:
+            logger.setLevel(args.loglevel.upper())
 
         app = get_app(args)
-        print(" * ")
-        print(f" * [bold]pipen-{self.name}: [/bold]{self.__doc__}")
-        print(f" * [bold]version: [/bold]{self.__version__}")
-        print(" * ")
+        logger.info("")
+        logger.info(
+            f"[bold][magenta]PIPEN-{self.name.upper()}[/magenta]: "
+            f"[cyan]v{self.__version__}[/cyan][/bold]"
+        )
+        logger.info(self.__doc__)
+        logger.info("")
 
+        # See https://github.com/pallets/quart/issues/224
+        # for customizing logger in the future
         app.run(port=args.port, debug=args.dev, use_reloader=args.dev)

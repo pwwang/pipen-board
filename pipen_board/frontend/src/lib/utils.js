@@ -308,6 +308,30 @@ const insertTab = async function(e) {
     }
 }
 
+const getStatusPercentage = function(data) {
+    let counts = {succeeded: 0, failed: 0, running: 0, init: 0};
+
+    for (let proc in data[SECTION_PROCESSES]) {
+        counts[data[SECTION_PROCESSES][proc].status] += 1;
+    }
+
+    for (let group in data[SECTION_PROCGROUPS]) {
+        for (let proc in data[SECTION_PROCGROUPS][group]) {
+            counts[data[SECTION_PROCGROUPS][group][proc].status] += 1;
+        }
+    }
+    const total = counts.succeeded + counts.failed + counts.running + counts.init;
+    if (total === 0) {
+        return [0, 0, 0, 100];
+    }
+    return [
+        (counts.succeeded / total) * 100,
+        (counts.failed / total) * 100,
+        (counts.running / total) * 100,
+        (counts.init / total) * 100,
+    ];
+};
+
 const IS_DEV = window.location.search.includes('dev=1');
 
 
@@ -322,5 +346,6 @@ export {
     parseMarkdown,
     autoHeight,
     insertTab,
+    getStatusPercentage,
     IS_DEV,
 };

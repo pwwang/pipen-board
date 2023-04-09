@@ -3,6 +3,9 @@ const SECTION_PROCESSES = "PROCESSES";
 const SECTION_PROCGROUPS = "PROCGROUPS";
 const SECTION_ADDITIONAL_OPTS = "ADDITIONAL_OPTIONS";
 const SECTION_RUNNING_OPTS = "RUNNING_OPTIONS";
+const SECTION_DIAGRAM = "DIAGRAM";
+const SECTION_REPORTS = "REPORTS";
+const SECTION_LOG = "LOG";
 const PROCESS_ENVS_DESC = "The options that shared by all jobs of the process";
 const PROCESS_PLUGIN_OPTS_DESC = "The plugin options for the process";
 const DEFAULT_DESCRIPTIONS = {
@@ -34,12 +37,19 @@ Running options are used to generate the command line to run the pipeline.
 };
 
 const JOB_TAG_KIND = {
-    "0": "green",
-    "-8525": "gray",
-    // other: "red"
+    "failed": "red",
+    "succeeded": "green",
+    "killed": "magenta",
+    "running": "cyan",
+    "submitted": "warm-gray",
+    "queued": "gray",
+    "init": "cool-gray",
 }
 
 export {
+    SECTION_DIAGRAM,
+    SECTION_REPORTS,
+    SECTION_LOG,
     SECTION_PIPELINE_OPTS,
     SECTION_PROCESSES,
     SECTION_PROCGROUPS,

@@ -1,4 +1,5 @@
 <script>
+    // Used by ../App.svelte
     import DataTable from "carbon-components-svelte/src/DataTable/DataTable.svelte";
     import Button from "carbon-components-svelte/src/Button/Button.svelte";
     import ToastNotification from "carbon-components-svelte/src/Notification/ToastNotification.svelte";

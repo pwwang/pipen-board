@@ -207,6 +207,26 @@ colorama = {version = "*", markers = "platform_system == \"Windows\""}
 importlib-metadata = {version = "*", markers = "python_version < \"3.8\""}
 
 [[package]]
+name = "cmdy"
+version = "0.5.4"
+description = "Shell language to run command in python"
+category = "main"
+optional = false
+python-versions = ">=3.7,<4.0"
+files = [
+    {file = "cmdy-0.5.4-py3-none-any.whl", hash = "sha256:b9dd68c62de9086f42ce1a3cc2b8a2598f71f249df6a945550e81637bee9709a"},
+    {file = "cmdy-0.5.4.tar.gz", hash = "sha256:f3baf5bb7d1aec4db988610994d0b6238051d683002daf813103f4266ec20c75"},
+]
+
+[package.dependencies]
+curio = ">=1.6,<2.0"
+python-simpleconf = {version = ">=0.5,<0.6", extras = ["toml"]}
+varname = [
+    {version = ">=0.10,<0.11", markers = "python_version < \"3.8\""},
+    {version = ">=0.11,<0.12", markers = "python_version >= \"3.8\" and python_version < \"4.0\""},
+]
+
+[[package]]
 name = "colorama"
 version = "0.4.6"
 description = "Cross-platform colored terminal text."
@@ -217,6 +237,20 @@ files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
 ]
+
+[[package]]
+name = "curio"
+version = "1.6"
+description = "Curio"
+category = "main"
+optional = false
+python-versions = ">= 3.7"
+files = [
+    {file = "curio-1.6.tar.gz", hash = "sha256:562a586db20216ba7d2be8263deb9eb079e56048f9b8906d11d5f45aa81c5247"},
+]
+
+[package.extras]
+test = ["Sphinx", "pytest"]
 
 [[package]]
 name = "diot"
@@ -1133,6 +1167,23 @@ files = [
 ]
 
 [[package]]
+name = "websocket-client"
+version = "1.5.1"
+description = "WebSocket client for Python with low level API options"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "websocket-client-1.5.1.tar.gz", hash = "sha256:3f09e6d8230892547132177f575a4e3e73cfdf06526e20cc02aa1c3b47184d40"},
+    {file = "websocket_client-1.5.1-py3-none-any.whl", hash = "sha256:cdf5877568b7e83aa7cf2244ab56a3213de587bbe0ce9d8b9600fc77b455d89e"},
+]
+
+[package.extras]
+docs = ["Sphinx (>=3.4)", "sphinx-rtd-theme (>=0.5)"]
+optional = ["python-socks", "wsaccel"]
+test = ["websockets"]
+
+[[package]]
 name = "werkzeug"
 version = "2.2.3"
 description = "The comprehensive WSGI web application library."
@@ -1207,4 +1258,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.7.1"
-content-hash = "b3c5a48ad4bda1a7a16b1c27cb75ef88c945af19aed87cd3615f546be3582e65"
+content-hash = "9b38136e21a5941c4eba478ff75cc1d9f3311ae69e34c13f99cebcc8307df1ec"

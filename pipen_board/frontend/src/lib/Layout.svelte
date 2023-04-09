@@ -1,78 +1,166 @@
 <script>
+    // Used by ../App.svelte
+    import { onMount } from "svelte";
     import Tabs from "carbon-components-svelte/src/Tabs/Tabs.svelte";
     import Tab from "carbon-components-svelte/src/Tabs/Tab.svelte";
     import TabContent from "carbon-components-svelte/src/Tabs/TabContent.svelte";
+    import Modal from "carbon-components-svelte/src/Modal/Modal.svelte";
+    import Button from "carbon-components-svelte/src/Button/Button.svelte";
+    import Loading from "carbon-components-svelte/src/Loading/Loading.svelte";
     import Settings from "carbon-icons-svelte/lib/Settings.svelte";
     import WatsonHealthStatusAcknowledge from "carbon-icons-svelte/lib/WatsonHealthStatusAcknowledge.svelte";
     import ContinueFilled from "carbon-icons-svelte/lib/ContinueFilled.svelte";
+    import SkipBack from "carbon-icons-svelte/lib/SkipBack.svelte";
 
+    import { IS_DEV, getStatusPercentage } from "./utils";
     import Header from "./Header.svelte";
     import Configuration from "./Configuration.svelte";
-    import PreviousRun from "./PreviousRun.svelte";
+    import Run from "./Run.svelte";
+    import { SECTION_PIPELINE_OPTS } from "./constants";
 
     export let configfile;
-    // start fetching data?
-    export let start;
     export let histories;
+
+    // 0: not run, show previous run data
+    // 1: first run trial
+    // 2: 2nd run trial
+    let isRunning = 0;
+    let config_data;
+    let run_data;
+
+    let loadingData = true;
+    let error;
 
     let pipelineName = "Loading";
     let pipelineDesc = "Loading ...";
+    // success, failure, running, init
+    let statusPercent = [0, 0, 0, 100];
 
-    let running = false;
     let selectedTab = 0;
 
-    // success, failure, unrun
-    let prev_success = [0, 0, 100];
+    $: if (isRunning) {
+        statusPercent = [0, 0, 0, 100];
+        selectedTab = 1;
+    }
 
-  </script>
+    const loadData = async () => {
+        try {
+            const fetched = await fetch("/api/pipeline", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ configfile }),
+            });
+            if (!fetched.ok) throw new Error(`${fetched.status} ${fetched.statusText}`);
+            const data = await fetched.json();
+            if (IS_DEV) {
+                // @ts-ignore
+                window.data = data;
+            }
 
-  <svelte:head>
-    <title>{pipelineName} :: PIPEN BOARD</title>
-  </svelte:head>
+            isRunning = data.isRunning + 0;
+            config_data = data.config;
+            run_data = data.run;
+            pipelineName = config_data[SECTION_PIPELINE_OPTS].name.value;
+            pipelineDesc = config_data[SECTION_PIPELINE_OPTS].desc.value;
+            statusPercent = getStatusPercentage(run_data);
+        } catch (e) {
+            error = `<strong>Failed to fetch or parse data:</strong> <br /><br /><pre>${e.stack}</pre>`;
+        } finally {
+            loadingData = false;
+        }
+    };
 
+    onMount(loadData);
+</script>
+
+<svelte:head>
+<title>{pipelineName} :: PIPEN BOARD</title>
+</svelte:head>
+
+{#if error}
+<Modal
+    class="model-error"
+    passiveModal
+    danger
+    open={true}
+    preventCloseOnClickOutside={true}
+    modalHeading="Error"
+    on:close={() => {}}
+>
+    {@html error}
+    <br />
+    <Button
+        kind="tertiary"
+        size="small"
+        on:click={() => {
+            if (histories.length > 0) {
+                configfile = undefined;
+            } else {
+                alert("No history available");
+            }
+        }}
+        icon={SkipBack}
+    >Back to History</Button>
+</Modal>
+{:else if loadingData}
+<Loading
+    class="pipen-cli-config-loading"
+    style="--content: 'Loading pipeline data ...'"
+    description="Loading pipeline data ..." />
+{:else}
   <div class="body">
     <Header {pipelineName} {pipelineDesc} backToHistory bind:configfile {histories} />
     <div class="pipen-tabs">
         <Tabs style="border-bottom: 2px solid #e0e0e0" bind:selected={selectedTab}>
             <Tab><Settings />Configuration</Tab>
             <Tab
-                class="prev-run-tab"
-                style="--n_succ: {prev_success[0]}%; --n_fail: {prev_success[1]}%; --n_unrun: {prev_success[2]}%"
-            ><WatsonHealthStatusAcknowledge />Previous Run</Tab>
-            {#if running}
-                <Tab><ContinueFilled />Running</Tab>
-            {/if}
+                class="run-tab {isRunning && statusPercent[2] > 0 ? 'running' : ''}"
+                style="--n_succ: {statusPercent[0]}%; --n_fail: {statusPercent[1]}%; --n_run: {statusPercent[2]}%; --n_init: {statusPercent[3]}%"
+            >
+                {#if isRunning}
+                <ContinueFilled />Running
+                {:else}
+                <WatsonHealthStatusAcknowledge />Previous Run
+                {/if}
+            </Tab>
             <svelte:fragment slot="content">
                 <TabContent>
-                    <Configuration {start} bind:histories bind:configfile bind:pipelineName bind:pipelineDesc />
+                    <Configuration
+                        data={config_data}
+                        bind:isRunning
+                        bind:histories
+                        bind:configfile
+                        bind:pipelineDesc />
                 </TabContent>
                 <TabContent>
-                    <PreviousRun bind:prev_success selected={selectedTab === 1} {configfile} />
+                    {#key isRunning}
+                        <Run data={run_data} bind:statusPercent bind:isRunning />
+                    {/key}
                 </TabContent>
-                {#if running}
-                    <TabContent>
-                        Running
-                    </TabContent>
-                {/if}
             </svelte:fragment>
         </Tabs>
     </div>
   </div>
+{/if}
 
-  <style>
-    div.body {
-        display: grid;
-        grid-template-areas:
-            "header"
-            "content";
-        grid-template-rows: auto 1fr;
-        grid-template-columns: 1fr;
-        height: 100vh;
-    }
-    div.pipen-tabs {
-        grid-area: content;
-        display: grid;
-        grid-template-rows: auto 1fr;
-        grid-template-columns: 1fr;
-    }
-  </style>
+<style>
+div.body {
+    display: grid;
+    grid-template-areas:
+        "header"
+        "content";
+    grid-template-rows: auto 1fr;
+    grid-template-columns: 1fr;
+    height: 100vh;
+}
+div.pipen-tabs {
+    grid-area: content;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    grid-template-columns: 1fr;
+    /* https://stackoverflow.com/a/71024439/5088165 */
+    min-height: 0;
+}
+</style>

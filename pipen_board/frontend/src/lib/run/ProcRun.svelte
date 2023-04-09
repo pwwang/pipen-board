@@ -161,7 +161,7 @@
     on:mouseup={handleDragEnd}
     on:mousemove={handleDrag} />
 
-{#if status === "unrun"}
+{#if status === "init"}
 <div class="center-wrapper">
     <InlineNotification
         lowContrast
@@ -179,7 +179,7 @@
                     disabled={fetching}
                     on:click={async (e) => {job = i; await loadJobTree(i);}}
                     class="{i === job ? 'selected' : ''}"
-                    type="{JOB_TAG_KIND[j.toString()] || 'red'}"
+                    type="{JOB_TAG_KIND[j] || 'red'}"
                     size="sm">{i}
                 </Tag>
             {/each}

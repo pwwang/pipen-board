@@ -18,9 +18,11 @@ python = "^3.7.1"
 pipen = "^0.7"
 quart = "^0.18"
 pipen-annotate = "^0.6"
+websocket-client = "^1.5"
+cmdy = "^0.5"
 
 [tool.poetry.plugins.pipen]
-board = "pipen_board:PipenBoardPlugin"
+board = "pipen_board:pipen_board_plugin"
 
 [tool.poetry.plugins.pipen_cli]
 cli-board = "pipen_board:PipenCliBoardPlugin"

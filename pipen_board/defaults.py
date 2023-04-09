@@ -1,4 +1,65 @@
+from __future__ import annotations
+
+import logging
 from pathlib import Path
+from typing import Awaitable, Callable, Coroutine
+
+from pipen.utils import get_logger
+from hypercorn.config import Config as HyperConfig
+from hypercorn.asyncio import serve
+from quart import Quart as _Quart
+
+NAME = "board"
+logger = get_logger(NAME)
+logging.getLogger('asyncio').setLevel(logging.WARNING)
+
+
+class PluginNameLogFilter(logging.Filter):
+    def filter(self, record):
+        if isinstance(record.args, dict) and "s" in record.args:
+            if record.args["s"] in (200, 304):
+                record.levelno = logging.DEBUG
+                record.levelname = "DEBUG"
+            elif record.args["s"] == 404:
+                record.levelno = logging.WARNING
+                record.levelname = "WARNING"
+            elif record.args["s"] >= 500:
+                record.levelno = logging.ERROR
+                record.levelname = "ERROR"
+
+        record.plugin_name = NAME
+        return True
+
+
+logger.logger.addFilter(PluginNameLogFilter())
+
+
+# Subclass Quart to allow using logger
+class Quart(_Quart):
+
+    def run_task(
+        self,
+        host: str = "127.0.0.1",
+        port: int = 5000,
+        debug: bool | None = None,
+        ca_certs: str | None = None,
+        certfile: str | None = None,
+        keyfile: str | None = None,
+        shutdown_trigger: Callable[..., Awaitable[None]] | None = None,
+    ) -> Coroutine[None, None, None]:
+        config = HyperConfig()
+        config.access_log_format = "%(r)s %(s)s %(b)s %(D)s"
+        config.accesslog = logger.logger
+        config.bind = [f"{host}:{port}"]
+        config.ca_certs = ca_certs
+        config.certfile = certfile
+        if debug is not None:
+            self.debug = debug
+        config.errorlog = config.accesslog
+        config.keyfile = keyfile
+
+        return serve(self, config, shutdown_trigger=shutdown_trigger)
+
 
 # Cached/saved pipeline data
 PIPEN_BOARD_DIR = Path("~/.pipen-board").expanduser()
@@ -7,6 +68,9 @@ PIPEN_BOARD_DIR.mkdir(parents=True, exist_ok=True)
 SECTION_PIPELINE_OPTIONS = "PIPELINE_OPTIONS"
 SECTION_PROCGROUPS = "PROCGROUPS"
 SECTION_PROCESSES = "PROCESSES"
+SECTION_LOG = "LOG"
+SECTION_DIAGRAM = "DIAGRAM"
+SECTION_REPORTS = "REPORTS"
 
 PIPELINE_OPTIONS = {
     "loglevel": {

@@ -90,7 +90,6 @@
     on:focus={onFocus}
     on:blur={onBlur}
     {key}
-    required={data.required}
     readonly={readonly || data.readonly}
     choices={data.choices}
     choicesDesc={data.choices_desc}
