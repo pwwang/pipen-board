@@ -19,5 +19,5 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install poetry
       - name: Publish to PyPI
-        run: poetry publish --build -u ${{ secrets.PYPI_USER }} -p ${{ secrets.PYPI_PASSWORD }}
+        run: poetry publish --build -vvv -u ${{ secrets.PYPI_USER }} -p ${{ secrets.PYPI_PASSWORD }}
         if: success()
