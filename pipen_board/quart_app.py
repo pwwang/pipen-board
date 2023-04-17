@@ -15,7 +15,6 @@ from quart import (
 
 from .defaults import Quart, logger
 from .apis import GETS, POSTS, WS
-from .ws_broker import Broker
 from .data_manager import data_manager
 
 if TYPE_CHECKING:
@@ -53,8 +52,7 @@ def get_app(args: Namespace):
         # so that the plugin can read it and connect to it
         portfile = (
             "pipen-board."
-            f"{slugify(str(Path(args.root).resolve()))}."
-            f"{slugify(args.name)}.port"
+            f"{slugify(str(Path(args.root).resolve()))}.{args.name}.port"
         )
         Path(gettempdir()).joinpath(portfile).write_text(str(args.port))
 
@@ -62,8 +60,7 @@ def get_app(args: Namespace):
     async def _():
         portfile = (
             "pipen-board."
-            f"{slugify(str(Path(args.root).resolve()))}."
-            f"{slugify(args.name)}.port"
+            f"{slugify(str(Path(args.root).resolve()))}.{args.name}.port"
         )
         try:
             Path(gettempdir()).joinpath(portfile).unlink()
@@ -76,31 +73,11 @@ def get_app(args: Namespace):
     for route, handler in POSTS.items():
         app.route(route, methods=["POST"])(handler)
 
-    broker = Broker()
     clients = {}
-    async def _receive() -> None:
-        while True:
-            message = await websocket.receive()
-            message = json.loads(message)
-            if message["type"] == "connect":
-                client = message["client"]
-                clients[client] = websocket._get_current_object()
-                await WS[f"{client}/conn"](clients)
-            else:
-                await broker.publish(message)
 
     @app.websocket("/ws")
     async def ws():
         """The websocket handler"""
-        # try:
-        #     task = asyncio.ensure_future(_receive())
-        #     async for message in broker.subscribe():
-        #         client = message["client"]
-        #         await WS[client](message, clients)
-        # finally:
-        #     task.cancel()
-        #     await task
-        #     await WS[f"{client}/disconn"](clients)
         try:
             while True:
                 message = await websocket.receive()

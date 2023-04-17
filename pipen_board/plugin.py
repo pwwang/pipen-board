@@ -53,8 +53,7 @@ class PipenBoardPlugin:
     def _connect(self, pipen: Pipen):
         portfile = (
             "pipen-board."
-            f"{slugify(str(Path('.').resolve()))}."
-            f"{slugify(pipen.name)}.port"
+            f"{slugify(str(Path('.').resolve()))}.{pipen.name}.port"
         )
         portfile = Path(gettempdir()).joinpath(portfile)
         if not portfile.is_file():

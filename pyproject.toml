@@ -14,10 +14,11 @@ include = ["pipen_board/frontend/dist"]
 generate-setup-file = true
 
 [tool.poetry.dependencies]
-python = "^3.7.1"
-pipen = "^0.7"
+python = "^3.8"
+pipen = "^0.9"
 quart = "^0.18"
-pipen-annotate = "^0.6"
+pipen-annotate = "^0.7"
+pipen-args = "^0.9.5"
 websocket-client = "^1.5"
 cmdy = "^0.5"
 

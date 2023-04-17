@@ -67,7 +67,7 @@ async def history():
     out["histories"] = []
 
     for histfile in PIPEN_BOARD_DIR.glob(
-        f"{slugify(args.pipeline)}.{slugify(args.name)}.*.json"
+        f"{slugify(args.pipeline)}.{args.name}.*.json"
     ):
         out["histories"].append({
             "name": args.name,
@@ -112,7 +112,7 @@ async def config_save():
     out = {"name": args.name, "mtime": now}
     if not configfile:
         configfile = PIPEN_BOARD_DIR.joinpath(
-            f"{slugify(args.pipeline)}.{slugify(args.name)}."
+            f"{slugify(args.pipeline)}.{args.name}."
             f"{now.replace(' ', '_').replace(':', '-')}.json"
         )
         out["ctime"] = now
@@ -132,8 +132,8 @@ async def job_get_tree():
     logger.info(f"API Fetching tree for: {data['proc']}/{data['job']}")
     jobdir = Path(args.root).joinpath(
         ".pipen",
-        slugify(args.name),
-        slugify(data["proc"]),
+        args.name,
+        data["proc"],
         str(data["job"]),
     )
     if not jobdir.is_dir():

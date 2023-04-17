@@ -1,6 +1,5 @@
 from pipen import Pipen, Proc, ProcGroup
 from pipen.utils import mark
-from pipen_args import install
 
 
 @mark(board_config_no_input=True)

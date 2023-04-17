@@ -16,7 +16,6 @@ from urllib.parse import urlparse
 
 import cmdy
 from simpleconf import Config
-from slugify import slugify
 from liquid import Liquid
 from pipen import Pipen, Proc, ProcGroup
 from pipen.utils import get_marked
@@ -412,7 +411,7 @@ class DataManager:
                 fresh one loaded from the pipeline object
         """
         out = self._run_data = {SECTION_LOG: None}
-        pipeline_dir = Path(args.root).joinpath(".pipen", slugify(args.name))
+        pipeline_dir = Path(args.root).joinpath(".pipen", args.name)
         if not pipeline_dir.is_dir():
             # no previous run, return defaults
             self._run_data = DEFAULT_RUN_DATA
@@ -424,9 +423,7 @@ class DataManager:
             "outdir",
             {"value": None},
         )["value"]
-        outdir = outdir or Path(args.root).joinpath(
-            f"{slugify(args.name)}_results"
-        )
+        outdir = outdir or Path(args.root).joinpath(f"{args.name}_results")
         reports_dir = outdir.joinpath("REPORTS")
         if reports_dir.joinpath("index.html").is_file():
             out[SECTION_REPORTS] = str(reports_dir)
@@ -439,7 +436,7 @@ class DataManager:
         out[SECTION_PROCGROUPS] = {}
 
         def process_proc(proc: str, container: dict):
-            procdir = pipeline_dir.joinpath(slugify(proc))
+            procdir = pipeline_dir.joinpath(proc)
             container[proc] = {"jobs": []}
             if not procdir.is_dir():
                 container[proc]["status"] = "init"
@@ -485,6 +482,7 @@ class DataManager:
     def get_data(self, args: Namespace, configfile: str | None = None):
         """Get the data"""
         if not self.running:
+            self._get_config_data(args, configfile=configfile)
             self._get_prev_run(args, configfile=configfile)
             return {
                 "isRunning": False,
