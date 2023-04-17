@@ -73,7 +73,7 @@
 {:else}
 <div class="run-container">
     <aside class="run-nav">
-        {#if isRunning > 0}
+        {#if data[SECTION_LOG] !== null}
             <NavItem text="Log" bind:activeNavItem />
         {/if}
         {#if data[SECTION_DIAGRAM]}
@@ -138,6 +138,16 @@
                     />
                 {/if}
             {/each}
+        {:else if data[SECTION_LOG] === null}
+            <div class="center-wrapper">
+                <InlineNotification
+                    lowContrast
+                    kind="warning"
+                    hideCloseButton
+                >
+                    <p>No previous run found.</p>
+                </InlineNotification>
+            </div>
         {:else}
             <div class="center-wrapper">
                 <InlineNotification

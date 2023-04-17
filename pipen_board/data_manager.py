@@ -37,8 +37,8 @@ if TYPE_CHECKING:
     from argparse import Namespace
 
 DEFAULT_RUN_DATA = {
-    # "log": ""
-    SECTION_LOG: "",
+    # "log": None
+    SECTION_LOG: None,
     # "diagram": "<svg>...</svg>"
     SECTION_DIAGRAM: None,
     # "reports": <reportdir>
@@ -412,12 +412,17 @@ class DataManager:
         """
         out = self._run_data = {SECTION_LOG: None}
         pipeline_dir = Path(args.root).joinpath(".pipen", args.name)
+        self._get_config_data(args, configfile=configfile)
         if not pipeline_dir.is_dir():
             # no previous run, return defaults
             self._run_data = DEFAULT_RUN_DATA
             return
 
-        self._get_config_data(args, configfile=configfile)
+        # Get the log
+        logfile = pipeline_dir.joinpath("run-latest.log")
+        if logfile.is_file():
+            out[SECTION_LOG] = logfile.read_text()
+
         config_data = self._config_data
         outdir = config_data[SECTION_PIPELINE_OPTIONS].get(
             "outdir",
@@ -482,7 +487,6 @@ class DataManager:
     def get_data(self, args: Namespace, configfile: str | None = None):
         """Get the data"""
         if not self.running:
-            self._get_config_data(args, configfile=configfile)
             self._get_prev_run(args, configfile=configfile)
             return {
                 "isRunning": False,
@@ -620,6 +624,7 @@ class DataManager:
         """Run a command and send the output to the websocket"""
         self.clear_run_data()
         self.running = True
+        # TODO: Redirect stderr to stdout
         for line in cmdy.bash(c=command).iter():
             self._run_data[SECTION_LOG] += line
 

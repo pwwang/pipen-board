@@ -21,6 +21,7 @@ pipen-annotate = "^0.7"
 pipen-args = "^0.9.5"
 websocket-client = "^1.5"
 cmdy = "^0.5"
+pipen-log2file = "^0.2.1"
 
 [tool.poetry.plugins.pipen]
 board = "pipen_board:pipen_board_plugin"
