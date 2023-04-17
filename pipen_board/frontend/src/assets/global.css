@@ -83,6 +83,16 @@ div.joblist button.bx--tag.bx--tag--gray {
     background-color: #d1d1d1;
 }
 
+div.joblist button.bx--tag.running {
+    background-color: #bae6ff;
+    animation: running-tag .5s cubic-bezier(0, 1.26, 0.39, 1.1) infinite;
+}
+
+@keyframes running-tag {
+    from {background-color: #bae6ff; }
+    to {background-color: #e3baff;}
+}
+
 div.joblist button.bx--tag:first-child {
     margin-left: 0;
 }

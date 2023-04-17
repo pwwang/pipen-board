@@ -178,7 +178,7 @@
                     interactive
                     disabled={fetching}
                     on:click={async (e) => {job = i; await loadJobTree(i);}}
-                    class="{i === job ? 'selected' : ''}"
+                    class="{i === job ? 'selected' : ''} {j === 'running' ? 'running' : ''}"
                     type="{JOB_TAG_KIND[j] || 'red'}"
                     size="sm">{i}
                 </Tag>

@@ -16,6 +16,7 @@ from urllib.parse import urlparse
 
 import cmdy
 from simpleconf import Config
+from slugify import slugify
 from liquid import Liquid
 from pipen import Pipen, Proc, ProcGroup
 from pipen.utils import get_marked
@@ -259,7 +260,9 @@ def _load_additional(additional: str, **kwargs) -> Mapping[str, Any]:
     # kwargs passed, treat the file as a template
     additional = Path(additional)
     tpl = Liquid(additional, mode="wild", from_file=True)
-    configfile = cache_dir / f"{additional.stem}.rendered{additional.suffix}"
+    configfile = cache_dir.joinpath(
+        f"{slugify(str(additional.resolve()))}.rendered{additional.suffix}"
+    )
     configfile.write_text(tpl.render(**kwargs))
     return Config.load(configfile)
 
@@ -282,6 +285,7 @@ async def _get_config_data(args: Namespace) -> Mapping[str, Any]:
         logger.debug("DBG Loading additional configuration items ...")
         data = _load_additional(
             args.additional,
+            name=args.name,
             pipeline=args.pipeline,
             pipeline_args=args.pipeline_args,
         )
@@ -350,8 +354,8 @@ async def _get_config_data(args: Namespace) -> Mapping[str, Any]:
 class DataManager:
     """Gather and manager the pipeline data"""
 
-    # Send data every 3 seconds to the client, via websocket
-    INTERVAL = 3
+    # Send data every 5 seconds to the client, via websocket
+    INTERVAL = 5
 
     def __init__(self) -> None:
         self.running = False
@@ -608,6 +612,11 @@ class DataManager:
     async def on_job_submitted(self, data, ws):
         await self._on_job(data, "submitted", ws)
 
+    async def on_job_running(self, data, ws):
+        await self._on_job(data, "running", ws)
+        # Notify the frontend that the job is running
+        await self.send_run_data(ws, force=True)
+
     async def on_job_killed(self, data, ws):
         await self._on_job(data, "killed", ws)
 
@@ -624,6 +633,7 @@ class DataManager:
         """Run a command and send the output to the websocket"""
         self.clear_run_data()
         self.running = True
+        self._run_data[SECTION_LOG] = self._run_data[SECTION_LOG] or ""
         # TODO: Redirect stderr to stdout
         for line in cmdy.bash(c=command).iter():
             self._run_data[SECTION_LOG] += line
