@@ -31,6 +31,7 @@
             && (v === "" || v === null || v === undefined)
         ) {
             value = origValue;
+            invalid = false;
             return;
         }
         const error = validateData(v, validator);
