@@ -270,7 +270,7 @@ def _load_additional(additional: str, **kwargs) -> Mapping[str, Any]:
 async def _get_config_data(args: Namespace) -> Mapping[str, Any]:
     """Get the pipeline data"""
     old_argv = sys.argv
-    sys.argv = ["from-pipen-cli-config"] + args.pipeline_args
+    sys.argv = ["@pipen-board"] + args.pipeline_args
     logger.debug("DBG Fetching pipeline data ...")
     try:
         pipeline = parse_pipeline(args.pipeline)
