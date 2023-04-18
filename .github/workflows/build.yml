@@ -19,6 +19,8 @@ jobs:
           python -m pip install --upgrade poetry
       - name: Build package
         run: poetry build -vvv
+      - name: Show package
+        run: tar -tvf dist/*.tar.gz
 
   deploy:
     runs-on: ubuntu-latest
