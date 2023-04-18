@@ -11,8 +11,13 @@
     export let title = "General Options";
     export let data;
     export let description;
+    export let initDescription = undefined;
     export let general_filter = (x) => true;
     export let activeNavItem;
+
+    if (initDescription) {
+        description = initDescription;
+    }
 
     let showHiddens = {};
 </script>

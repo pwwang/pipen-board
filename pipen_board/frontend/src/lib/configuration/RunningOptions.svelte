@@ -20,9 +20,14 @@
     // used to generate toml
     export let config_data;
     export let description;
+    export let initDescription = undefined;
     export let activeNavItem;
     export let isRunning;
     export let openConfirm = false;
+
+    if (initDescription) {
+        description = initDescription;
+    }
 
     let invalid = false;
     let invalidText = "No command generated or filled."

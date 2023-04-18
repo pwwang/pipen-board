@@ -1,7 +1,12 @@
 <script>
-
     import InlineNotification from "carbon-components-svelte/src/Notification/InlineNotification.svelte";
 
+    export let description;
+    export let initDescription = undefined;
+
+    if (initDescription) {
+        description = initDescription;
+    }
 </script>
 
 <div class="center-wrapper">

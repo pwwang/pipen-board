@@ -231,6 +231,7 @@
                 <GeneralOptions
                     bind:description={itemDescription}
                     bind:data={data[SECTION_PROCESSES][proc].value}
+                    initDescription={data[SECTION_PROCESSES][proc].desc}
                     {activeNavItem}
                     general_filter={(k) => !k.endsWith("_opts") && k !== "envs" && k !== "in"}
                     title="Process Options"
@@ -252,11 +253,14 @@
                     {#each Object.keys(data[SECTION_PROCGROUPS][group].PROCESSES) as proc}
                         {#if proc === activeNavItem}
                             {#if data[SECTION_PROCGROUPS][group].PROCESSES[proc].hidden}
-                            <HiddenOptions />
+                            <HiddenOptions
+                                bind:description={itemDescription}
+                                initDescription={data[SECTION_PROCGROUPS][group].PROCESSES[proc].desc} />
                             {:else}
                             <GeneralOptions
                                 bind:description={itemDescription}
                                 bind:data={data[SECTION_PROCGROUPS][group].PROCESSES[proc].value}
+                                initDescription={data[SECTION_PROCGROUPS][group].PROCESSES[proc].desc}
                                 {activeNavItem}
                                 general_filter={(k) => !k.endsWith("_opts") && k !== "envs" && k !== "in"}
                                 title="Process Options"
@@ -274,6 +278,7 @@
                         config_data={data}
                         bind:isRunning
                         bind:description={itemDescription}
+                        initDescription={data[SECTION_RUNNING_OPTS][running].desc}
                         bind:data={data[SECTION_RUNNING_OPTS][running]}
                         {activeNavItem}
                     />
