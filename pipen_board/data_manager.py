@@ -168,6 +168,7 @@ def _proc_to_argspec(
     proc: Proc | Type[Proc],
     is_start: bool,
     hidden: bool = False,
+    order: int = 0,
 ) -> Mapping[str, Any]:
     """Convert the proc to the argument spec"""
     if isinstance(proc, Proc):
@@ -178,6 +179,7 @@ def _proc_to_argspec(
     summary = anno.get("Summary", {"short": "", "long": ""})
     argspec = {
         "is_start": is_start,
+        "order": order,
         "desc": f'# {summary["short"]}\n\n{summary["long"]}',
         "value": {},
     }
@@ -324,7 +326,7 @@ async def _get_config_data(args: Namespace) -> Mapping[str, Any]:
     }
     data[SECTION_PROCESSES] = {}
     pg_sec = {}
-    for proc in pipeline.procs:
+    for i, proc in enumerate(pipeline.procs):
         logger.debug(
             "[bold][yellow]DBG[/yellow][/bold] Parsing process %s ...",
             proc.name,
@@ -344,12 +346,14 @@ async def _get_config_data(args: Namespace) -> Mapping[str, Any]:
                 proc,
                 proc in pipeline.starts,
                 get_marked(proc, "board_config_hidden", False),
+                order=i,
             )
         else:
             data[SECTION_PROCESSES][proc.name] = _proc_to_argspec(
                 proc,
                 proc in pipeline.starts,
                 get_marked(proc, "board_config_hidden", False),
+                order=i,
             )
 
     data[SECTION_PROCGROUPS] = pg_sec
@@ -367,6 +371,7 @@ class DataManager:
         self._config_data = None
         self._run_data = None
         self._timer = None
+        self._proc_running_order = 0;
 
     def _get_config_data(
         self,
@@ -483,6 +488,7 @@ class DataManager:
 
     def clear_run_data(self, keep_log: bool = False):
         """Clear the data"""
+        self._proc_running_order = 0
         if not keep_log:
             self._run_data = deepcopy(DEFAULT_RUN_DATA)
         else:
@@ -526,6 +532,7 @@ class DataManager:
         self._timer = time.time()
 
     async def on_start(self, data, ws):
+        self._proc_running_order = 0
         # { SECTION_PROCESSES: [p1, p2], SECTION_PROCGROUPS: {pg1: [p3, p4]} }
         if isinstance(data, str):
             data = json.loads(data)
@@ -536,6 +543,7 @@ class DataManager:
         if SECTION_PROCESSES in data:
             for proc in data[SECTION_PROCESSES]:
                 self._run_data[SECTION_PROCESSES][proc] = {
+                    "order": 0,
                     "status": "init",
                     "jobs": [],
                 }
@@ -561,6 +569,7 @@ class DataManager:
 
         self.running = False
         await self.send_run_data(ws, force=True)
+        self._proc_running_order = 0
 
     async def on_proc_start(self, data, ws):
         if isinstance(data, str):
@@ -569,9 +578,15 @@ class DataManager:
         proc, group, njobs = data["proc"], data["procgroup"], data["njobs"]
 
         if not group:
+            self._run_data[SECTION_PROCESSES][proc][
+                "order"
+            ] = self._proc_running_order
             self._run_data[SECTION_PROCESSES][proc]["status"] = "running"
             self._run_data[SECTION_PROCESSES][proc]["jobs"] = ["init"] * njobs
         else:
+            self._run_data[SECTION_PROCGROUPS][group][proc][
+                "order"
+            ] = self._proc_running_order
             self._run_data[SECTION_PROCGROUPS][group][proc][
                 "status"
             ] = "running"
@@ -579,6 +594,7 @@ class DataManager:
                 "init"
             ] * njobs
 
+        self._proc_running_order += 1
         await self.send_run_data(ws, force=True)
 
     async def on_proc_done(self, data, ws):

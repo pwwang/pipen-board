@@ -3,7 +3,7 @@ from pipen.utils import mark
 
 
 @mark(board_config_no_input=True)
-class P1(Proc):
+class P4(Proc):
     """The P1 process
 
     Input:
@@ -19,30 +19,30 @@ class MyGroup(ProcGroup):
     @ProcGroup.add_proc
     def p2(self):
         @mark(board_config_hidden=True)
-        class P2(Proc):
+        class P3(Proc):
             """The P2 process"""
             input = "infile:file"
             output = "outfile:file:{{in.infile | split: '/' | last | split: '.' | first}}.out"
             lang = "bash"
             cache = False
             script = "cat {{in.infile}} > {{out.outfile}}; sleep 30; echo P2 >> {{out.outfile}}"
-        return P2
+        return P3
 
     @ProcGroup.add_proc
     def p3(self):
-        class P3(Proc):
+        class P1(Proc):
             requires = self.p2
             input = "infile:file"
             output = "outfile:file:{{in.infile | split: '/' | last | split: '.' | first}}.out"
             script = "cat {{in.infile}} > {{out.outfile}}; echo P3 >> {{out.outfile}}; exit 1"
-        return P3
+        return P1
 
 
 mg = MyGroup()
-mg.p2.requires = P1
+mg.p2.requires = P4
 
 
-class P4(Proc):
+class P2(Proc):
     """The P4 process
 
     Envs:
@@ -65,7 +65,7 @@ class P4(Proc):
 
 class ExamplePipeline(Pipen):
     """An example pipeline showing how pipen-cli-config works."""
-    starts = P1
+    starts = P4
     data = [["123"] * 10]
     loglevel = "debug"
 

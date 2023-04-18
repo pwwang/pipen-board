@@ -20,8 +20,8 @@ y = [ 1, 2, 3 ]
   [ns_opt.nest_opt]
   x = 1
 
-[P4.envs]
+[P2.envs]
 abc = "123"
 
-  [P4.envs.method]
+  [P2.envs.method]
   a = 1

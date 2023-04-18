@@ -159,6 +159,7 @@ docs/api/
 
 .pipen/
 *_results
+*-output
 
 test.py
 frontend_source.env

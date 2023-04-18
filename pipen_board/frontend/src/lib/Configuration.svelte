@@ -173,7 +173,7 @@
         {/if}
         {#if data[SECTION_PROCESSES] && Object.keys(data[SECTION_PROCESSES]).length > 0}
             <NavDivider group="processes" />
-            {#each Object.keys(data[SECTION_PROCESSES]) as proc}
+            {#each Object.keys(data[SECTION_PROCESSES]).sort((a, b) => data[SECTION_PROCESSES][a].order - data[SECTION_PROCESSES][b].order) as proc}
                 <NavItem
                     text={proc}
                     hidden={data[SECTION_PROCESSES][proc].hidden}
@@ -192,7 +192,7 @@
                         bind:activeNavItem
                     />
                 {/if}
-                {#each Object.keys(data[SECTION_PROCGROUPS][procgroup].PROCESSES) as proc}
+                {#each Object.keys(data[SECTION_PROCGROUPS][procgroup].PROCESSES).sort((a, b) => data[SECTION_PROCGROUPS][procgroup].PROCESSES[a].order - data[SECTION_PROCGROUPS][procgroup].PROCESSES[b].order) as proc}
                     <NavItem
                         sub
                         text={proc}
