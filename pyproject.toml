@@ -1,14 +1,11 @@
 [tool.poetry]
 name = "pipen-board"
-version = "0.0.4"
+version = "0.0.5"
 description = "Visualization configuration and running of pipen pipelines on the web"
 authors = ["pwwang <pwwang@pwwang.com>"]
 license = "MIT"
 readme = "README.md"
-packages = [
-    { include = "pipen_board/**/*.py" },
-]
-include = ["pipen_board/frontend/build"]
+exclude = ["pipen_board/frontend/[!build]*", "pipen_board/frontend/index.html"]
 
 [tool.poetry.build]
 generate-setup-file = true

@@ -1,7 +1,7 @@
 from .cli import PipenCliBoardPlugin
 from .plugin import PipenBoardPlugin
 
-__version__ = "0.0.4"
+__version__ = "0.0.5"
 
 PipenBoardPlugin.__version__ = __version__
 PipenCliBoardPlugin.__version__ = __version__
