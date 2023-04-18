@@ -276,7 +276,9 @@ async def _get_config_data(args: Namespace) -> Mapping[str, Any]:
         pipeline = parse_pipeline(args.pipeline)
         # Initialize the pipeline so that the arguments definied by
         # other plugins (i.e. pipen-args) to take in place.
+        pipeline.workdir = Path(pipeline.config.workdir) / args.name
         await pipeline._init()
+        pipeline.workdir.mkdir(parents=True, exist_ok=True)
         pipeline.build_proc_relationships()
     finally:
         sys.argv = old_argv
