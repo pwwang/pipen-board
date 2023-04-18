@@ -26,12 +26,14 @@ class PipenCliBoardPlugin(CLIPlugin):
         super().__init__(parser, subparser)
         subparser.usage = "%(prog)s [options] <pipeline> -- [pipeline options]"
         subparser.add_argument(
+            "-p",
             "--port",
             type=int,
             default=18521,
             help="Port to serve the UI wizard",
         )
         subparser.add_argument(
+            "-n",
             "--name",
             help=(
                 "The name of the pipeline. Default to the pipeline class name. "
@@ -40,6 +42,7 @@ class PipenCliBoardPlugin(CLIPlugin):
             )
         )
         subparser.add_argument(
+            "-a",
             "--additional",
             metavar="FILE",
             help=(
@@ -90,7 +93,7 @@ class PipenCliBoardPlugin(CLIPlugin):
         # the second part is the args for the pipeline
         args = sys.argv[1:]
         idx = args.index("--") if "--" in args else len(args)
-        args, rest = args[:idx], args[idx + 1 :]
+        args, rest = args[:idx], args[idx + 1:]
         parsed = self.parser.parse_args(args=args)
         parsed.name = parsed.name or parsed.pipeline.rpartition(":")[-1]
         parsed.pipeline_args = rest

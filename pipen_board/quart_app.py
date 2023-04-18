@@ -106,7 +106,9 @@ def get_app(args: Namespace):
         except Exception:
             return {}, 410
 
-        logger.info(f"API Running pipeline: {command}")
+        logger.info(
+            f"[bold][yellow]API[/yellow][/bold] Running pipeline: {command}"
+        )
         # Run command at background
         app.add_background_task(
             data_manager.run_pipeline,

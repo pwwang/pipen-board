@@ -60,7 +60,7 @@ async def index():
 
 
 async def history():
-    logger.info("API Getting histories")
+    logger.info("[bold][yellow]API[/yellow][/bold] Getting histories")
     args = request.cli_args
     out = {}
     out["pipeline"] = args.pipeline
@@ -91,13 +91,16 @@ async def history():
 
 async def history_del():
     configfile = (await request.get_json())["configfile"]
-    logger.info("API Deleting history: %s", configfile)
+    logger.info(
+        "[bold][yellow]API[/yellow][/bold] Deleting history: %s",
+        configfile,
+    )
     PIPEN_BOARD_DIR.joinpath(configfile).unlink()
     return {"ok": True}
 
 
 async def pipeline_data():
-    logger.info("API Getting pipeline data")
+    logger.info("[bold][yellow]API[/yellow][/bold] Getting pipeline data")
     configfile = (await request.get_json()).get("configfile")
     return data_manager.get_data(request.cli_args, configfile)
 
@@ -116,10 +119,15 @@ async def config_save():
             f"{now.replace(' ', '_').replace(':', '-')}.json"
         )
         out["ctime"] = now
-        logger.info(f"API Saving config to a new file: {configfile}")
+        logger.info(
+            "[bold][yellow]API[/yellow][/bold] Saving config to a new file: "
+            f"{configfile}"
+        )
     else:
         configfile = PIPEN_BOARD_DIR.joinpath(configfile)
-        logger.info(f"API Saving config to: {configfile}")
+        logger.info(
+            f"[bold][yellow]API[/yellow][/bold] Saving config to: {configfile}"
+        )
 
     out["configfile"] = configfile.name
     configfile.write_text(configdata)
@@ -129,7 +137,10 @@ async def config_save():
 async def job_get_tree():
     args = request.cli_args
     data = await request.get_json()
-    logger.info(f"API Fetching tree for: {data['proc']}/{data['job']}")
+    logger.info(
+        "[bold][yellow]API[/yellow][/bold] Fetching tree for: "
+        f"{data['proc']}/{data['job']}"
+    )
     jobdir = Path(args.root).joinpath(
         ".pipen",
         args.name,
@@ -151,13 +162,13 @@ async def job_get_file():
     path = Path(data["path"])
     if how != "full":
         logger.info(
-            "API Fetching file for "
+            "[bold][yellow]API[/yellow][/bold] Fetching file for "
             f"{data['proc']}/{data['job']}: {path} ({how})"
         )
         return {"type": "bigtext-part", "content": _get_file_content(path, how)}
 
     logger.info(
-        "API Fetching file for "
+        "[bold][yellow]API[/yellow][/bold] Fetching file for "
         f"{data['proc']}/{data['job']}: {path}"
     )
     if (
@@ -219,21 +230,21 @@ async def ws_pipeline(data, clients):
 
 
 async def ws_web_conn(clients):
-    logger.info(f"WS/WEB Client 'web' connected.")
+    logger.info("WS/WEB Client 'web' connected.")
     # send the current run data, to let UI know the current status
     await data_manager.send_run_data(clients["web"], True)
 
 
 async def ws_pipeline_conn(clients):
-    logger.info(f"WS/PIPELINE Client 'pipeline' connected.")
+    logger.info("WS/PIPELINE Client 'pipeline' connected.")
 
 
 async def ws_web_disconn(clients):
-    logger.info(f"WS/WEB Client 'web' disconnected.")
+    logger.info("WS/WEB Client 'web' disconnected.")
 
 
 async def ws_pipeline_disconn(clients):
-    logger.info(f"WS/PIPELINE Client 'pipeline' disconnected.")
+    logger.info("WS/PIPELINE Client 'pipeline' disconnected.")
     data_manager.running = False
 
 

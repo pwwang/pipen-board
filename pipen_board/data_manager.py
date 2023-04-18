@@ -111,7 +111,7 @@ def _anno_to_argspec(anno: Mapping[str, Any] | None) -> Mapping[str, Any]:
         # choices
         # itype
         if "ctype" not in argspec[arg]:
-            if (argspec[arg].get("action") in ("store_true", "store_false")):
+            if argspec[arg].get("action") in ("store_true", "store_false"):
                 argspec[arg]["type"] = "bool"
             elif (
                 argspec[arg].get("action") in ("ns", "namespace")
@@ -120,9 +120,8 @@ def _anno_to_argspec(anno: Mapping[str, Any] | None) -> Mapping[str, Any]:
             ):
                 argspec[arg]["type"] = "ns"
             elif (
-                argspec[arg].get("action") in (
-                    "append", "extend", "clear_append", "clear_extend"
-                )
+                argspec[arg].get("action")
+                in ("append", "extend", "clear_append", "clear_extend")
                 or argspec[arg].get("array")
                 or argspec[arg].get("list")
             ):
@@ -147,10 +146,9 @@ def _anno_to_argspec(anno: Mapping[str, Any] | None) -> Mapping[str, Any]:
             argspec[arg]["value"] = argspec[arg].pop("default", None)
 
         # determine the itype for list elements
-        if t == 'list':
-            if (
-                argspec[arg]["value"] is not None
-                and not isinstance(argspec[arg]["value"], list)
+        if t == "list":
+            if argspec[arg]["value"] is not None and not isinstance(
+                argspec[arg]["value"], list
             ):
                 argspec[arg]["value"] = [argspec[arg]["value"]]
             if (
@@ -223,28 +221,28 @@ def _load_additional(additional: str, **kwargs) -> Mapping[str, Any]:
         return {}
 
     parsed = urlparse(additional)
-    cache_dir = Path(gettempdir()) / 'pipen-cli-config-additional-configs'
+    cache_dir = Path(gettempdir()) / "pipen-cli-config-additional-configs"
     cache_dir.mkdir(parents=True, exist_ok=True)
-    if parsed.scheme in ('http', 'https', 'ftp', 'ftps', 'gh'):
+    if parsed.scheme in ("http", "https", "ftp", "ftps", "gh"):
         from hashlib import sha256
         from urllib.error import URLError
         from urllib.request import urlretrieve
 
-        if parsed.scheme == 'gh':
+        if parsed.scheme == "gh":
             try:
-                user, repo, file_path = parsed.path.split('/', 2)
+                user, repo, file_path = parsed.path.split("/", 2)
             except ValueError:
                 raise ValueError(f"Invalid gh:// URL: {additional}")
-            branch = 'master'
-            if '@' in file_path:
-                file_path, branch = file_path.split('@')
+            branch = "master"
+            if "@" in file_path:
+                file_path, branch = file_path.split("@")
             parsed = urlparse(
                 "https://raw.githubusercontent.com/"
                 f"{user}/{repo}/{branch}/{file_path}"
             )
 
         url = parsed.geturl()
-        cache_key = sha256(url.encode('utf-8')).hexdigest()
+        cache_key = sha256(url.encode("utf-8")).hexdigest()
         additional = cache_dir / f"{cache_key}-{parsed.path.split('/')[-1]}"
         if not additional.exists():
             try:
@@ -271,7 +269,9 @@ async def _get_config_data(args: Namespace) -> Mapping[str, Any]:
     """Get the pipeline data"""
     old_argv = sys.argv
     sys.argv = ["@pipen-board"] + args.pipeline_args
-    logger.debug("DBG Fetching pipeline data ...")
+    logger.debug(
+        "[bold][yellow]DBG[/yellow][/bold] Fetching pipeline data ..."
+    )
     try:
         pipeline = parse_pipeline(args.pipeline)
         # Initialize the pipeline so that the arguments definied by
@@ -284,7 +284,10 @@ async def _get_config_data(args: Namespace) -> Mapping[str, Any]:
         sys.argv = old_argv
 
     if args.additional:
-        logger.debug("DBG Loading additional configuration items ...")
+        logger.debug(
+            "[bold][yellow]DBG[/yellow][/bold] "
+            "Loading additional configuration items ..."
+        )
         data = _load_additional(
             args.additional,
             name=args.name,
@@ -310,8 +313,7 @@ async def _get_config_data(args: Namespace) -> Mapping[str, Any]:
         "type": "str",
         "value": pipeline.desc,
         "desc": (
-            "The description of the pipeline, "
-            "shows in the log and report."
+            "The description of the pipeline, " "shows in the log and report."
         ),
     }
     data[SECTION_PIPELINE_OPTIONS]["outdir"] = {
@@ -323,15 +325,16 @@ async def _get_config_data(args: Namespace) -> Mapping[str, Any]:
     data[SECTION_PROCESSES] = {}
     pg_sec = {}
     for proc in pipeline.procs:
-        logger.debug("DBG Parsing process %s ...", proc.name)
+        logger.debug(
+            "[bold][yellow]DBG[/yellow][/bold] Parsing process %s ...",
+            proc.name,
+        )
 
         pg = proc.__meta__["procgroup"]
         if pg:
             if pg.name not in pg_sec:
                 pg_sec[pg.name] = {"PROCESSES": {}}
-                pg_args = _anno_to_argspec(
-                    annotate(pg.__class__).get("Args")
-                )
+                pg_args = _anno_to_argspec(annotate(pg.__class__).get("Args"))
                 if pg_args:
                     for arg, arginfo in pg_args.items():
                         arginfo["value"] = pg.DEFAULTS.get(arg)
@@ -387,17 +390,14 @@ class DataManager:
                 return
 
         if (
-            (use_cached is True or (use_cached == "auto" and args.dev))
-            and self._config_data
-        ):
+            use_cached is True or (use_cached == "auto" and args.dev)
+        ) and self._config_data:
             return
 
         # Use multiprocessing to get a clean environment
         # to load the pipeline to avoid conflicts
         def target(conn):
-            conn.send(
-                json.dumps(asyncio.run(_get_config_data(args))).encode()
-            )
+            conn.send(json.dumps(asyncio.run(_get_config_data(args))).encode())
             conn.close()
 
         parent_conn, child_conn = Pipe()
@@ -514,7 +514,9 @@ class DataManager:
             return
 
         # Send data
-        logger.debug("DBG Sending run data to the frontend")
+        logger.debug(
+            "[bold][yellow]DBG[/yellow][/bold] Sending run data to the frontend"
+        )
         try:
             await ws.send(json.dumps(self._run_data))
         except BrokenPipeError:
@@ -534,7 +536,8 @@ class DataManager:
         if SECTION_PROCESSES in data:
             for proc in data[SECTION_PROCESSES]:
                 self._run_data[SECTION_PROCESSES][proc] = {
-                    "status": "init", "jobs": []
+                    "status": "init",
+                    "jobs": [],
                 }
 
         if SECTION_PROCGROUPS in data:
@@ -542,7 +545,8 @@ class DataManager:
                 self._run_data[SECTION_PROCGROUPS][pg] = {}
                 for proc in data[SECTION_PROCGROUPS][pg]:
                     self._run_data[SECTION_PROCGROUPS][pg][proc] = {
-                        "status": "init", "jobs": []
+                        "status": "init",
+                        "jobs": [],
                     }
 
         self.timer = time.time()
@@ -568,7 +572,9 @@ class DataManager:
             self._run_data[SECTION_PROCESSES][proc]["status"] = "running"
             self._run_data[SECTION_PROCESSES][proc]["jobs"] = ["init"] * njobs
         else:
-            self._run_data[SECTION_PROCGROUPS][group][proc]["status"] = "running"
+            self._run_data[SECTION_PROCGROUPS][group][proc][
+                "status"
+            ] = "running"
             self._run_data[SECTION_PROCGROUPS][group][proc]["jobs"] = [
                 "init"
             ] * njobs
@@ -603,9 +609,9 @@ class DataManager:
         if not group:
             self._run_data[SECTION_PROCESSES][proc]["jobs"][job] = status
         else:
-            self._run_data[
-                SECTION_PROCGROUPS
-            ][group][proc]["jobs"][job] = status
+            self._run_data[SECTION_PROCGROUPS][group][proc]["jobs"][
+                job
+            ] = status
         await self.send_run_data(ws)
 
     async def on_job_queued(self, data, ws):
