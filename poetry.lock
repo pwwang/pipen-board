@@ -663,14 +663,14 @@ executing = ">1.1.0,<2.0"
 
 [[package]]
 name = "pipen"
-version = "0.9.5"
+version = "0.9.6"
 description = "A pipeline framework for python"
 category = "main"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "pipen-0.9.5-py3-none-any.whl", hash = "sha256:4e260d2ea48504c513ffa0ec5a934fe8c02e1a7890d04f37f045daacf351cb26"},
-    {file = "pipen-0.9.5.tar.gz", hash = "sha256:6a361703e572e045608475b8a21693c39586df563c5edec5899535fca2592c6d"},
+    {file = "pipen-0.9.6-py3-none-any.whl", hash = "sha256:1298ca681dfe29092e5f1207d5a05eac53dc1080a2e553ff582948a1127cae58"},
+    {file = "pipen-0.9.6.tar.gz", hash = "sha256:8318608f201c1e15ac6ea8e66f72003cb7ca5b3107974c3d6ff84ef19e45632e"},
 ]
 
 [package.dependencies]
@@ -700,14 +700,14 @@ pipen = ">=0.9,<0.10"
 
 [[package]]
 name = "pipen-args"
-version = "0.9.6"
+version = "0.9.7"
 description = "Command-line argument parser for pipen."
 category = "main"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "pipen_args-0.9.6-py3-none-any.whl", hash = "sha256:d3663e19d78dad9c1289e5ac997b8620aff87af4c5154290ca55696096d0a9e5"},
-    {file = "pipen_args-0.9.6.tar.gz", hash = "sha256:0f48bb1033d9864210a8d2e8dc908b00cf86e397f736aee03885f8626cca7ee5"},
+    {file = "pipen_args-0.9.7-py3-none-any.whl", hash = "sha256:be65ef115d3fe34f64b954afe1a00eb8c9498e66c0faf0c9da35319ab59404c0"},
+    {file = "pipen_args-0.9.7.tar.gz", hash = "sha256:0fea9f00217e02820b564a1b91f58f2d94dc05b1773f9ab208b10e9ecbe2d591"},
 ]
 
 [package.dependencies]
@@ -1139,4 +1139,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "732fe332354a681823373c99a6361c3cbccd8d11830ad737f8eafe5e8ad6bcb2"
+content-hash = "24c8d169fbd98e9b683f7e71e193cba7376ddcc5bc72345b6d2290a0ccd1652a"

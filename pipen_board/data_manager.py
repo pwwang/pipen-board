@@ -314,7 +314,7 @@ async def _get_config_data(args: Namespace) -> Mapping[str, Any]:
     }
     data[SECTION_PIPELINE_OPTIONS]["outdir"] = {
         "desc": "The output directory of your pipeline",
-        "placeholder": "./<name>_results",
+        "placeholder": "./<name>-output",
         "type": "str",
         "value": None,
     }
@@ -432,7 +432,7 @@ class DataManager:
             "outdir",
             {"value": None},
         )["value"]
-        outdir = outdir or Path(args.root).joinpath(f"{args.name}_results")
+        outdir = outdir or Path(args.root).joinpath(f"{args.name}-output")
         reports_dir = outdir.joinpath("REPORTS")
         if reports_dir.joinpath("index.html").is_file():
             out[SECTION_REPORTS] = str(reports_dir)
