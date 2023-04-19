@@ -85,7 +85,30 @@ div.joblist button.bx--tag.bx--tag--gray {
 
 div.joblist button.bx--tag.running {
     background-color: #bae6ff;
-    animation: running-tag .5s cubic-bezier(0, 1.26, 0.39, 1.1) infinite;
+    animation: running-tag .5s cubic-bezier(0.81, -0.05, 0.03, 1.06) infinite;
+}
+
+div.procrun-wrap div.tree > label {
+    display: block;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid #bfbfbf;
+}
+
+div.procrun-wrap div.tree.failed > label {
+    background-color: #ffd7d9;
+}
+
+div.procrun-wrap div.tree.succeeded > label {
+    background-color: #a7f0ba;
+}
+
+div.procrun-wrap div.tree.running > label {
+    background-color: #bae6ff;
+    animation: running-tag .5s cubic-bezier(0.81, -0.05, 0.03, 1.06) infinite;
+}
+
+div.procrun-wrap div.tree.killed > label {
+    background-color: #ffd6e8;
 }
 
 @keyframes running-tag {

@@ -68,7 +68,7 @@
 
     const loadJobTree = async function (jobid) {
         // unload previous job tree
-        jobTree = [];
+        let loadedJobTree = [];
         // reset tree selection does not work
         // treeActiveId = "";
         // treeSelectedIds = [];
@@ -96,9 +96,14 @@
             toastNotify.subtitle = `Failed to get job details: ${response.status} ${response.statusText}`;
         } else {
             toastNotify.kind = undefined;
-            jobTree = await response.json();
+            loadedJobTree = await response.json();
         }
+        return loadedJobTree;
     };
+    if (jobs.length === 1) {
+        job = 0;
+        loadJobTree(0).then(t => { jobTree = t; });
+    }
 
     const loadFileDetails = async (e) => {
         // {expanded, id, leaf, text}
@@ -170,14 +175,14 @@
     >This process has not been run yet or unknown errors occurred.</InlineNotification>
 </div>
 {:else}
-<div class="procrun-wrap" id="procrun-wrap">
+<div class="procrun-wrap" id="procrun-wrap" style="{jobs.length === 1 ? '--jobs-height: 0' : ''}">
     <div class="jobs">
         <div class="joblist">
             {#each jobs as j, i (i)}
                 <Tag
                     interactive
                     disabled={fetching}
-                    on:click={async (e) => {job = i; await loadJobTree(i);}}
+                    on:click={async (e) => {job = i; jobTree = await loadJobTree(i);}}
                     class="{i === job ? 'selected' : ''} {j === 'running' ? 'running' : ''}"
                     type="{JOB_TAG_KIND[j] || 'red'}"
                     size="sm">{i}
@@ -186,7 +191,7 @@
         </div>
     </div>
     <div class="draggable row" on:mousedown={handleDragStartY}></div>
-    <div class="tree">
+    <div class="tree {jobs[job] || ''}">
         {#if job !== undefined}
         <TreeView
             labelText="Job #{job}"

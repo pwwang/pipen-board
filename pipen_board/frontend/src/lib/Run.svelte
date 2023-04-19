@@ -123,19 +123,23 @@
                 </Tile>
             </div>
         {:else if activeNavItem in data[SECTION_PROCESSES]}
+            {#key activeNavItem}
             <ProcRun
                 status={data[SECTION_PROCESSES][activeNavItem].status}
                 proc={activeNavItem}
                 jobs={data[SECTION_PROCESSES][activeNavItem].jobs}
             />
+            {/key}
         {:else if activeNavItem}
             {#each Object.keys(data[SECTION_PROCGROUPS]) as procgroup}
                 {#if activeNavItem in data[SECTION_PROCGROUPS][procgroup]}
+                    {#key activeNavItem}
                     <ProcRun
                         status={data[SECTION_PROCGROUPS][procgroup][activeNavItem].status}
                         proc={activeNavItem}
                         jobs={data[SECTION_PROCGROUPS][procgroup][activeNavItem].jobs}
                     />
+                    {/key}
                 {/if}
             {/each}
         {:else if data[SECTION_LOG] === null}
