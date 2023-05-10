@@ -37,7 +37,15 @@ class MyGroup(ProcGroup):
             input = "infile:file"
             input_data = lambda ch: list(ch.outfile)[:1]
             output = "outfile:file:{{in.infile | split: '/' | last | split: '.' | first}}.out"
-            script = "cat {{in.infile}} > {{out.outfile}}; echo P3 >> {{out.outfile}}; exit 1"
+            script = """
+                cat {{in.infile}} > {{out.outfile}}
+                echo P3 >> {{out.outfile}}
+                mkdir -p {{out.outfile | dirname | dirname}}/ja_subdir
+                for i in $(seq 1 10); do
+                    echo $i >> {{out.outfile | dirname | dirname}}/ja_subdir/$i.txt
+                done
+                exit 1
+            """
         return P3
 
 
