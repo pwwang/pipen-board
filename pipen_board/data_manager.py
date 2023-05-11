@@ -14,7 +14,6 @@ from tempfile import gettempdir
 from typing import TYPE_CHECKING, Any, Mapping, Type
 from urllib.parse import urlparse
 
-import cmdy
 from simpleconf import Config
 from slugify import slugify
 from liquid import Liquid
@@ -367,7 +366,7 @@ class DataManager:
     INTERVAL = 5
 
     def __init__(self) -> None:
-        self.running = False
+        self.running: int | bool = False
         self._config_data = None
         self._run_data = None
         self._timer = None
@@ -653,14 +652,28 @@ class DataManager:
     async def on_job_cached(self, data, ws):
         await self._on_job(data, "succeeded", ws)
 
-    def run_pipeline(self, command, ws):
+    async def run_pipeline(self, command, port, ws):
         """Run a command and send the output to the websocket"""
         self.clear_run_data()
-        self.running = True
         self._run_data[SECTION_LOG] = self._run_data[SECTION_LOG] or ""
-        # TODO: Redirect stderr to stdout
-        for line in cmdy.bash(c=command).iter():
+
+        p = await asyncio.create_subprocess_exec(
+            "bash",
+            "-c",
+            command,
+            stdin=asyncio.subprocess.PIPE,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.STDOUT,
+        )
+        p.stdin.write(f"pipen-board:{port}\n".encode())
+        self.running = p.pid
+
+        async for line in p.stdout:
+            line = line.decode()
+            print(line, end = "")
             self._run_data[SECTION_LOG] += line
+
+        await p.wait()
 
 
 data_manager = DataManager()

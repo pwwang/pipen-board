@@ -27,7 +27,7 @@ class MyGroup(ProcGroup):
             output = "outfile:file:{{in.infile | split: '/' | last | split: '.' | first}}.out"
             lang = "bash"
             cache = False
-            script = "cat {{in.infile}} > {{out.outfile}}; sleep 10; echo P2 >> {{out.outfile}}"
+            script = "cat {{in.infile}} > {{out.outfile}}; sleep 30; echo P2 >> {{out.outfile}}"
         return P2
 
     @ProcGroup.add_proc

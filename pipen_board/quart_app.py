@@ -45,28 +45,6 @@ def get_app(args: Namespace):
             r.headers['Cache-Control'] = 'public, max-age=0'
         return r
 
-    @app.before_serving
-    async def _():
-        # save the port to the file
-        # with given root and name
-        # so that the plugin can read it and connect to it
-        portfile = (
-            "pipen-board."
-            f"{slugify(str(Path(args.root).resolve()))}.{args.name}.port"
-        )
-        Path(gettempdir()).joinpath(portfile).write_text(str(args.port))
-
-    @app.after_serving
-    async def _():
-        portfile = (
-            "pipen-board."
-            f"{slugify(str(Path(args.root).resolve()))}.{args.name}.port"
-        )
-        try:
-            Path(gettempdir()).joinpath(portfile).unlink()
-        except FileNotFoundError:
-            pass
-
     for route, handler in GETS.items():
         app.route(route, methods=["GET"])(handler)
 
@@ -113,6 +91,7 @@ def get_app(args: Namespace):
         app.add_background_task(
             data_manager.run_pipeline,
             command,
+            args.port,
             clients.get("web"),
         )
         return {"ok": True}

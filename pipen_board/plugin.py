@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import logging
 import json
+import sys
+import selectors
 from pathlib import Path
 from tempfile import gettempdir
 from typing import TYPE_CHECKING
@@ -50,32 +52,32 @@ class PipenBoardPlugin:
             else:
                 log("debug", logmsg, logger=logger)
 
-    def _connect(self, pipen: Pipen):
-        portfile = (
-            "pipen-board."
-            f"{slugify(str(Path('.').resolve()))}.{pipen.name}.port"
-        )
-        portfile = Path(gettempdir()).joinpath(portfile)
-        if not portfile.is_file():
-            logger.debug("No port file found, skip.")
-            return
-
-        port = portfile.read_text().strip()
-        try:
-            port = int(port)
-        except ValueError:
-            logger.debug("Not a valid port, skip.")
-            return
-
-        self.ws = websocket.WebSocket()
-        try:
-            self.ws.connect(f"ws://localhost:{port}/ws")
-        except ConnectionRefusedError:
-            logger.debug("Cannot connect to pipen-board, skip.")
+    def _connect(self):
+        """Connect to pipen-board server"""
+        if not sys.stdin.readable():
             self.ws = None
-        else:
-            logger.info(f"Connected to pipen-board at ws://localhost:{port}/ws")
-            self._send({"type": "connect", "client": "pipeline"})
+            logger.debug("Stdin is not readable, skip.")
+            return
+
+        sel = selectors.DefaultSelector()
+        sel.register(sys.stdin, selectors.EVENT_READ)
+        if not sel.select(timeout=0.1):
+            self.ws = None
+            logger.debug("No data in stdin, skip.")
+            return
+
+        port = sys.stdin.readline().strip()
+        if not port.startswith("pipen-board:"):
+            self.ws = None
+            logger.debug("Not spawned by pipen-board server, skip.")
+            return
+
+        # Now that we are spawned by pipen-board
+        port = int(port[12:])
+        self.ws = websocket.WebSocket()
+        self.ws.connect(f"ws://localhost:{port}/ws")
+        logger.info(f"Connected to pipen-board at ws://localhost:{port}/ws")
+        self._send({"type": "connect", "client": "pipeline"})
 
     def _disconnect(self):
         if self.ws:
@@ -87,7 +89,7 @@ class PipenBoardPlugin:
         logger.setLevel(
             getattr(logging, pipen.config.get("loglevel", "INFO").upper())
         )
-        self._connect(pipen)
+        self._connect()
         if not self.ws:
             return
 
