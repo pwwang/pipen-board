@@ -16,6 +16,7 @@ quart = "^0.18"
 pipen-args = "^0.9.7"
 websocket-client = "^1.5"
 pipen-log2file = "^0.2.1"
+psutil = "^5.9.5"
 
 [tool.poetry.plugins.pipen]
 board = "pipen_board:pipen_board_plugin"
