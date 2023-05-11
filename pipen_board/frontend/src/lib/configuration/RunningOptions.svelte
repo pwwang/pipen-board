@@ -142,6 +142,7 @@
   primaryButtonText="Confirm"
   secondaryButtonText="Cancel"
   preventCloseOnClickOutside={true}
+  class="running-confirm-modal"
   on:click:button--secondary={() => {openConfirm = false}}
   on:click:button--primary={runCommand}
 >
@@ -150,6 +151,8 @@
   <p><code>{generatedCommand}</code></p>
   <p>&nbsp;</p>
   <p>This will override the "Running"/"Previous Run" tab.</p>
+  <p>&nbsp;</p>
+  <p>You can also save the configuration into <code>{tomlfile}</code> using the <code>Generate TOML Configuration</code> button on the left bottom, and run the command manually in your teminal.</p>
 </Modal>
 
 <Accordion align="start">
@@ -198,7 +201,7 @@
                     size="small"
                     kind="danger-tertiary"
                     icon={ContinueFilled}
-                    disabled={submitting}
+                    disabled={submitting || generatedCommand === ""}
                     iconDescription="Run the Command"
                     on:click={runCommandConfirm}>
                     Run the Command
