@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
+import signal
 import sys
 import time
 import importlib
@@ -37,6 +39,7 @@ if TYPE_CHECKING:
     from argparse import Namespace
 
 DEFAULT_RUN_DATA = {
+    "FINISHED": False,
     # "log": None
     SECTION_LOG: None,
     # "diagram": "<svg>...</svg>"
@@ -371,6 +374,7 @@ class DataManager:
         self._run_data = None
         self._timer = None
         self._proc_running_order = 0;
+        self._command = None
 
     def _get_config_data(
         self,
@@ -420,7 +424,7 @@ class DataManager:
             configfile: The config file to use, if not specified, use a
                 fresh one loaded from the pipeline object
         """
-        out = self._run_data = {SECTION_LOG: None}
+        out = self._run_data = {SECTION_LOG: None, "FINISHED": True}
         pipeline_dir = Path(args.root).joinpath(".pipen", args.name)
         self._get_config_data(args, configfile=configfile)
         if not pipeline_dir.is_dir():
@@ -567,6 +571,7 @@ class DataManager:
             self._run_data[SECTION_REPORTS] = data[SECTION_REPORTS]
 
         self.running = False
+        self._run_data["FINISHED"] = True
         await self.send_run_data(ws, force=True)
         self._proc_running_order = 0
 
@@ -652,14 +657,12 @@ class DataManager:
     async def on_job_cached(self, data, ws):
         await self._on_job(data, "succeeded", ws)
 
-    async def run_pipeline(self, command, port, ws):
+    async def run_pipeline(self, command, port):
         """Run a command and send the output to the websocket"""
         self.clear_run_data()
         self._run_data[SECTION_LOG] = self._run_data[SECTION_LOG] or ""
 
-        p = await asyncio.create_subprocess_exec(
-            "bash",
-            "-c",
+        p = await asyncio.create_subprocess_shell(
             command,
             stdin=asyncio.subprocess.PIPE,
             stdout=asyncio.subprocess.PIPE,
@@ -667,13 +670,54 @@ class DataManager:
         )
         p.stdin.write(f"pipen-board:{port}\n".encode())
         self.running = p.pid
+        self._command = command
 
         async for line in p.stdout:
-            line = line.decode()
-            print(line, end = "")
-            self._run_data[SECTION_LOG] += line
+            self._run_data[SECTION_LOG] += line.decode()
 
         await p.wait()
+
+    async def stop_pipeline(self):
+        """Stop the pipeline"""
+        if not self.running:
+            return {"ok": False, "msg": "Pipeline is not running"}
+
+        logger.debug(
+            "[bold][yellow]DBG[/yellow][/bold] Killing pipeline at %s ...",
+            self.running,
+        )
+
+        # Let the pipeline send signals to the jobs
+        # The jobs could be on some scheduler systems
+        os.kill(self.running, signal.SIGINT)
+        await asyncio.sleep(3)
+        # Start killing
+        import psutil
+        proc = psutil.Process(self.running)
+        for child in proc.children(recursive=True):
+            child.terminate()
+            await asyncio.sleep(1)
+            try:
+                child.kill()
+                await asyncio.sleep(1)
+            except psutil.NoSuchProcess:
+                pass
+
+        try:
+            proc.terminate()
+            await asyncio.sleep(1)
+        except psutil.NoSuchProcess:
+            pass
+
+        try:
+            proc.kill()
+            await asyncio.sleep(1)
+        except psutil.NoSuchProcess:
+            pass
+
+        self.running = False
+        self._run_data["FINISHED"] = True
+        return {"ok": True, "msg": "Pipeline killed"}
 
 
 data_manager = DataManager()

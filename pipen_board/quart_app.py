@@ -56,6 +56,7 @@ def get_app(args: Namespace):
     @app.websocket("/ws")
     async def ws():
         """The websocket handler"""
+        client = None
         try:
             while True:
                 message = await websocket.receive()
@@ -92,7 +93,20 @@ def get_app(args: Namespace):
             data_manager.run_pipeline,
             command,
             args.port,
-            clients.get("web"),
+        )
+        return {"ok": True}
+
+    @app.route("/api/pipeline/rerun", methods=["POST"])
+    async def rerun():
+        logger.info(
+            f"[bold][yellow]API[/yellow][/bold] Re-Running pipeline: %s",
+            data_manager._command,
+        )
+        # Run command at background
+        app.add_background_task(
+            data_manager.run_pipeline,
+            data_manager._command,
+            args.port,
         )
         return {"ok": True}
 

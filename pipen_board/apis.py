@@ -210,6 +210,10 @@ async def job_get_file():
     return {"type": "binary"}
 
 
+async def pipeline_stop():
+    return await data_manager.stop_pipeline()
+
+
 async def ws_web(data, clients):
     logger.info(f"WS/WEB Received: {data}")
 
@@ -259,6 +263,7 @@ POSTS = {
     "/api/config/save": config_save,
     "/api/job/get_tree": job_get_tree,
     "/api/job/get_file": job_get_file,
+    "/api/pipeline/stop": pipeline_stop,
 }
 
 WS = {
