@@ -45,6 +45,8 @@
     let finished = false;
     // whether we are re-running or stopping
     let rerunningOrStopping = false;
+    // the log of building the report
+    let report_building_log = "Click 'building log' above to load.";
 
     if (isRunning > 0) {
         // fetch the updated running data
@@ -134,6 +136,21 @@
         rerunningOrStopping = false;
     }
 
+    const loadReportBuildingLog = async () => {
+        report_building_log = 'Loading ...';
+        const res = await fetch('/api/report_building_log');
+        if (res.ok) {
+            const d = await res.json();
+            if (d.ok) {
+                report_building_log = d.content;
+            } else {
+                report_building_log = `Error: ${d.content}`;
+            }
+        } else {
+            report_building_log = 'Error: Failed to load the log.';
+        }
+    }
+
 </script>
 
 {#if !data && fetching}
@@ -199,20 +216,27 @@
             </div>
         {:else if activeNavItem === "Reports"}
             <div class="run-main">
-                <Tile>
-                    <div class="reports-wrapper">
-                        <p>Reports are generated at <code>{data[SECTION_REPORTS]}</code></p>
-                        <p>&nbsp;</p>
-                        <p>You can either:</p>
-                        <ul>
-                            <li>Check them out by directly visiting <code>{data[SECTION_REPORTS]}/index.html</code></li>
-                            <li>Or run <code>pipen report serve -r {data[SECTION_REPORTS].substring(0, data[SECTION_REPORTS].lastIndexOf('/'))}</code>, and go to <code>REPORTS</code> directory.</li>
-                            <li>Or visit <a target="_blank" href="/reports/REPORTS/index.html?root={data[SECTION_REPORTS]}">the reports</a> served by this plugin</li>
-                        </ul>
-                        <p>&nbsp;</p>
-                        <p>Note that if the run fails, the reports may be incomplete.</p>
-                    </div>
-                </Tile>
+                <div class="reports-wrapper-layout">
+                    <Tile>
+                        <div class="reports-wrapper">
+                            <p>Reports are generated at <code>{data[SECTION_REPORTS]}</code></p>
+                            <p>&nbsp;</p>
+                            <p>You can either:</p>
+                            <ul>
+                                <li>Check them out by directly visiting <code>{data[SECTION_REPORTS]}/index.html</code></li>
+                                <li>Run <code>pipen report serve -r {data[SECTION_REPORTS].substring(0, data[SECTION_REPORTS].lastIndexOf('/'))}</code>, and go to <code>REPORTS</code> directory.</li>
+                                <li>Visit <a target="_blank" href="/reports/REPORTS/index.html?root={data[SECTION_REPORTS]}">the reports</a> served by this plugin</li>
+                                <li>Or check the
+                                    <a href={'javascript:void(0)'} on:click|preventDefault={loadReportBuildingLog}>building log</a>
+                                    if necessary.
+                                </li>
+                            </ul>
+                            <p>&nbsp;</p>
+                            <p>Note that if the run fails, the reports may be incomplete.</p>
+                        </div>
+                    </Tile>
+                    <Log log={report_building_log} />
+                </div>
             </div>
         {:else if activeNavItem in data[SECTION_PROCESSES]}
             {#key activeNavItem}
@@ -321,5 +345,21 @@
         color: white;
         line-height: .8rem;
         font-size: .8rem;
+    }
+    div.reports-wrapper-layout {
+        display: flex;
+        flex-flow: column;
+        height: 100%;
+        gap: 1rem;
+    }
+    div.reports-wrapper-layout > :global(div.bx--tile) {
+        min-height: auto !important;
+    }
+    div.reports-wrapper-layout > :global(div.run-log) {
+        flex-grow: 1;
+    }
+    div.reports-wrapper-layout > :global(div.run-log > div.run-log__code) {
+        height: 100%;
+        overflow: auto;
     }
 </style>

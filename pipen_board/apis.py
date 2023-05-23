@@ -1,6 +1,7 @@
 from __future__ import annotations
-import base64
 
+import base64
+import re
 from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -109,6 +110,26 @@ async def reports(report_path):
 # Cache the physical path of the reports
 # A better way?
 reports.root = None
+
+
+async def report_building_log():
+    """Get the building log of a report"""
+    args = request.cli_args
+    report_file = Path(args.root).joinpath(
+        ".pipen",
+        args.name,
+        ".report-workdir",
+        "pipen-report.log",
+    )
+    logger.info(
+        "[bold][yellow]API[/yellow][/bold] Getting building log: %s",
+        report_file,
+    )
+    if not report_file.is_file():
+        return {"ok": False, "content": "No report building log file found."}
+
+    pattern =  re.compile(r'\x1B\[\d+(;\d+){0,2}m')
+    return {"ok": True, "content": pattern.sub('', report_file.read_text())}
 
 
 async def history_del():
@@ -277,6 +298,7 @@ async def ws_pipeline_disconn(clients):
 GETS = {
     "/": index,
     "/api/history": history,
+    "/api/report_building_log": report_building_log,
     "/reports/<path:report_path>": reports,
 }
 
