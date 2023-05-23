@@ -5,7 +5,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from quart import request, redirect
+from quart import request, redirect, send_file
 from slugify import slugify
 
 from .defaults import JOB_STATUS, PIPEN_BOARD_DIR, logger
@@ -87,6 +87,28 @@ async def history():
         })
 
     return out
+
+
+async def reports(report_path):
+    root = request.args.get("root", None)
+    root = root or reports.root
+    if root is None:
+        return {"error": "No root directory for reports is specified"}
+
+    reports.root = root
+    logger.info(root)
+    logger.info(report_path)
+    report_path = Path(root).parent / report_path
+    if report_path.is_dir():
+        report_path = report_path / "index.html"
+
+    # Serve the file
+    return await send_file(report_path)
+
+
+# Cache the physical path of the reports
+# A better way?
+reports.root = None
 
 
 async def history_del():
@@ -255,6 +277,7 @@ async def ws_pipeline_disconn(clients):
 GETS = {
     "/": index,
     "/api/history": history,
+    "/reports/<path:report_path>": reports,
 }
 
 POSTS = {

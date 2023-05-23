@@ -207,6 +207,7 @@
                         <ul>
                             <li>Check them out by directly visiting <code>{data[SECTION_REPORTS]}/index.html</code></li>
                             <li>Or run <code>pipen report serve -r {data[SECTION_REPORTS].substring(0, data[SECTION_REPORTS].lastIndexOf('/'))}</code>, and go to <code>REPORTS</code> directory.</li>
+                            <li>Or visit <a target="_blank" href="/reports/REPORTS/index.html?root={data[SECTION_REPORTS]}">the reports</a> served by this plugin</li>
                         </ul>
                         <p>&nbsp;</p>
                         <p>Note that if the run fails, the reports may be incomplete.</p>
