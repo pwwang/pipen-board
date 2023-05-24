@@ -108,15 +108,17 @@ class PipenCliBoardPlugin(CLIPlugin):
         else:
             logger.setLevel(args.loglevel.upper())
 
-        app = get_app(args)
-        logger.info("")
-        logger.info(
-            f"[bold][magenta]PIPEN-{self.name.upper()}[/magenta]: "
-            f"[cyan]v{self.__version__}[/cyan][/bold]"
-        )
-        logger.info(self.__doc__)
-        logger.info("")
+        print(" * ")
+        print(" *        __   __  __         __  __      __  __")
+        print(" *       |__)||__)|_ |\ | __ |__)/  \ /\ |__)|  \\")
+        print(" *       |   ||   |__| \|    |__)\__//--\| \ |__/")
+        print(" * ")
+        print(" *                   version: %s" % __version__)
+        print(" * ")
+        print("\n".join(map(lambda x: f" * {x}", self.__doc__.splitlines())))
+        print(" * ")
 
+        app = get_app(args)
         # See https://github.com/pallets/quart/issues/224
         # for customizing logger in the future
         app.run(port=args.port, debug=args.dev, use_reloader=args.dev)
