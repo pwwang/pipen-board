@@ -1,8 +1,10 @@
 <script>
     import InlineNotification from "carbon-components-svelte/src/Notification/InlineNotification.svelte";
+    import Button from "carbon-components-svelte/src/Button/Button.svelte";
     import TreeView from "carbon-components-svelte/src/TreeView/TreeView.svelte";
     import ToastNotification from "carbon-components-svelte/src/Notification/ToastNotification.svelte";
     import Tag from "carbon-components-svelte/src/Tag/Tag.svelte";
+    import Reset from "carbon-icons-svelte/lib/Reset.svelte";
 
     import { JOB_TAG_KIND } from "../constants";
     import FilePreview from "./FilePreview.svelte";
@@ -159,7 +161,6 @@
         }
     };
 
-
 </script>
 
 <svelte:window
@@ -198,6 +199,18 @@
             on:select={loadFileDetails}
             children={jobTree}
             />
+        <div class="jft-reloader">
+            <Button
+                on:click={async () => {jobTree = await loadJobTree(job);}}
+                size="small"
+                kind="ghost"
+                tooltipPosition="left"
+                tooltipAlignment="start"
+                iconDescription="Reload file tree"
+                icon={Reset} />
+        </div>
+        {:else}
+        File tree view
         {/if}
     </div>
     <div class="draggable" on:mousedown={handleDragStartX}></div>
@@ -263,6 +276,14 @@
         grid-area: tree;
         overflow-y: auto;
         padding: 1rem;
+        position: relative;
+    }
+    div.procrun-wrap div.tree div.jft-reloader {
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: 1rem;
+        transform: scale(.8);
     }
     div.procrun-wrap div.draggable {
         grid-area: draggable;
