@@ -142,7 +142,7 @@
         if (res.ok) {
             const d = await res.json();
             if (d.ok) {
-                report_building_log = d.content;
+                report_building_log = d.content || '(empty)';
             } else {
                 report_building_log = `Error: ${d.content}`;
             }

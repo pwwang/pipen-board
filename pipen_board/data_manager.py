@@ -696,19 +696,29 @@ class DataManager:
 
         try:
             proc = psutil.Process(self.running)
-            for child in proc.children(recursive=True):
-                child.terminate()
-                await asyncio.sleep(1)
-                child.kill()
-                await asyncio.sleep(1)
-
-            proc.terminate()
-            await asyncio.sleep(1)
-            proc.kill()
-            await asyncio.sleep(1)
         except psutil.NoSuchProcess:
             # Might be killed by SIGINT
             pass
+        else:
+            for child in proc.children(recursive=True):
+                try:
+                    child.terminate()
+                    await asyncio.sleep(1)
+                except psutil.NoSuchProcess:
+                    pass
+                try:
+                    child.kill()
+                    await asyncio.sleep(1)
+                except psutil.NoSuchProcess:
+                    pass
+
+            try:
+                proc.terminate()
+                await asyncio.sleep(1)
+                proc.kill()
+                await asyncio.sleep(1)
+            except psutil.NoSuchProcess:
+                pass
 
         self.running = False
         self._run_data["FINISHED"] = True

@@ -27,7 +27,7 @@ class MyGroup(ProcGroup):
             output = "outfile:file:{{in.infile | split: '/' | last | split: '.' | first}}.out"
             lang = "bash"
             cache = False
-            script = "cat {{in.infile}} > {{out.outfile}}; sleep 1; echo P2 >> {{out.outfile}}"
+            script = "cat {{in.infile}} > {{out.outfile}}; sleep 3; echo P2 >> {{out.outfile}}"
         return P2
 
     @ProcGroup.add_proc
@@ -44,14 +44,14 @@ class MyGroup(ProcGroup):
                 for i in $(seq 1 10); do
                     echo $i >> {{out.outfile | dirname | dirname}}/ja_subdir/$i.txt
                 done
-                convert -size 200x200 xc:white {{out.outfile | dirname}}/ja_subdir/image.png
+                convert -size 200x200 xc:white {{out.outfile | dirname}}/image.png
                 # exit 1
             """
             plugin_opts = {
                 "report": """
                     <script>import { Image } from '$libs';</script>
                     <h1>P3</h1>
-                    <Image src="{{job.outdir}}/ja_subdir/image.png" />
+                    <Image src="{{job.outdir}}/image.png" />
                 """
             }
         return P3

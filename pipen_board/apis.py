@@ -97,8 +97,6 @@ async def reports(report_path):
         return {"error": "No root directory for reports is specified"}
 
     reports.root = root
-    logger.info(root)
-    logger.info(report_path)
     report_path = Path(root).parent / report_path
     if report_path.is_dir():
         report_path = report_path / "index.html"
