@@ -37,6 +37,9 @@
     let initWidth = null;
     let initHeight = null;
 
+    // file selected in the tree
+    let fileSelected = null;
+
     const handleDragStartX = function (e) {
         dragStartX = e.clientX;
         initWidth = e.target.previousElementSibling.clientWidth;
@@ -131,7 +134,28 @@
             }
         };
         // find the full path in job tree
-        const item = findItem(jobTree, e.detail.id);
+        fileSelected = e.detail.id;
+        loadFileDetailsById();
+    };
+
+    const loadFileDetailsById = async () => {
+        if (!fileSelected) {
+            return;
+        }
+        const findItem = function(items, id) {
+            for (const item of items) {
+                if (item.id === id) {
+                    return item;
+                }
+                if (item.children) {
+                    const found = findItem(item.children, id);
+                    if (found) {
+                        return found;
+                    }
+                }
+            }
+        };
+        const item = findItem(jobTree, fileSelected);
         // unlikely to happen
         if (!item) {
             toastNotify.kind = "error";
@@ -233,7 +257,7 @@
                     >Select a file to preview</InlineNotification>
                 </div>
             {:else}
-                <FilePreview {proc} {job} info={fileDetails} />
+                <FilePreview {proc} {job} reloadFileDetails={loadFileDetailsById} info={fileDetails} />
             {/if}
         </div>
     </div>

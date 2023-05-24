@@ -3,10 +3,12 @@
     import Button from "carbon-components-svelte/src/Button/Button.svelte";
     import InlineNotification from "carbon-components-svelte/src/Notification/InlineNotification.svelte";
     import Copy from "carbon-icons-svelte/lib/Copy.svelte";
+    import Reset from "carbon-icons-svelte/lib/Reset.svelte";
     // {type, content}
     export let proc;
     export let job;
     export let info;
+    export let reloadFileDetails;
 
     let fetching = false;
     let bigtextShowing = "Head 100";
@@ -51,6 +53,7 @@
                 <Button size="small" disabled={bigtextShowing === showing || fetching} kind="tertiary" on:click={e => bigtextShow(showing)}>{showing}</Button>
             {/each}
         {/if}
+        <Button size="small" kind="tertiary" icon={Reset} on:click={reloadFileDetails}>Reload</Button>
     </div>
     <div class="filepreview-content">
         {#if info.type === "text" }
