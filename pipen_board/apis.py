@@ -15,21 +15,20 @@ from .data_manager import data_manager
 
 
 if TYPE_CHECKING:
-    from typing import Mapping, Any
+    from typing import Mapping, Any, Tuple
 
 
 # Helper functions
-def _get_children(parent: Path, idx: int = 0) -> Mapping[str, Any]:
+def _get_children(parent: Path, idx: int = 0) -> Tuple[Mapping[str, Any], int]:
     """Get the children of a parent path"""
     out = []
     for child in parent.glob("*"):
         idx += 1
         item = {"id": idx, "text": child.name, "full": str(child)}
         if child.is_dir():
-            item["children"] = _get_children(child, idx)
-            idx += len(item["children"])
+            item["children"], idx = _get_children(child, idx)
         out.append(item)
-    return out
+    return out, idx
 
 
 def _get_file_content(path: Path, how: str) -> str:
@@ -199,7 +198,7 @@ async def job_get_tree():
 
     # compose a treeview data
     # see: https://carbon-components-svelte.onrender.com/components/TreeView
-    return _get_children(jobdir)
+    return _get_children(jobdir)[0]
 
 
 async def job_get_file():

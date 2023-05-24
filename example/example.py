@@ -81,6 +81,29 @@ class P4(Proc):
     plugin_opts = {"report": "<h1>P4</h1><p>{{envs.abc}}</p>"}
 
 
+class P5(Proc):
+    """Emulate the recursive output directory being shown correctly in job tree
+    """
+    requires = P4
+    input = "infile:file"
+    output = "outdir:dir:p5outdir"
+    script = """
+    outdir="{{out.outdir}}"
+    mkdir -p $outdir/subdir1
+    echo "a1" > $outdir/subdir1/a1.txt
+    echo "a11" > $outdir/subdir1/a11.txt
+    mkdir -p $outdir/subdir2
+    echo "a2" > $outdir/subdir2/a2.txt
+    echo "a22" > $outdir/subdir2/a22.txt
+    mkdir -p $outdir/subdir3
+    echo "a3" > $outdir/subdir3/a3.txt
+    echo "a33" > $outdir/subdir3/a33.txt
+    mkdir -p $outdir/subdir3/subdir4
+    echo "a4" > $outdir/subdir3/subdir4/a4.txt
+    echo "a44" > $outdir/subdir3/subdir4/a44.txt
+    """
+
+
 class ExamplePipeline(Pipen):
     """An example pipeline showing how pipen-board works."""
     starts = P1
