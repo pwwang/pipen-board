@@ -164,3 +164,4 @@ docs/api/
 test.py
 frontend_source.env
 /t_*.py
+test_ws.py

@@ -78,7 +78,7 @@ class P4(Proc):
     output = "outfile:file:{{in.infile | split: '/' | last | split: '.' | first}}.out"
     envs = {"abc": "123", "method": {"a": 1}}
     script = "cat {{in.infile}} > {{out.outfile}}; echo P4 >> {{out.outfile}};"
-    plugin_opts = {"report": "<h1>P4</h1>"}
+    plugin_opts = {"report": "<h1>P4</h1><p>{{envs.abc}}</p>"}
 
 
 class ExamplePipeline(Pipen):
