@@ -4,14 +4,12 @@ import logging
 from pathlib import Path
 from typing import Awaitable, Callable, Coroutine
 
-from pipen.utils import get_logger
+from rich.logging import RichHandler
 from hypercorn.config import Config as HyperConfig
 from hypercorn.asyncio import serve
 from quart import Quart as _Quart
 
 NAME = "board"
-logger = get_logger(NAME)
-logging.getLogger('asyncio').setLevel(logging.WARNING)
 
 
 class PluginNameLogFilter(logging.Filter):
@@ -31,7 +29,18 @@ class PluginNameLogFilter(logging.Filter):
         return True
 
 
-logger.logger.addFilter(PluginNameLogFilter())
+# Use a different logger to avoid writing the logs from this plugin in
+# terminal to the file (by plugin log2file)
+logger = logging.getLogger(f"pipen-{NAME}")
+logger.addHandler(
+    RichHandler(
+        show_path=False,
+        omit_repeated_times=False,
+        markup=True,
+    )
+)
+logger.addFilter(PluginNameLogFilter())
+logging.getLogger('asyncio').setLevel(logging.WARNING)
 
 
 # Subclass Quart to allow using logger
@@ -49,7 +58,7 @@ class Quart(_Quart):
     ) -> Coroutine[None, None, None]:
         config = HyperConfig()
         config.access_log_format = "%(r)s %(s)s %(b)s %(D)s"
-        config.accesslog = logger.logger
+        config.accesslog = logger
         config.bind = [f"{host}:{port}"]
         config.ca_certs = ca_certs
         config.certfile = certfile

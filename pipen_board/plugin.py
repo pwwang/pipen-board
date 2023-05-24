@@ -4,13 +4,10 @@ import logging
 import json
 import sys
 import selectors
-from pathlib import Path
-from tempfile import gettempdir
 from typing import TYPE_CHECKING
 
 import websocket
-from slugify import slugify
-from pipen.utils import get_marked
+from pipen.utils import get_marked, get_logger
 from pipen.pluginmgr import plugin
 
 from .defaults import (
@@ -19,18 +16,19 @@ from .defaults import (
     SECTION_PROCGROUPS,
     SECTION_DIAGRAM,
     SECTION_REPORTS,
-    logger,
 )
 
 if TYPE_CHECKING:
     from pipen import Pipen, Proc
     from pipen.job import Job
 
+logger = get_logger(NAME)
+
 
 class PipenBoardPlugin:
     name = NAME
     # Let other plugins run first
-    order = 9999
+    priority = 9999
 
     def __init__(self):
         self.ws = None
