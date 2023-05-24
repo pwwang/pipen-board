@@ -10,6 +10,7 @@ import websocket
 from pipen.utils import get_marked, get_logger
 from pipen.pluginmgr import plugin
 
+from .version import __version__
 from .defaults import (
     NAME,
     SECTION_PROCESSES,
@@ -29,6 +30,7 @@ class PipenBoardPlugin:
     name = NAME
     # Let other plugins run first
     priority = 9999
+    __version__ = __version__
 
     def __init__(self):
         self.ws = None

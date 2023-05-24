@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 from pipen.cli import CLIPlugin
 
+from .version import __version__
 from .defaults import NAME, logger
 from .quart_app import get_app
 
@@ -14,9 +15,10 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 class PipenCliBoardPlugin(CLIPlugin):
-    """Visualize configuration and running of pipen pipelines on the web"""
+    """Configure and run pipen pipelines on the web"""
 
     name = NAME
+    __version__ = __version__
 
     def __init__(
         self,

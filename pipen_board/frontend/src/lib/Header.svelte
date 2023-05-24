@@ -8,12 +8,13 @@
     export let backToHistory = false;
     export let configfile = undefined;
     export let histories;
+    export let version = "0.0.0";
 </script>
 
 <header>
     <div class="header-left">
         <div class="wizard-desc">
-            <Dashboard /> PIPEN BOARD
+            <Dashboard /> PIPEN BOARD <em>v{version}</em>
         </div>
         <h1>{pipelineName}</h1>
         <div>{pipelineDesc ? pipelineDesc : ""}</div>

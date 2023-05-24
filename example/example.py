@@ -82,7 +82,7 @@ class P4(Proc):
 
 
 class ExamplePipeline(Pipen):
-    """An example pipeline showing how pipen-cli-config works."""
+    """An example pipeline showing how pipen-board works."""
     starts = P1
     data = [["123"] * 10]
     loglevel = "debug"

@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 from quart import request, redirect, send_file
 from slugify import slugify
 
+from .version import __version__
 from .defaults import JOB_STATUS, PIPEN_BOARD_DIR, logger
 from .data_manager import data_manager
 
@@ -88,6 +89,11 @@ async def history():
         })
 
     return out
+
+
+async def version():
+    """Get the version of pipen-board"""
+    return __version__
 
 
 async def reports(report_path):
@@ -296,6 +302,7 @@ async def ws_pipeline_disconn(clients):
 GETS = {
     "/": index,
     "/api/history": history,
+    "/api/version": version,
     "/api/report_building_log": report_building_log,
     "/reports/<path:report_path>": reports,
 }
