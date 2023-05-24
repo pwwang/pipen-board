@@ -11,6 +11,7 @@
     import WatsonHealthStatusAcknowledge from "carbon-icons-svelte/lib/WatsonHealthStatusAcknowledge.svelte";
     import ContinueFilled from "carbon-icons-svelte/lib/ContinueFilled.svelte";
     import SkipBack from "carbon-icons-svelte/lib/SkipBack.svelte";
+    import CheckmarkOutline from "carbon-icons-svelte/lib/CheckmarkOutline.svelte";
 
     import { IS_DEV, getStatusPercentage } from "./utils";
     import Header from "./Header.svelte";
@@ -25,6 +26,8 @@
     // 1: first run trial
     // 2: 2nd run trial
     let isRunning = 0;
+    // If the pipeline is running, whether it is finished
+    let finished = false;
     let config_data;
     let run_data;
 
@@ -116,13 +119,15 @@
         <Tabs style="border-bottom: 2px solid #e0e0e0" bind:selected={selectedTab}>
             <Tab><Settings />Configuration</Tab>
             <Tab
-                class="run-tab {isRunning && statusPercent[2] > 0 ? 'running' : ''}"
+                class="run-tab {isRunning && (statusPercent[2] > 0 || !finished) ? 'running' : ''}"
                 style="--n_succ: {statusPercent[0]}%; --n_fail: {statusPercent[1]}%; --n_run: {statusPercent[2]}%; --n_init: {statusPercent[3]}%"
             >
-                {#if isRunning}
-                <ContinueFilled />Running
+                {#if isRunning && finished}
+                <CheckmarkOutline /><span class="runtab-title">Finished</span>
+                {:else if isRunning && !finished}
+                <ContinueFilled /><span class="runtab-title">Running</span>
                 {:else}
-                <WatsonHealthStatusAcknowledge />Previous Run
+                <WatsonHealthStatusAcknowledge /><span class="runtab-title">Previous Run</span>
                 {/if}
             </Tab>
             <svelte:fragment slot="content">
@@ -136,7 +141,7 @@
                 </TabContent>
                 <TabContent>
                     {#key isRunning}
-                        <Run data={run_data} bind:statusPercent bind:isRunning />
+                        <Run data={run_data} bind:finished bind:statusPercent bind:isRunning />
                     {/key}
                 </TabContent>
             </svelte:fragment>
@@ -162,5 +167,8 @@ div.pipen-tabs {
     grid-template-columns: 1fr;
     /* https://stackoverflow.com/a/71024439/5088165 */
     min-height: 0;
+}
+div.pipen-tabs span.runtab-title {
+    min-width: 5rem;
 }
 </style>

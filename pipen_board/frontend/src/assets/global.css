@@ -252,7 +252,7 @@ div.pipen-tabs li.run-tab.running::after {
     border-bottom-color: transparent;
     animation: running-dot 1s linear infinite;
     position: absolute;
-    right: 2px;
+    right: 1rem;
     top: calc(50% - 8px);
 }
 

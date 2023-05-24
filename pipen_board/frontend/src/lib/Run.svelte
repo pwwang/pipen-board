@@ -32,6 +32,8 @@
     export let statusPercent;
     // reactive
     export let isRunning;
+    // reactive
+    export let finished;
 
     // if we are fetching the inital data
     let fetching = true;
@@ -41,8 +43,6 @@
     let toastNotify = { kind: undefined, subtitle: undefined, timeout: 0 };
     // whether we have a first update from running data
     let firstUpdate = true;
-    // whether the run is finished
-    let finished = false;
     // whether we are re-running or stopping
     let rerunningOrStopping = false;
     // the log of building the report
