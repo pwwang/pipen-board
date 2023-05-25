@@ -180,6 +180,13 @@ function updateConfig(config, option, value, ns=false) {
 
 function finalizeConfig(schema) {
     let config = {};
+    // Should we flatten the config (without process namespace)?
+    // Only works for single-process pipelines
+    const flatten = !!(
+        schema[SECTION_PIPELINE_OPTS].plugin_opts
+        && schema[SECTION_PIPELINE_OPTS].plugin_opts.value.args_flatten
+        && schema[SECTION_PIPELINE_OPTS].plugin_opts.value.args_flatten.value
+    );
     for (let [option, optinfo] of Object.entries(schema[SECTION_PIPELINE_OPTS])) {
         config = updateConfig(config, option, optinfo, option.endsWith("_opts"));
     }
@@ -198,7 +205,13 @@ function finalizeConfig(schema) {
             // remove options that are equal to the pipeline options
             if (_equal(proc_conf[option], config[option])) { delete proc_conf[option]; }
         }
-        if (Object.keys(proc_conf).length > 0) config[proc] = proc_conf;
+        if (Object.keys(proc_conf).length > 0) {
+            if (flatten) {
+                config = { ...config, ...proc_conf };
+            } else {
+                config[proc] = proc_conf;
+            }
+        }
     }
     for (let [group, groupinfo] of Object.entries(schema[SECTION_PROCGROUPS] || {})) {
         for (let option in groupinfo.ARGUMENTS) {

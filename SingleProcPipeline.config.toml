@@ -1,0 +1,9 @@
+desc = "An example pipeline showing how pipen-board works."
+error_strategy = "ignore"
+loglevel = "info"
+name = "SingleProcPipeline"
+plugin_opts = { }
+scheduler_opts = { }
+
+[in]
+var = [ "segsegrserg" ]

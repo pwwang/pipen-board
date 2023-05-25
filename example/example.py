@@ -89,6 +89,7 @@ class P5(Proc):
     output = "outdir:dir:p5outdir"
     script = """
     outdir="{{out.outdir}}"
+    cat {{in.infile}} > $outdir/a0.txt
     mkdir -p $outdir/subdir1
     echo "a1" > $outdir/subdir1/a1.txt
     echo "a11" > $outdir/subdir1/a11.txt

@@ -301,7 +301,7 @@ async def _get_config_data(args: Namespace) -> Mapping[str, Any]:
     else:
         data = {}
 
-    data[SECTION_PIPELINE_OPTIONS] = PIPELINE_OPTIONS
+    data[SECTION_PIPELINE_OPTIONS] = PIPELINE_OPTIONS.copy()
     data[SECTION_PIPELINE_OPTIONS]["name"] = {
         "type": "str",
         "value": args.name or pipeline.name,
@@ -327,6 +327,24 @@ async def _get_config_data(args: Namespace) -> Mapping[str, Any]:
         "value": None,
     }
     data[SECTION_PROCESSES] = {}
+
+    if pipeline.config.plugin_opts.get("args_flatten") is True or (
+        "args_flatten" not in pipeline.config.plugin_opts
+        and len(pipeline.procs) == 1
+    ):
+        data[SECTION_PIPELINE_OPTIONS]["plugin_opts"]["value"][
+            "args_flatten"
+        ] = {
+            "desc": (
+                "Flatten the arguments of the pipeline. "
+                "For example, [envs] will ba treated as [<Process>.envs]. "
+                "Only works for single-process pipeline"
+            ),
+            "type": "bool",
+            "value": True,
+            "readonly": True,
+        }
+
     pg_sec = {}
     for i, proc in enumerate(pipeline.procs):
         logger.debug(
@@ -373,7 +391,7 @@ class DataManager:
         self._config_data = None
         self._run_data = None
         self._timer = None
-        self._proc_running_order = 0;
+        self._proc_running_order = 0
         self._command = None
 
     def _get_config_data(
