@@ -10,7 +10,6 @@
     import Modal from "carbon-components-svelte/src/Modal/Modal.svelte";
     import ChevronUp from "carbon-icons-svelte/lib/ChevronUp.svelte";
     import ChevronDown from "carbon-icons-svelte/lib/ChevronDown.svelte";
-    import Cicsplex from "carbon-icons-svelte/lib/Cicsplex.svelte";
     import ContinueFilled from "carbon-icons-svelte/lib/ContinueFilled.svelte";
     import Option from "./options/Option.svelte";
     import { hasHidden, getKeysHidden, getKeysUnhidden, autoHeight, finalizeConfig } from "../utils";
@@ -40,6 +39,10 @@
     let overwriteConfig = false;
 
     $: tomlfile = data.value[data.configfile].value;
+    $: {
+        data = data;
+        generateCommand();
+    }
 
     const setError = (key, value) => {
         errors[key] = value;
@@ -62,22 +65,6 @@
             </ul>
         `;
         return true;
-    }
-
-    const generateCommand = () => {
-        if (checkErrors($storedErrors)) {
-            return;
-        }
-        if (checkErrors(errors)) {
-            return;
-        }
-
-        let obj = {};
-        for (let key in data.value) {
-            obj[key] = data.value[key].value;
-        }
-        generatedCommand = data.command.replace(/\$\{(\w+)\}/g, (_, key) => obj[key]);
-        invalid = false;
     }
 
     const runCommandConfirm = async () => {
@@ -133,6 +120,21 @@
         }
     }
 
+    const generateCommand = () => {
+        if (checkErrors($storedErrors)) {
+            return;
+        }
+        if (checkErrors(errors)) {
+            return;
+        }
+
+        let obj = {};
+        for (let key in data.value) {
+            obj[key] = data.value[key].value;
+        }
+        generatedCommand = data.command.replace(/\$\{(\w+)\}/g, (_, key) => obj[key]);
+        invalid = false;
+    }
 </script>
 
 <Modal
@@ -184,14 +186,6 @@
             bind:value={generatedCommand}
             on:input={e => autoHeight(e.target)} />
         <div class="running-action-wrapper">
-            <Button
-                size="small"
-                kind="tertiary"
-                icon={Cicsplex}
-                iconDescription="Generate Command based on the options"
-                on:click={generateCommand}>
-                Generate Command
-            </Button>
             {#if data.allow_run}
             <TooltipDefinition
                 direction="bottom"
@@ -199,7 +193,7 @@
                 tooltipText="Save the configurations to {tomlfile} and run the generated command.">
                 <Button
                     size="small"
-                    kind="danger-tertiary"
+                    kind="tertiary"
                     icon={ContinueFilled}
                     disabled={submitting || generatedCommand === ""}
                     iconDescription="Run the Command"
