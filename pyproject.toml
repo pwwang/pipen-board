@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pipen-board"
-version = "0.1.0"
+version = "0.2.0"
 description = "Visualization configuration and running of pipen pipelines on the web"
 authors = ["pwwang <pwwang@pwwang.com>"]
 license = "MIT"
@@ -13,7 +13,7 @@ generate-setup-file = true
 [tool.poetry.dependencies]
 python = "^3.8"
 quart = "^0.18"
-pipen-args = "^0.9.7"
+pipen-args = "^0.9.8"
 websocket-client = "^1.5"
 pipen-log2file = "^0.2.1"
 psutil = "^5.9.5"
