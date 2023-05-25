@@ -14,7 +14,7 @@
 <header>
     <div class="header-left">
         <div class="wizard-desc">
-            <Dashboard /> PIPEN BOARD <em>v{version}</em>
+            <Dashboard /> <a href="https://github.com/pwwang/pipen-board" target="_blank">PIPEN BOARD</a> <em>v{version}</em>
         </div>
         <h1>{pipelineName}</h1>
         <div>{pipelineDesc ? pipelineDesc : ""}</div>
@@ -41,6 +41,10 @@
         align-items: center;
         margin-bottom: 0.7rem;
         gap: 0.5rem;
+    }
+    div.wizard-desc a {
+        color: #cadeff;
+        text-decoration: none;
     }
     header {
         grid-area: header;
