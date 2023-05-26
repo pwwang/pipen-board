@@ -216,7 +216,7 @@
         </div>
     </div>
     <div class="draggable row" on:mousedown={handleDragStartY}></div>
-    <div class="tree {jobs[job] || ''}">
+    <div class="tree scrollable {jobs[job] || ''}">
         {#if job !== undefined}
         <TreeView
             labelText="Job #{job}"
@@ -301,6 +301,9 @@
         overflow-y: auto;
         padding: 1rem;
         position: relative;
+    }
+    div.procrun-wrap div.tree > :global(ul.bx--tree) {
+        overflow: visible;
     }
     div.procrun-wrap div.tree div.jft-reloader {
         position: absolute;
