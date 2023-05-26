@@ -113,7 +113,7 @@ def _anno_to_argspec(anno: Mapping[str, Any] | None) -> Mapping[str, Any]:
         # choices
         # itype
         argspec[arg]["desc"] = arginfo.help
-        if "ctype" not in argspec[arg]:
+        if "btype" not in argspec[arg]:
             if argspec[arg].get("action") in ("store_true", "store_false"):
                 argspec[arg]["type"] = "bool"
             elif (
@@ -134,7 +134,7 @@ def _anno_to_argspec(anno: Mapping[str, Any] | None) -> Mapping[str, Any]:
             elif argspec[arg].get("mchoice") or argspec[arg].get("mchoices"):
                 argspec[arg]["type"] = "mchoice"
         else:
-            argspec[arg]["type"] = argspec[arg].pop("ctype")
+            argspec[arg]["type"] = argspec[arg].pop("btype")
 
         t = argspec[arg].get("type")
         if t == "ns":
@@ -164,10 +164,14 @@ def _anno_to_argspec(anno: Mapping[str, Any] | None) -> Mapping[str, Any]:
             if (
                 argspec[arg]["value"] is not None
                 and argspec[arg]["value"]
+                and "bitype" not in argspec[arg]
                 and "itype" not in argspec[arg]
                 and not isinstance(argspec[arg]["value"][0], str)
             ):
                 argspec[arg]["itype"] = type(argspec[arg]["value"][0]).__name__
+
+            if "bitype" in argspec[arg]:
+                argspec[arg]["itype"] = argspec[arg].pop("bitype")
 
     return argspec
 
