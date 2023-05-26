@@ -273,7 +273,7 @@ async def _get_config_data(args: Namespace) -> Mapping[str, Any]:
     """Get the pipeline data"""
     old_argv = sys.argv
     sys.argv = ["@pipen-board"] + args.pipeline_args
-    logger.debug(
+    logger.info(
         "[bold][yellow]DBG[/yellow][/bold] Fetching pipeline data ..."
     )
     try:
@@ -288,7 +288,7 @@ async def _get_config_data(args: Namespace) -> Mapping[str, Any]:
         sys.argv = old_argv
 
     if args.additional:
-        logger.debug(
+        logger.info(
             "[bold][yellow]DBG[/yellow][/bold] "
             "Loading additional configuration items ..."
         )
@@ -347,9 +347,9 @@ async def _get_config_data(args: Namespace) -> Mapping[str, Any]:
 
     pg_sec = {}
     for i, proc in enumerate(pipeline.procs):
-        logger.debug(
-            "[bold][yellow]DBG[/yellow][/bold] Parsing process %s ...",
-            proc.name,
+        logger.info(
+            "[bold][yellow]DBG[/yellow][/bold] Parsing process: %s ...",
+            proc,
         )
 
         pg = proc.__meta__["procgroup"]

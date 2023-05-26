@@ -11,6 +11,17 @@ from quart import Quart as _Quart
 
 NAME = "board"
 
+# Use a different logger to avoid writing the logs from this plugin in
+# terminal to the file (by plugin log2file)
+logger = logging.getLogger(f"pipen-{NAME}")
+logger.addHandler(
+    RichHandler(
+        show_path=False,
+        omit_repeated_times=False,
+        markup=True,
+    )
+)
+
 
 class PluginNameLogFilter(logging.Filter):
     def filter(self, record):
@@ -24,21 +35,12 @@ class PluginNameLogFilter(logging.Filter):
             elif record.args["s"] >= 500:
                 record.levelno = logging.ERROR
                 record.levelname = "ERROR"
+            if record.levelno < logger.level:
+                return False
 
-        record.plugin_name = NAME
         return True
 
 
-# Use a different logger to avoid writing the logs from this plugin in
-# terminal to the file (by plugin log2file)
-logger = logging.getLogger(f"pipen-{NAME}")
-logger.addHandler(
-    RichHandler(
-        show_path=False,
-        omit_repeated_times=False,
-        markup=True,
-    )
-)
 logger.addFilter(PluginNameLogFilter())
 logging.getLogger('asyncio').setLevel(logging.WARNING)
 
