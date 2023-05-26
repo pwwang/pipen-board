@@ -87,6 +87,7 @@ class P4(Proc):
             - a: Use method a
             - b: Use method b
             - c: Use method c
+            - <more>: More methods
     """
     requires = mg.p2
     input = "infile:file"

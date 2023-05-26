@@ -108,11 +108,9 @@ def _anno_to_argspec(anno: Mapping[str, Any] | None) -> Mapping[str, Any]:
     # arginfo: attrs, help, terms
     for arg, arginfo in anno.items():
         argspec[arg] = arginfo.attrs.copy()
-        # type - bool/text/choice/mchoice(s)/json/auto/list(array)/ns(namespace)
-        # required
-        # choices
-        # itype
         argspec[arg]["desc"] = arginfo.help
+        if arg.startswith("<") and arg.endswith(">"):
+            argspec[arg].setdefault("order", 999)
         if "btype" not in argspec[arg]:
             if argspec[arg].get("action") in ("store_true", "store_false"):
                 argspec[arg]["type"] = "bool"

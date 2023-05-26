@@ -138,6 +138,7 @@ effect immediately, especially when the job takes long time to run.
             "<option_name>": {
                 "type": "auto",
                 "desc": "The value of the option",
+                "order": 999,
             }
         }
     },
@@ -150,6 +151,7 @@ effect immediately, especially when the job takes long time to run.
                     "`<plugin_name>_<plugin_opt_name>`"
                 ),
                 "type": "str",
+                "order": 999,
             }
         }
     },
