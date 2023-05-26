@@ -33,6 +33,7 @@
         if (
             (origValue === null || origValue === undefined)
             && (v === "" || v === null || v === undefined)
+            && !required
         ) {
             value = origValue;
             invalid = false;

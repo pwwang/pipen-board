@@ -64,7 +64,7 @@ class P4(Proc):
     """The P4 process
 
     Envs:
-        abc: The abc env
+        abc (required): The abc env
         method (ns): The method to use.
             More description about method.
             >>> code code code code code code code code code code code code code code code code code code code code
@@ -76,7 +76,7 @@ class P4(Proc):
     requires = mg.p2
     input = "infile:file"
     output = "outfile:file:{{in.infile | split: '/' | last | split: '.' | first}}.out"
-    envs = {"abc": "123", "method": {"a": 1}}
+    envs = {"abc": None, "method": {"a": 1}}
     script = "cat {{in.infile}} > {{out.outfile}}; echo P4 >> {{out.outfile}};"
     plugin_opts = {"report": "<h1>P4</h1><p>{{envs.abc}}</p>"}
 
