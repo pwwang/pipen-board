@@ -1,4 +1,4 @@
-desc = "An example pipeline showing how pipen-cli-config works."
+desc = "An example pipeline showing how pipen-board works."
 error_strategy = "ignore"
 loglevel = "info"
 name = "ExamplePipeline"
@@ -20,8 +20,11 @@ y = [ 1, 2, 3 ]
   [ns_opt.nest_opt]
   x = 1
 
+[P1.envs]
+number = "1"
+
 [P4.envs]
-abc = "A paragraph"
+abc = "abcded"
 
   [P4.envs.method]
   a = 1

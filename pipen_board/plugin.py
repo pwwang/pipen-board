@@ -61,7 +61,7 @@ class PipenBoardPlugin:
 
         sel = selectors.DefaultSelector()
         sel.register(sys.stdin, selectors.EVENT_READ)
-        if not sel.select(timeout=0.1):
+        if not sel.select(timeout=1):
             self.ws = None
             logger.debug("No data in stdin, skip.")
             return

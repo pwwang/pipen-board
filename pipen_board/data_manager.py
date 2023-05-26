@@ -703,9 +703,14 @@ class DataManager:
         self.running = p.pid
         self._command = command
 
-        async for line in p.stdout:
-            self._run_data[SECTION_LOG] += line.decode()
+        async def read_stream(stream):
+            while True:
+                line = await stream.readline()
+                if not line:
+                    break
+                self._run_data[SECTION_LOG] += line.decode()
 
+        await asyncio.create_task(read_stream(p.stdout))
         await p.wait()
 
     async def stop_pipeline(self):
@@ -720,7 +725,17 @@ class DataManager:
 
         # Let the pipeline send signals to the jobs
         # The jobs could be on some scheduler systems
-        os.kill(self.running, signal.SIGINT)
+        try:
+            os.kill(self.running, signal.SIGINT)
+        except ProcessLookupError:
+            return {
+                "ok": False,
+                "msg": (
+                    "Pipeline probably failed to start. You may want to "
+                    "restart the pipen-board server and try again."
+                )
+            }
+
         await asyncio.sleep(3)
         # Start killing
         import psutil
