@@ -669,14 +669,14 @@ pipen = ">=0.9,<0.10"
 
 [[package]]
 name = "pipen-args"
-version = "0.9.8"
+version = "0.9.9"
 description = "Command-line argument parser for pipen."
 category = "main"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "pipen_args-0.9.8-py3-none-any.whl", hash = "sha256:feeb78b0605e9b5d8cfb2217837e97789ac818e1a908c019118ed0985e702446"},
-    {file = "pipen_args-0.9.8.tar.gz", hash = "sha256:92c2390f36b32e2bb7dc2bfa2965ade4905316ee8e5a2d1e90cd2991a86d872a"},
+    {file = "pipen_args-0.9.9-py3-none-any.whl", hash = "sha256:a691f8d662d4a778d675198390da3661edfcf119400a188e1afd7eea6f465282"},
+    {file = "pipen_args-0.9.9.tar.gz", hash = "sha256:25a5821bf3f1e476d8fcd135d530f45393f58f1ec9a129bfe28c73b1da25da6c"},
 ]
 
 [package.dependencies]
@@ -959,14 +959,14 @@ files = [
 
 [[package]]
 name = "typing-extensions"
-version = "4.6.1"
+version = "4.6.2"
 description = "Backported and Experimental Type Hints for Python 3.7+"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "typing_extensions-4.6.1-py3-none-any.whl", hash = "sha256:6bac751f4789b135c43228e72de18637e9a6c29d12777023a703fd1a6858469f"},
-    {file = "typing_extensions-4.6.1.tar.gz", hash = "sha256:558bc0c4145f01e6405f4a5fdbd82050bd221b119f4bf72a961a1cfd471349d6"},
+    {file = "typing_extensions-4.6.2-py3-none-any.whl", hash = "sha256:3a8b36f13dd5fdc5d1b16fe317f5668545de77fa0b8e02006381fd49d731ab98"},
+    {file = "typing_extensions-4.6.2.tar.gz", hash = "sha256:06006244c70ac8ee83fa8282cb188f697b8db25bc8b4df07be1873c43897060c"},
 ]
 
 [[package]]
@@ -1135,4 +1135,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "d0eab595b84258ab885ab8bd3df2e4a22a631da877827abae3ccf3cf6f6f663b"
+content-hash = "ebbe10d2b2212142d4e43cbe829b7f43dc221a0786baaf29962874612d5769e5"
