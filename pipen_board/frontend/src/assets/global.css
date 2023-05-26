@@ -2,6 +2,9 @@
     overflow-x: hidden;
 }
 
+div.bx--snippet-container::-webkit-scrollbar-track,
+div.bx--snippet-container > pre::-webkit-scrollbar-track,
+div.bx--modal-content::-webkit-scrollbar-track,
 div.scrollable::-webkit-scrollbar-track,
 aside::-webkit-scrollbar-track,
 main::-webkit-scrollbar-track
@@ -9,7 +12,10 @@ main::-webkit-scrollbar-track
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
     background-color: #F5F5F5;
 }
+div.bx--snippet-container::-webkit-scrollbar,
+div.bx--snippet-container > pre::-webkit-scrollbar,
 div.scrollable::-webkit-scrollbar,
+div.bx--modal-content::-webkit-scrollbar,
 aside::-webkit-scrollbar,
 main::-webkit-scrollbar
 {
@@ -17,7 +23,10 @@ main::-webkit-scrollbar
     height: 6px;
     background-color: #F5F5F5;
 }
+div.bx--snippet-container::-webkit-scrollbar-thumb,
+div.bx--snippet-container > pre::-webkit-scrollbar-thumb,
 div.scrollable::-webkit-scrollbar-thumb,
+div.bx--modal-content::-webkit-scrollbar-thumb,
 aside::-webkit-scrollbar-thumb,
 main::-webkit-scrollbar-thumb
 {

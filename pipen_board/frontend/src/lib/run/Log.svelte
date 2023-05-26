@@ -17,7 +17,7 @@
 
 </script>
 
-<div class="run-log" bind:this={container}>
+<div class="run-log scrollable" bind:this={container}>
     <CodeSnippet
         type="multi"
         expanded
