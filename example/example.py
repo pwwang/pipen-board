@@ -8,9 +8,22 @@ class P1(Proc):
 
     Input:
         invar: The input variable
+
+    Envs:
+        number (choice): The number of whatever
+            - 1: One.
+                Some description about one 1.
+                Some description about one 2.
+                Some description about one 3.
+                Some description about one 4.
+            - 2: Two.
+                Some description about two
+            - 3: Three.
+                Some description about three
     """
     input = "invar:var"
     output = "outfile:file:{{in.invar}}.out"
+    envs = {"number": "1"}
     script = "echo {{in.invar}} P1 > {{out.outfile}}"
 
 
