@@ -362,12 +362,17 @@ async def _get_config_data(args: Namespace) -> Mapping[str, Any]:
         if pg:
             if pg.name not in pg_sec:
                 pg_sec[pg.name] = {"PROCESSES": {}}
-                pg_args = _anno_to_argspec(annotate(pg.__class__).get("Args"))
-                if pg_args:
-                    for arg, arginfo in pg_args.items():
-                        arginfo["value"] = pg.DEFAULTS.get(arg)
-                    pg_sec[pg.name]["ARGUMENTS"] = pg_args
-
+                pg_anno = annotate(pg.__class__)
+                # desc
+                pg_summ = pg_anno.get("Summary", {"short": "", "long": ""})
+                pg_sec[pg.name]["desc"] = (
+                    f'# {pg_summ["short"]}\n\n{pg_summ["long"]}'
+                )
+                # args
+                pg_args = _anno_to_argspec(pg_anno.get("Args")) or {}
+                for arg, arginfo in pg_args.items():
+                    arginfo["value"] = pg.DEFAULTS.get(arg)
+                pg_sec[pg.name]["ARGUMENTS"] = pg_args
             pg_sec[pg.name][SECTION_PROCESSES][proc.name] = _proc_to_argspec(
                 proc,
                 proc in pipeline.starts,

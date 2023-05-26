@@ -28,6 +28,8 @@ class P1(Proc):
 
 
 class MyGroup(ProcGroup):
+    """Group description
+    """
 
     @ProcGroup.add_proc
     def p2(self):

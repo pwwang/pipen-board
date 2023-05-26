@@ -185,13 +185,11 @@
         {#if data[SECTION_PROCGROUPS]}
             {#each Object.keys(data[SECTION_PROCGROUPS]) as procgroup}
                 <NavDivider group="group: {procgroup}" />
-                {#if data[SECTION_PROCGROUPS][procgroup].ARGUMENTS}
-                    <NavItem
-                        sub
-                        text="{procgroup} Arguments"
-                        bind:activeNavItem
-                    />
-                {/if}
+                <NavItem
+                    sub
+                    text="{procgroup} Arguments"
+                    bind:activeNavItem
+                />
                 {#each Object.keys(data[SECTION_PROCGROUPS][procgroup].PROCESSES).sort((a, b) => data[SECTION_PROCGROUPS][procgroup].PROCESSES[a].order - data[SECTION_PROCGROUPS][procgroup].PROCESSES[b].order) as proc}
                     <NavItem
                         sub
@@ -241,14 +239,13 @@
         {#if data[SECTION_PROCGROUPS]}
             {#each Object.keys(data[SECTION_PROCGROUPS]) as group}
                 {#if activeNavItem === `${group} Arguments`}
-                    {#if data[SECTION_PROCGROUPS][group].ARGUMENTS}
                     <GeneralOptions
                         bind:description={itemDescription}
                         bind:data={data[SECTION_PROCGROUPS][group].ARGUMENTS}
+                        initDescription={data[SECTION_PROCGROUPS][group].desc}
                         {activeNavItem}
                         title="Process Group Arguments"
                     />
-                    {/if}
                 {:else}
                     {#each Object.keys(data[SECTION_PROCGROUPS][group].PROCESSES) as proc}
                         {#if proc === activeNavItem}
