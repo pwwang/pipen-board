@@ -153,6 +153,9 @@ div.tree .bx--tree-node {
     position: absolute;
     top: calc(50% + 5.5rem / 2 + 1rem);
     color: white;
+    white-space: pre;
+    text-align: center;
+    line-height: 1.3rem;
 }
 
 .ns-desc * {font-size: .8rem;}
