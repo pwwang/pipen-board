@@ -4,6 +4,7 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import re
 import signal
 import sys
 import time
@@ -108,7 +109,11 @@ def _anno_to_argspec(anno: Mapping[str, Any] | None) -> Mapping[str, Any]:
     # arginfo: attrs, help, terms
     for arg, arginfo in anno.items():
         argspec[arg] = arginfo.attrs.copy()
-        argspec[arg]["desc"] = arginfo.help
+        argspec[arg]["desc"] = re.sub(
+            r"([\.\?!])\s*\n",
+            "\\1<br />\n",
+            arginfo.help,
+        )
         if arg.startswith("<") and arg.endswith(">"):
             argspec[arg].setdefault("order", 999)
         if "btype" not in argspec[arg]:
@@ -149,7 +154,8 @@ def _anno_to_argspec(anno: Mapping[str, Any] | None) -> Mapping[str, Any]:
             argspec[arg]["desc"] += "\n"
             # Add the choices to the description
             for termname, term in arginfo.terms.items():
-                argspec[arg]["desc"] += f"- `{termname}`: {term.help}\n"
+                h = re.sub(r"([\.\?!])\s*\n", "\\1<br />\n", term.help)
+                argspec[arg]["desc"] += f"- `{termname}`: {h}\n"
         else:
             argspec[arg]["value"] = argspec[arg].pop("default", None)
 

@@ -20,10 +20,14 @@ class P1(Proc):
                 Some description about two
             - 3: Three.
                 Some description about three
+        gene_qc (ns): Filter genes. Currently only `min_cells` is supported.
+            `gene_qc` is applied after `cell_qc`.
+            - min_cells: the minimum number of cells that a gene must be
+                expressed in to be kept.
     """
     input = "invar:var"
     output = "outfile:file:{{in.invar}}.out"
-    envs = {"number": "1"}
+    envs = {"number": "1", "gene_qc": {"min_cells": 3}}
     script = "echo {{in.invar}} P1 > {{out.outfile}}"
 
 

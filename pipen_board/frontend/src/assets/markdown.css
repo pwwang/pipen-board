@@ -70,8 +70,8 @@
   .description ul,
   .description ol {
       list-style-type: square;
-      list-style-position: inside;
-      padding-left: .2rem;
+      list-style-position: outside;
+      padding-left: 1.2rem;
       margin-bottom: 1.3rem;
   }
 
@@ -86,4 +86,10 @@
   .description li {
       margin-bottom: .5rem;
       line-height: 1.2;
+  }
+  .description li:first-of-type {
+      margin-top: .5rem;
+  }
+  .description li:last-of-type {
+      margin-bottom: .5rem;
   }
