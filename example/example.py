@@ -79,8 +79,10 @@ class P4(Proc):
     """The P4 process
 
     Envs:
-        abc (required): The abc env
-        method (ns): The method to use.
+        abc (required): The `abc` env
+            >>> code code code
+            >>> more code
+        method (ns): The `method` to use.
             More description about method.
             >>> code code code code code code code code code code code code code code code code code code code code
             >>> more code
