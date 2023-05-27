@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import json
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -27,12 +28,19 @@ def get_app(args: Namespace):
             super().__init__(*ags, **kwargs)
             self.cli_args = args
 
+    os.environ["QUART_ENV"] = "development"
     app = Quart(
         __package__,
         static_folder=Path(__file__).parent / "frontend" / "build",
         static_url_path="/",
     )
     app.request_class = PipenBoardRequrest
+
+    if args.dev:
+        print(
+            " * To enable dev mode in the UI, try: "
+            f"http://127.0.0.1:{args.port}?dev=1"
+        )
 
     @app.after_request
     async def _(r):
