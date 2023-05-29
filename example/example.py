@@ -6,6 +6,8 @@ from pipen.utils import mark
 class P1(Proc):
     """The P1 process
 
+    See https://google.com
+
     Input:
         invar: The input variable
 

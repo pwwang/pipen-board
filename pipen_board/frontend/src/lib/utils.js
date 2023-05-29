@@ -301,7 +301,14 @@ function parseMarkdown(text) {
     };
     // @ts-ignore
     marked.use({ hooks });
-    return marked.parse(text);
+
+    const renderer = new marked.Renderer();
+    const linkRenderer = renderer.link;
+    renderer.link = (href, title, text) => {
+        const html = linkRenderer.call(renderer, href, title, text);
+        return html.replace(/^<a /, '<a target="_blank" ');
+    };
+    return marked.parse(text, { renderer });
 }
 
 function autoHeight(textarea) {
