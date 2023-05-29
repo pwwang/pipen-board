@@ -7,6 +7,7 @@
     import Reset from "carbon-icons-svelte/lib/Reset.svelte";
 
     import { JOB_TAG_KIND } from "../constants";
+    import { fetchAPI } from "../utils";
     import FilePreview from "./FilePreview.svelte";
 
     export let status;
@@ -82,9 +83,8 @@
         toastNotify.kind = "info";
         toastNotify.subtitle = "Loading job details...";
         fetching = true;
-        let response = {};
         try {
-            response = await fetch("/api/job/get_tree", {
+            loadedJobTree = await fetchAPI("/api/job/get_tree", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -92,16 +92,13 @@
                 body: JSON.stringify({ proc, job: jobid }),
             })
         } catch (error) {
-            response.statusText = error;
+            toastNotify.kind = "error";
+            toastNotify.subtitle = `Failed to get job details: ${error}`;
         } finally {
             fetching = false;
         }
-        if (!response.ok) {
-            toastNotify.kind = "error";
-            toastNotify.subtitle = `Failed to get job details: ${response.status} ${response.statusText}`;
-        } else {
+        if (toastNotify.kind !== "error") {
             toastNotify.kind = undefined;
-            loadedJobTree = await response.json();
         }
         return loadedJobTree;
     };
@@ -163,9 +160,9 @@
             fetchingFile = false;
             return;
         }
-        let response = {};
+        let fd;
         try {
-            response = await fetch("/api/job/get_file", {
+            fd = await fetchAPI("/api/job/get_file", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -173,15 +170,14 @@
                 body: JSON.stringify({ proc, job, path: item.full }),
             })
         } catch (error) {
-            response.statusText = error;
+            toastNotify.kind = "error";
+            toastNotify.subtitle = `Failed to get file details: ${error}`;
         } finally {
             fetchingFile = false;
         }
-        if (!response.ok) {
-            toastNotify.kind = "error";
-            toastNotify.subtitle = `Failed to get file details: ${response.status} ${response.statusText}`;
-        } else {
-            fileDetails = { ...await response.json(), path: item.full, text: item.text};
+        if (toastNotify.kind !== "error") {
+            toastNotify.kind = undefined;
+            fileDetails = { ...fd, path: item.full, text: item.text};
         }
     };
 

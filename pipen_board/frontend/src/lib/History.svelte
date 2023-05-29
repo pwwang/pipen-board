@@ -8,6 +8,7 @@
     import GroupObjectsNew from "carbon-icons-svelte/lib/GroupObjectsNew.svelte";
     import Header from "./Header.svelte";
     import { updateConfigfile, updateErrors } from "./store";
+    import { fetchAPI } from "./utils";
 
     // example.py:ExamplePipeline
     export let pipeline;
@@ -45,17 +46,15 @@
         }
 
         try {
-            const fetched = await fetch("/api/history/del", {
+            await fetchAPI("/api/history/del", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({ configfile }),
             });
-            if (!fetched.ok)
-                throw new Error(`${fetched.status} ${fetched.statusText}`);
         } catch (e) {
-            error = `<strong>Failed to delete history:</strong> <br /><br /><pre>${e.stack}</pre>`;
+            error = `<strong>Failed to delete history:</strong> <br /><br /><pre>${e}</pre>`;
         } finally {
             deleting = undefined;
         }

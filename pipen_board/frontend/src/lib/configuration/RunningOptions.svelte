@@ -12,7 +12,7 @@
     import ChevronDown from "carbon-icons-svelte/lib/ChevronDown.svelte";
     import ContinueFilled from "carbon-icons-svelte/lib/ContinueFilled.svelte";
     import Option from "./options/Option.svelte";
-    import { hasHidden, getKeysHidden, getKeysUnhidden, autoHeight, finalizeConfig } from "../utils";
+    import { hasHidden, getKeysHidden, getKeysUnhidden, autoHeight, finalizeConfig, fetchAPI } from "../utils";
     import { storedErrors } from "../store";
 
     export let data;
@@ -78,8 +78,9 @@
     const runCommand = async () => {
         openConfirm = false;
         submitting = true;
+
         try {
-            const response = await fetch("/api/run", {
+            const response = await fetchAPI("/api/run", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -91,7 +92,7 @@
                     overwriteConfig,
                     tomlfile,
                 }),
-            });
+            }, "response");
             if (!response.ok) {
                 if (response.status === 409) {
                     throw new Error(

@@ -18,7 +18,7 @@
         SECTION_RUNNING_OPTS,
         DEFAULT_DESCRIPTIONS,
     } from "./constants.js";
-    import { finalizeConfig, IS_DEV } from "./utils.js";
+    import { finalizeConfig, fetchAPI } from "./utils.js";
     import { descFocused, storedErrors } from "./store.js";
     import NavItem from "./configuration/NavItem.svelte";
     import NavDivider from "./configuration/NavDivider.svelte";
@@ -103,9 +103,9 @@
         saving = true;
         toastNotify.kind = "info";
         toastNotify.subtitle = "Saving data ...";
-        let response = {};
+        let saved;
         try {
-            response = await fetch("/api/config/save", {
+            saved = await fetchAPI("/api/config/save", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -114,15 +114,12 @@
                 }),
             });
         } catch (error) {
-            response.statusText = error;
+            toastNotify.kind = "error";
+            toastNotify.subtitle = `Failed to save: ${error}`;
         } finally {
             saving = false;
         }
-        if (!response.ok) {
-            toastNotify.kind = "error";
-            toastNotify.subtitle = `Failed to save: ${response.status} ${response.statusText}`;
-        } else {
-            const saved = await response.json();
+        if (toastNotify.kind !== "error") {
             configfile = saved.configfile;
             toastNotify.kind = "success";
             toastNotify.subtitle = `Saved to ${configfile}`;

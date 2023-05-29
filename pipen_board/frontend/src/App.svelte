@@ -7,6 +7,7 @@
     import { storedConfigfile } from "./lib/store";
     import History from "./lib/History.svelte";
     import Layout from "./lib/Layout.svelte";
+    import { fetchAPI} from "./lib/utils";
 
     // example.py:ExamplePipeline
     let pipeline;
@@ -26,12 +27,9 @@
     onMount(async () => {
         let fetched_history;
         try {
-            const fetched = await fetch("/api/history");
-            if (!fetched.ok)
-                throw new Error(`${fetched.status} ${fetched.statusText}`);
-            fetched_history = await fetched.json();
+            fetched_history = await fetchAPI("/api/history");
         } catch (e) {
-            error = `<strong>Failed to fetch or parse history data:</strong> <br /><br /><pre>${e.stack}</pre>`;
+            error = e;
         } finally {
             fetching_history = false;
         }

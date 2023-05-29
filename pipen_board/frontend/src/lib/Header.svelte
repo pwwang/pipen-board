@@ -1,20 +1,33 @@
 <script>
+    import { onMount } from "svelte";
     import Dashboard from "carbon-icons-svelte/lib/Dashboard.svelte";
     import DirectionLoopLeftFilled from "carbon-icons-svelte/lib/DirectionLoopLeftFilled.svelte";
     import Button from "carbon-components-svelte/src/Button/Button.svelte";
+    import { fetchAPI } from "./utils";
 
     export let pipelineName;
     export let pipelineDesc = undefined;
     export let backToHistory = false;
     export let configfile = undefined;
     export let histories;
-    export let version = "0.0.0";
+
+    let version = "0.0.0";
+
+    const loadVersion = async function() {
+        try {
+            version = await fetchAPI("/api/version", {}, "text");
+        } catch (e) {
+            version = '<font style="color:red">Error</font>';
+        }
+    };
+
+    onMount(loadVersion);
 </script>
 
 <header>
     <div class="header-left">
         <div class="wizard-desc">
-            <Dashboard /> <a href="https://github.com/pwwang/pipen-board" target="_blank">PIPEN BOARD</a> <em>v{version}</em>
+            <Dashboard /> <a href="https://github.com/pwwang/pipen-board" target="_blank">PIPEN BOARD</a> <em>v{@html version}</em>
         </div>
         <h1>{pipelineName}</h1>
         <div>{pipelineDesc ? pipelineDesc : ""}</div>

@@ -13,7 +13,7 @@
     import SkipBack from "carbon-icons-svelte/lib/SkipBack.svelte";
     import CheckmarkOutline from "carbon-icons-svelte/lib/CheckmarkOutline.svelte";
 
-    import { IS_DEV, getStatusPercentage } from "./utils";
+    import { IS_DEV, getStatusPercentage, fetchAPI } from "./utils";
     import Header from "./Header.svelte";
     import Configuration from "./Configuration.svelte";
     import Run from "./Run.svelte";
@@ -21,9 +21,6 @@
 
     export let configfile;
     export let histories;
-
-    // The version of pipen-board
-    let version = "0.0.0";
 
     // 0: not run, show previous run data
     // 1: first run trial
@@ -50,40 +47,32 @@
     }
 
     const loadData = async () => {
+        let data;
         try {
-            const fetched_ver = await fetch("/api/version");
-            if (!fetched_ver.ok) throw new Error(`${fetched_ver.status} ${fetched_ver.statusText}`);
-            version = await fetched_ver.text();
+            data = await fetchAPI("/api/pipeline", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ configfile }),
+            });
         } catch (e) {
-            error = `<strong>Failed to fetch or parse version:</strong> <br /><br /><pre>${e.stack}</pre>`;
+            error = `<strong>Failed to fetch or parse data:</strong> <br /><br /><pre>${e}</pre>`;
+        } finally {
+            loadingData = false;
         }
         if (!error) {
-            try {
-                const fetched = await fetch("/api/pipeline", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ configfile }),
-                });
-                if (!fetched.ok) throw new Error(`${fetched.status} ${fetched.statusText}`);
-                const data = await fetched.json();
-                if (IS_DEV) {
-                    // @ts-ignore
-                    window.data = data;
-                }
-
-                isRunning = data.isRunning + 0;
-                config_data = data.config;
-                run_data = data.run;
-                pipelineName = config_data[SECTION_PIPELINE_OPTS].name.value;
-                pipelineDesc = config_data[SECTION_PIPELINE_OPTS].desc.value;
-                statusPercent = getStatusPercentage(run_data);
-            } catch (e) {
-                error = `<strong>Failed to fetch or parse data:</strong> <br /><br /><pre>${e.stack}</pre>`;
-            } finally {
-                loadingData = false;
+            if (IS_DEV) {
+                // @ts-ignore
+                window.data = data;
             }
+
+            isRunning = data.isRunning + 0;
+            config_data = data.config;
+            run_data = data.run;
+            pipelineName = config_data[SECTION_PIPELINE_OPTS].name.value;
+            pipelineDesc = config_data[SECTION_PIPELINE_OPTS].desc.value;
+            statusPercent = getStatusPercentage(run_data);
         }
     };
 
@@ -91,7 +80,7 @@
 </script>
 
 <svelte:head>
-<title>{pipelineName} :: PIPEN BOARD v{version}</title>
+<title>{pipelineName} :: PIPEN BOARD</title>
 </svelte:head>
 
 {#if error}
@@ -126,7 +115,7 @@
     description="Loading pipeline data ..." />
 {:else}
   <div class="body">
-    <Header {pipelineName} {pipelineDesc} {version} backToHistory bind:configfile {histories} />
+    <Header {pipelineName} {pipelineDesc} backToHistory bind:configfile {histories} />
     <div class="pipen-tabs">
         <Tabs style="border-bottom: 2px solid #e0e0e0" bind:selected={selectedTab}>
             <Tab><Settings />Configuration</Tab>

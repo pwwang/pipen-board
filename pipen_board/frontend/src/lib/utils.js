@@ -345,6 +345,27 @@ const getStatusPercentage = function(data) {
     ];
 };
 
+
+const fetchAPI = async function(url, options, result = "json") {
+    let response;
+    try {
+        response = await fetch(url, options);
+    } catch (e) {
+        throw new Error(`Failed to fetch ${url}: ${e}`);
+    }
+    if (!response.ok) {
+        throw new Error(`Failed to fetch ${url}: ${response.status} ${response.statusText}`);
+    }
+    if (result === "json") {
+        return await response.json();
+    } else if (result === "text") {
+        return await response.text();
+    } else {
+        return response;
+    }
+};
+
+
 const IS_DEV = window.location.search.includes('dev=1');
 
 
@@ -360,5 +381,6 @@ export {
     autoHeight,
     insertTab,
     getStatusPercentage,
+    fetchAPI,
     IS_DEV,
 };

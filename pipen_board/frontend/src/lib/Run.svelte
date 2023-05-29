@@ -12,7 +12,7 @@
     import ProcRun from "./run/ProcRun.svelte";
     import Log from "./run/Log.svelte";
     import { SECTION_PROCESSES, SECTION_PROCGROUPS, SECTION_DIAGRAM, SECTION_REPORTS, SECTION_LOG } from "./constants.js";
-    import { getStatusPercentage } from "./utils";
+    import { getStatusPercentage, fetchAPI } from "./utils";
 
     // {
     //    LOG, DIAGRAM, REPORTS,
@@ -93,9 +93,15 @@
             return;
         }
         rerunningOrStopping = true;
-        const res = await fetch(`/api/pipeline/rerun`, { method: "POST" });
-        if (res.ok) {
-            const d = await res.json();
+        let d;
+        try {
+            d = await fetchAPI("/api/pipeline/rerun", { method: "POST" });
+        } catch (e) {
+            toastNotify = { kind: "error", subtitle: `Run re-submission failed: ${e}.`, timeout: 5000 };
+        } finally {
+            rerunningOrStopping = false;
+        }
+        if (toastNotify.kind !== "error") {
             if (d.ok) {
                 toastNotify = { kind: "success", subtitle: "Run re-submitted successfully.", timeout: 5000 };
                 finished = false;
@@ -107,10 +113,7 @@
             } else {
                 toastNotify = { kind: "error", subtitle: `Run re-submission failed: ${d.msg}.`, timeout: 5000 };
             }
-        } else {
-            toastNotify = { kind: "error", subtitle: "Run re-submission failed.", timeout: 5000 };
         }
-        rerunningOrStopping = false;
     }
 
     const stoprun = async () => {
@@ -118,9 +121,15 @@
             return;
         }
         rerunningOrStopping = true;
-        const res = await fetch(`/api/pipeline/stop`, { method: "POST" });
-        if (res.ok) {
-            const d = await res.json();
+        let d;
+        try {
+            d = await fetchAPI("/api/pipeline/stop", { method: "POST" });
+        } catch (e) {
+            toastNotify = { kind: "error", subtitle: `Run stop failed: ${e}.`, timeout: 5000 };
+        } finally {
+            rerunningOrStopping = false;
+        }
+        if (toastNotify.kind !== "error") {
             if (d.ok) {
                 toastNotify = { kind: "success", subtitle: "Run stopped successfully.", timeout: 5000 };
                 finished = true;
@@ -130,24 +139,19 @@
             } else {
                 toastNotify = { kind: "error", subtitle: `Run stop failed: ${d.msg}.`, timeout: 5000 };
             }
-        } else {
-            toastNotify = { kind: "error", subtitle: "Run stop failed.", timeout: 5000 };
         }
-        rerunningOrStopping = false;
     }
 
     const loadReportBuildingLog = async () => {
         report_building_log = 'Loading ...';
-        const res = await fetch('/api/report_building_log');
-        if (res.ok) {
-            const d = await res.json();
-            if (d.ok) {
-                report_building_log = d.content || '(empty)';
-            } else {
-                report_building_log = `Error: ${d.content}`;
-            }
-        } else {
-            report_building_log = 'Error: Failed to load the log.';
+        let d;
+        try {
+            d = await fetchAPI("/api/report_building_log");
+        } catch (e) {
+            report_building_log = `Error: ${e}`;
+        }
+        if (d) {
+            report_building_log = d.ok ? (d.content || '(empty)') : `Error: ${d.msg}`;
         }
     }
 

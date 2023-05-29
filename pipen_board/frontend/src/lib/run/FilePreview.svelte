@@ -4,6 +4,7 @@
     import InlineNotification from "carbon-components-svelte/src/Notification/InlineNotification.svelte";
     import Copy from "carbon-icons-svelte/lib/Copy.svelte";
     import Reset from "carbon-icons-svelte/lib/Reset.svelte";
+    import { fetchAPI } from "../utils";
     // {type, content}
     export let proc;
     export let job;
@@ -21,22 +22,19 @@
         bigtextShowing = showing;
 
         fetching = true;
-        let response = {};
+        let out;
         try {
-            response = await fetch("/api/job/get_file", {
+            out = await fetchAPI("/api/job/get_file", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ proc, job, path: info.path, how: bigtextShowing }),
             })
         } catch (error) {
-            response.statusText = error;
+            alert(`Failed to get file content: ${error}`);
         } finally {
             fetching = false;
         }
-        if (!response.ok) {
-            alert(`Failed to get file content: ${response.status} ${response.statusText}`);
-        } else {
-            const out = await response.json();
+        if (out) {
             bigtextContent = out.content;
         }
     }
