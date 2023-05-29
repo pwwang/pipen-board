@@ -1,3 +1,4 @@
+html {overflow: hidden;}
 #app {
     overflow-x: hidden;
 }
