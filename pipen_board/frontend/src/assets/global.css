@@ -228,6 +228,10 @@ div.tree .bx--tree-node {
     color: #6969ff;
     border: 1px solid #3838dd;
 }
+.ns-desc a:hover > code {
+    color: #ff8e4e;
+    border: 1px solid #c55e24;
+}
 div.description code, div.running-confirm-modal code {
     font-size: .8rem;
     border: 1px solid #aaa;
