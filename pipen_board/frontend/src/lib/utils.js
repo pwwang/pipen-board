@@ -306,7 +306,7 @@ function parseMarkdown(text) {
     const linkRenderer = renderer.link;
     renderer.link = (href, title, text) => {
         const html = linkRenderer.call(renderer, href, title, text);
-        return html.replace(/^<a /, '<a target="_blank" ');
+        return html.replace(/^<a /, '<a target="_blank" title="Open in New Window" rel="noopener" ');
     };
     return marked.parse(text, { renderer });
 }
