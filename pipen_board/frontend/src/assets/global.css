@@ -144,6 +144,10 @@ div.procrun-wrap div.tree.killed > label {
     background-color: #ffd6e8;
 }
 
+main label.bx--label--inline--sm {
+    font-weight: bold;
+}
+
 @keyframes running-tag {
     from {background-color: #bae6ff; }
     to {background-color: #e3baff;}
