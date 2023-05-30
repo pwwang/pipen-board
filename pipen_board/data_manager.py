@@ -435,7 +435,7 @@ class DataManager:
                 return
 
         if (
-            use_cached is True or (use_cached == "auto" and args.dev)
+            use_cached is True or (use_cached == "auto" and not args.dev)
         ) and self._config_data:
             return
 
