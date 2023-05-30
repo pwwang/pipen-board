@@ -2,6 +2,9 @@ html {overflow: hidden;}
 #app {
     overflow-x: hidden;
 }
+a:has(>code) {
+    text-decoration: none;
+}
 
 div.bx--snippet-container::-webkit-scrollbar-track,
 div.bx--snippet-container > pre::-webkit-scrollbar-track,
@@ -220,6 +223,10 @@ div.tree .bx--tree-node {
     border-radius: 0;
     background-color: transparent;
     padding: 0;
+}
+.ns-desc a > code {
+    color: #6969ff;
+    border: 1px solid #3838dd;
 }
 div.description code, div.running-confirm-modal code {
     font-size: .8rem;

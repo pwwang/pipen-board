@@ -88,7 +88,7 @@ class P4(Proc):
         abc (required): The `abc` env
             >>> code code code
             >>> more code
-        method (ns): The `method` to use.
+        method (ns): The [`method`](https://google.com) to use.
             More description about method.
             >>> code code code code code code code code code code code code code code code code code code code code
             >>> more code
