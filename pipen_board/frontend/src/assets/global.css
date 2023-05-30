@@ -195,7 +195,7 @@ div.tree .bx--tree-node {
     line-height: 1.3rem;
 }
 
-.ns-desc * {font-size: .8rem;}
+.ns-desc * {font-size: .8rem; line-height: 1.1rem;}
 .ns-desc code {
     font-size: .75rem;
     border: 1px solid #aaa;
@@ -204,9 +204,6 @@ div.tree .bx--tree-node {
     padding: 0.05rem 0.3rem;
     border-radius: 0.3rem;
 }
-.ns-desc p {
-    line-height: 1rem;
-}
 .ns-desc pre {
     padding: 0.2rem 0.5rem;
     margin: 0.2rem 0;
@@ -214,6 +211,7 @@ div.tree .bx--tree-node {
     background-color: #eee;
     color: #333;
     border-radius: 0.3rem;
+    line-height: 1rem;
 }
 .ns-desc pre code {
     font-size: .8rem;
