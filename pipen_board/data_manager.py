@@ -110,7 +110,7 @@ def _anno_to_argspec(anno: Mapping[str, Any] | None) -> Mapping[str, Any]:
     for arg, arginfo in anno.items():
         argspec[arg] = arginfo.attrs.copy()
         argspec[arg]["desc"] = re.sub(
-            r"([\.\?!])\s*\n",
+            r"([\.\?!:])\s*\n",
             "\\1<br />\n",
             arginfo.help,
         )
@@ -154,7 +154,7 @@ def _anno_to_argspec(anno: Mapping[str, Any] | None) -> Mapping[str, Any]:
             argspec[arg]["desc"] += "\n"
             # Add the choices to the description
             for termname, term in arginfo.terms.items():
-                h = re.sub(r"([\.\?!])\s*\n", "\\1<br />\n", term.help)
+                h = re.sub(r"([\.\?!:])\s*\n", "\\1<br />\n", term.help)
                 argspec[arg]["desc"] += f"- `{termname}`: {h}\n"
         else:
             argspec[arg]["value"] = argspec[arg].pop("default", None)
