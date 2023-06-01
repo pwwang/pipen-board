@@ -26,8 +26,5 @@ number = "1"
   [P1.envs.gene_qc]
   min_cells = 3
 
-[P4.envs]
-abc = "abcdef"
-
-  [P4.envs.method]
-  a = 1
+[P4.envs.method]
+a = 1

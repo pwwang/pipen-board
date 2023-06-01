@@ -92,25 +92,12 @@
                     overwriteConfig,
                     tomlfile,
                 }),
-            }, "response");
+            });
             if (!response.ok) {
-                if (response.status === 409) {
-                    throw new Error(
-                        `Failed to run command: ${tomlfile} exists.`
-                    );
-                } else if (response.status === 410) {
-                    throw new Error(
-                        `Failed to run command: Failed to save config to ${tomlfile}.`
-                    );
-                } else {
-                    throw new Error(
-                        `Failed to run command: ${response.status} ${response.statusText}`
-                    );
-                }
+                throw new Error(`Failed to run command: ${response.msg}`);
             } else {
                 isRunning = isRunning + 1;
             }
-
         } catch (error) {
             toastNotify.kind = "error";
             toastNotify.subtitle = error;

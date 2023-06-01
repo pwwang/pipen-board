@@ -694,7 +694,7 @@ class DataManager:
     async def on_job_cached(self, data, ws):
         await self._on_job(data, "succeeded", ws)
 
-    async def run_pipeline(self, command, port):
+    async def run_pipeline(self, command, port, ws_clients):
         """Run a command and send the output to the websocket"""
         self.clear_run_data()
         self._run_data[SECTION_LOG] = self._run_data[SECTION_LOG] or ""
@@ -706,18 +706,21 @@ class DataManager:
             stderr=asyncio.subprocess.STDOUT,
         )
         p.stdin.write(f"pipen-board:{port}\n".encode())
+        p.stdin.close()
         self.running = p.pid
         self._command = command
 
-        async def read_stream(stream):
-            while True:
-                line = await stream.readline()
-                if not line:
-                    break
-                self._run_data[SECTION_LOG] += line.decode()
+        while True:
+            line = await p.stdout.readline()
+            if not line:
+                break
+            self._run_data[SECTION_LOG] += line.decode()
 
-        await asyncio.create_task(read_stream(p.stdout))
         await p.wait()
+        # In case the pipeline fails to start
+        self._run_data["FINISHED"] = True
+        self.running = False
+        await self.send_run_data(ws_clients.get("web"), force=True)
 
     async def stop_pipeline(self):
         """Stop the pipeline"""

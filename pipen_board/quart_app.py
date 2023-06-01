@@ -85,11 +85,30 @@ def get_app(args: Namespace):
         config = data["config"]
         tomlfile = Path(data["tomlfile"])
         if not overwriteConfig and tomlfile.exists():
-            return {}, 409
+            return {
+                "ok": False,
+                "msg": (
+                    "Config file already exists. "
+                    "Check the box to overwrite it, "
+                    "or use a different configuration file name."
+                )
+            }
         try:
             tomlfile.write_text(config)
-        except Exception:
-            return {}, 410
+        except Exception as ex:
+            return {
+                "ok": False,
+                "msg": f"Failed to write the configuration file: {ex}"
+            }
+
+        if data_manager.running:
+            return {
+                "ok": False,
+                "msg": (
+                    "Pipeline is already running. "
+                    "Please wait for it to finish, or stop it first."
+                )
+            }
 
         logger.info(
             f"[bold][yellow]API[/yellow][/bold] Running pipeline: {command}"
@@ -99,8 +118,9 @@ def get_app(args: Namespace):
             data_manager.run_pipeline,
             command,
             args.port,
+            clients,
         )
-        return {"ok": True}
+        return {"ok": True, "msg": ""}
 
     @app.route("/api/pipeline/rerun", methods=["POST"])
     async def rerun():
@@ -113,6 +133,7 @@ def get_app(args: Namespace):
             data_manager.run_pipeline,
             data_manager._command,
             args.port,
+            clients,
         )
         return {"ok": True}
 
