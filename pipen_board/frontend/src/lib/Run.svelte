@@ -186,25 +186,25 @@
     <aside class="run-nav">
 
         {#if data[SECTION_LOG] !== null}
-            <NavItem text="Log" bind:activeNavItem />
+            <NavItem text="Log" noerror bind:activeNavItem />
         {/if}
         {#if data[SECTION_DIAGRAM]}
-            <NavItem text="Diagram" bind:activeNavItem />
+            <NavItem text="Diagram" noerror bind:activeNavItem />
         {/if}
         {#if data[SECTION_REPORTS]}
-            <NavItem text="Reports" bind:activeNavItem />
+            <NavItem text="Reports" noerror bind:activeNavItem />
         {/if}
         {#if data[SECTION_PROCESSES] && Object.keys(data[SECTION_PROCESSES]).length > 0}
             <NavDivider group="processes" />
             {#each Object.keys(data[SECTION_PROCESSES]).sort((a, b) => data[SECTION_PROCESSES][a].order - data[SECTION_PROCESSES][b].order) as proc}
-                <NavItem class="run-status-{data[SECTION_PROCESSES][proc].status}" text={proc} sub bind:activeNavItem />
+                <NavItem class="run-status-{data[SECTION_PROCESSES][proc].status}" noerror text={proc} sub bind:activeNavItem />
             {/each}
         {/if}
         {#if data[SECTION_PROCGROUPS]}
             {#each Object.keys(data[SECTION_PROCGROUPS]) as procgroup}
                 <NavDivider group="group: {procgroup}" />
                 {#each Object.keys(data[SECTION_PROCGROUPS][procgroup]).sort((a, b) => data[SECTION_PROCGROUPS][procgroup][a].order - data[SECTION_PROCGROUPS][procgroup][b].order) as proc}
-                    <NavItem class="run-status-{data[SECTION_PROCGROUPS][procgroup][proc].status}" sub text={proc} bind:activeNavItem />
+                    <NavItem class="run-status-{data[SECTION_PROCGROUPS][procgroup][proc].status}" noerror sub text={proc} bind:activeNavItem />
                 {/each}
             {/each}
         {/if}

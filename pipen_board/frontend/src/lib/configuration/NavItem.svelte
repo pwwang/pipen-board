@@ -7,12 +7,15 @@
     export let is_start = false;
     // whether the process is hidden for config
     export let hidden = false;
+    // suppress error when it's used in running tab
+    export let noerror = false;
 
     let errored = false;
-
-    storedErrors.subscribe((errors) => {
-        errored = Object.keys(errors).map(e => e.split(" / ")[0]).includes(text);
-    });
+    if (!noerror) {
+        storedErrors.subscribe((errors) => {
+            errored = Object.keys(errors).map(e => e.split(" / ")[0]).includes(text);
+        });
+    }
 
     $: active = text === activeNavItem;
 </script>
