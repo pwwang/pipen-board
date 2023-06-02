@@ -90,7 +90,9 @@
     on:focus={onFocus}
     on:blur={onBlur}
     {key}
+    {activeNavItem}
     readonly={readonly || data.readonly}
+    required={data.required}
     choices={data.choices}
     choicesDesc={data.choices_desc}
     bind:value={data.value}

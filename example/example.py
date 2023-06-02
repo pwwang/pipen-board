@@ -12,7 +12,7 @@ class P1(Proc):
         invar: The input variable
 
     Envs:
-        number (choice): The number of whatever
+        number (choice;required): The number of whatever
             - 1: One (long tail description ...).
                 Some description about one 1.
                 Some description about one 2.
@@ -23,6 +23,9 @@ class P1(Proc):
             - 3: Three (long tail description ...).
                 Some description about three
         gene_qc (ns): Filter genes. Currently only `min_cells` is supported.
+            A fox jumps over a lazy dog. A fox jumps over a lazy dog.
+            A fox jumps over a lazy dog. A fox jumps over a lazy dog.
+            A fox jumps over a lazy dog. A fox jumps over a lazy dog.
             `gene_qc` is applied after `cell_qc`.
             - min_cells: the minimum number of cells that a gene must be
                 expressed in to be kept.
