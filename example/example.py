@@ -13,14 +13,14 @@ class P1(Proc):
 
     Envs:
         number (choice): The number of whatever
-            - 1: One.
+            - 1: One (long tail description ...).
                 Some description about one 1.
                 Some description about one 2.
                 Some description about one 3.
                 Some description about one 4.
-            - 2: Two.
+            - 2: Two (long tail description ...).
                 Some description about two
-            - 3: Three.
+            - 3: Three (long tail description ...).
                 Some description about three
         gene_qc (ns): Filter genes. Currently only `min_cells` is supported.
             `gene_qc` is applied after `cell_qc`.
@@ -29,7 +29,7 @@ class P1(Proc):
     """
     input = "invar:var"
     output = "outfile:file:{{in.invar}}.out"
-    envs = {"number": "1", "gene_qc": {"min_cells": 3}}
+    envs = {"number": None, "gene_qc": {"min_cells": 3}}
     script = "echo {{in.invar}} P1 > {{out.outfile}}"
 
 

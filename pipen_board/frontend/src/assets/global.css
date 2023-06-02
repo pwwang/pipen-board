@@ -356,6 +356,10 @@ div.center-wrapper .bx--inline-loading {
     width: fit-content;
 }
 
+.bx--list-box__menu {
+    width: fit-content !important;
+}
+
 /* Place the scroll bar on the left side */
 aside.left, aside.run-nav {
     direction: rtl;
@@ -371,28 +375,4 @@ aside.left *, aside.run-nav * {
     }
 }
 
-/* .bx--form-item:has(.bx--form-requirement) {
-    position: relative;
-}
-
-.bx--form-item .bx--form-requirement {
-    background-color: rgb(221, 1, 1);
-    position: absolute;
-    bottom: -1.4rem;
-    z-index: 1001;
-    color: white !important;
-    padding: 0 0.8rem;
-    border-radius: 3px;
-}
-
-.bx--form-item .bx--form-requirement::before {
-    content: "";
-    display: block;
-    position: absolute;
-    top: calc(-100% + 0.8rem - 9px);
-    left: 50%;
-    transform: translateX(-50%);
-    border: 7px solid transparent;
-    border-bottom-color: rgb(221, 1, 1);
-} */
 
