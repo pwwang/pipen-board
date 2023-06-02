@@ -378,8 +378,9 @@ async def _get_config_data(args: Namespace) -> Mapping[str, Any]:
                 )
                 # args
                 pg_args = _anno_to_argspec(pg_anno.get("Args")) or {}
-                for arg, arginfo in pg_args.items():
-                    arginfo["value"] = pg.DEFAULTS.get(arg)
+                # Implemented by pipen-annotate 0.7.3
+                # for arg, arginfo in pg_args.items():
+                #     arginfo["value"] = pg.DEFAULTS.get(arg)
                 pg_sec[pg.name]["ARGUMENTS"] = pg_args
             pg_sec[pg.name][SECTION_PROCESSES][proc.name] = _proc_to_argspec(
                 proc,

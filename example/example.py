@@ -38,7 +38,18 @@ class P1(Proc):
 
 class MyGroup(ProcGroup):
     """Group description
+
+    Args:
+        arg: The arg
+        nsarg: The nsarg
+            - a: The a
+            - b: The b
     """
+
+    DEFAULTS = {
+        "arg": "default value",
+        "nsarg": {"a": "default a", "b": "default b"},
+    }
 
     @ProcGroup.add_proc
     def p2(self):
