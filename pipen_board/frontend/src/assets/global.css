@@ -391,6 +391,12 @@ aside.left *, aside.run-nav * {
     direction: ltr;
 }
 
+/* Labels for readonly options */
+.bx--text-input-wrapper--readonly .bx--label, .readonly-label {
+    color: #5252528c;
+    font-style: italic;
+}
+
 @media (min-width: 640px) {
     .accordion-less-padding-right .bx--accordion__content {
         padding-right: 3rem;

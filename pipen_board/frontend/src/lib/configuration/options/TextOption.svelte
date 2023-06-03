@@ -54,7 +54,7 @@
 </script>
 
 <OptionFrame on:mouseenter on:mouseleave>
-    <div slot="label">{key} {readonly ? '(readonly)' : ''}</div>
+    <div slot="label" class={readonly ? "readonly-label" : ""}>{key}</div>
     <div slot="field">
         <TextArea
             on:focus

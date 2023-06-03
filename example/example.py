@@ -40,7 +40,7 @@ class MyGroup(ProcGroup):
     """Group description
 
     Args:
-        arg: The arg
+        arg (readonly): The arg
         nsarg: The nsarg
             - a: The a
             - b: The b

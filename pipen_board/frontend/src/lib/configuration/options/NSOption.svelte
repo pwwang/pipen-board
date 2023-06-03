@@ -17,7 +17,7 @@
 </script>
 
 <OptionFrame on:mouseenter on:mouseleave>
-    <svelte:fragment slot="label">{key} {readonly ? '(readonly)' : ''}</svelte:fragment>
+    <div slot="label" class={readonly ? "readonly-label" : ""}>{key}</div>
     <div slot="field" class="ns-desc">{@html parseMarkdown(desc)}</div>
 </OptionFrame>
 

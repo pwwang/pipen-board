@@ -12,7 +12,7 @@
 </script>
 
 <OptionFrame on:mouseenter on:mouseleave>
-    <div slot="label" style="height: 1.2rem;">{key} {readonly ? '(readonly)' : ''}</div>
+    <div slot="label" style="height: 1.2rem;" class={readonly ? "readonly-label" : ""}>{key}</div>
     <div slot="field" style="align-self: center;">
         <Toggle
             on:focus

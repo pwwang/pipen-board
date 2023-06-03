@@ -64,7 +64,8 @@
     {readonly}
     inline
     size="sm"
+    class={readonly ? "readonly" : ""}
     placeholder={placeholder}
-    labelText={readonly ? `${key} (readonly)` : key}
+    labelText={key}
     bind:value={strValue}
 />
