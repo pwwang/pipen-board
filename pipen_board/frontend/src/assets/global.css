@@ -97,14 +97,30 @@ button.show-hidden {
 
 div.draggable {
     background-color: #dcdcdc;
-    background-image: linear-gradient(to bottom,#333 100%, #333 100%);
+    background-image: linear-gradient(
+        90deg,
+        rgba(134,134,134,1) 0%,
+        rgba(134,134,134,1) 35%,
+        rgba(220,220,220,1) 36%,
+        rgba(220,220,220,1) 64%,
+        rgba(134,134,134,1) 65%,
+        rgba(134,134,134,1) 100%
+    );
     background-size: 100% 2rem;
     background-position: 100% 50%;
     background-repeat: no-repeat;
     cursor: col-resize;
 }
 div.draggable.row {
-    background-image: linear-gradient(to right,#333 100%, #333 100%);
+    background-image: linear-gradient(
+        0deg,
+        rgba(134,134,134,1) 0%,
+        rgba(134,134,134,1) 35%,
+        rgba(220,220,220,1) 36%,
+        rgba(220,220,220,1) 64%,
+        rgba(134,134,134,1) 65%,
+        rgba(134,134,134,1) 100%
+    );
     background-size: 2rem 100%;
     background-position: 50% 100%;
     cursor: row-resize;
