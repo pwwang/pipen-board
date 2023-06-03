@@ -1,4 +1,10 @@
-html {overflow: hidden;}
+html {
+    overflow: hidden;
+    /* Avoid extra space at the bottom */
+    position: fixed;
+    width: 100%;
+    height: 100%;
+}
 #app {
     overflow-x: hidden;
 }
