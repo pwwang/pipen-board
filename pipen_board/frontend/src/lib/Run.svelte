@@ -282,6 +282,7 @@
                     <p>Select an item from the navigation menu on the left to view its details.</p>
                     <p style="flex-basis: 100%;">&nbsp;</p>
                     <p>Note that the information may be incomplete for the previous run if it was failed, since the information was gather from the working directory instead of the pipeline (<code>Pipen</code>) object.</p>
+                    <p>There may be also extra processes or process groups that are not in the pipeline by current configuration, but were run in the previous run with a different configuration.</p>
                 </InlineNotification>
             </div>
         {/if}
