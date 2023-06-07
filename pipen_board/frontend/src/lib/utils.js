@@ -299,8 +299,9 @@ function parseMarkdown(text) {
             return _formatSentencesIntoParagraphs(html);
         },
     };
+    // https://github.com/markedjs/marked/issues/2793
     // @ts-ignore
-    marked.use({ hooks });
+    marked.use({ hooks, silent: true });
 
     const renderer = new marked.Renderer();
     const linkRenderer = renderer.link;
