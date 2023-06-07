@@ -94,6 +94,7 @@ Available marks:
 | `action` | Like the `action` argument in [`argx`][2]*. | `store_true`, `store_false`, `ns`, `namespace`, `append`, `extend`, `clear_append`, `clear_extend` (other values are allowed but ignore, they may be effective for CLI use) |
 | `btype`  | Board type (option type specified directly). If specified, `action` will be ignored | `ns`, `choice`, `mchoice`, `array`, `list`, `json`, `int`, `float`, `bool`, `str`, `text`, `auto`* |
 | `type` | Fallback for `action` and `btype` | Same as `btype` |
+| `flag` | Fallback for `action=store_true` | No values needed |
 | `ns`/`namespace` | Shortcut for `btype=ns` | No values needed |
 | `choices`/`choice` | Shortcut for `btype=choice` | No values needed |
 | `mchoices`/`mchoice` | Shortcut for `btype=mchoice` | No values needed |

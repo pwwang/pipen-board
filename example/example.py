@@ -40,14 +40,14 @@ class MyGroup(ProcGroup):
     """Group description
 
     Args:
-        arg (readonly): The arg
+        arg (readonly;flag): The arg
         nsarg: The nsarg
             - a: The a
             - b: The b
     """
 
     DEFAULTS = {
-        "arg": "default value",
+        "arg": True,
         "nsarg": {"a": "default a", "b": "default b"},
     }
 

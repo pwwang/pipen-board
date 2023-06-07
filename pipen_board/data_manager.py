@@ -117,7 +117,10 @@ def _anno_to_argspec(anno: Mapping[str, Any] | None) -> Mapping[str, Any]:
         if arg.startswith("<") and arg.endswith(">"):
             argspec[arg].setdefault("order", 999)
         if "btype" not in argspec[arg]:
-            if argspec[arg].get("action") in ("store_true", "store_false"):
+            if (
+                argspec[arg].get("action") in ("store_true", "store_false")
+                or argspec[arg].get("flag")
+            ):
                 argspec[arg]["type"] = "bool"
             elif (
                 argspec[arg].get("action") in ("ns", "namespace")
