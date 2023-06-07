@@ -223,6 +223,11 @@
         {/if}
         {#each Object.keys(data[SECTION_PROCESSES]) as proc}
             {#if proc === activeNavItem}
+                {#if data[SECTION_PROCESSES][proc].hidden}
+                <HiddenOptions
+                    bind:description={itemDescription}
+                    initDescription={data[SECTION_PROCESSES][proc].desc} />
+                {:else}
                 <GeneralOptions
                     bind:description={itemDescription}
                     bind:data={data[SECTION_PROCESSES][proc].value}
@@ -231,6 +236,7 @@
                     general_filter={(k) => !k.endsWith("_opts") && k !== "envs" && k !== "in"}
                     title="Process Options"
                 />
+                {/if}
             {/if}
         {/each}
         {#if data[SECTION_PROCGROUPS]}

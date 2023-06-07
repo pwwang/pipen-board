@@ -53,16 +53,27 @@ class MyGroup(ProcGroup):
 
     @ProcGroup.add_proc
     def p2(self):
-        @mark(board_config_hidden=True)
+
         class P2(Proc):
-            """The P2 process"""
+            """The P2 process
+
+            Envs:
+                p2arg (flag;pgarg=arg): The arg linked from the group
+                p2arg2 (pgarg=nsarg.a): The nsarg.a linked from the group
+            """
             requires = P1
             input = "infile:file"
             forks = 2
             output = "outfile:file:{{in.infile | split: '/' | last | split: '.' | first}}.out"
+            envs = {"p2arg": self.opts.arg, "p2arg2": self.opts.nsarg["a"]}
             lang = "bash"
             cache = False
-            script = "cat {{in.infile}} > {{out.outfile}}; sleep 3; echo P2 >> {{out.outfile}}"
+            script = """
+                cat {{in.infile}} > {{out.outfile}}
+                sleep 3
+                echo P2 >> {{out.outfile}}
+                echo {{envs.p2arg}}, {{envs.p2arg2}} >> {{out.outfile}}
+            """
         return P2
 
     @ProcGroup.add_proc
@@ -119,6 +130,7 @@ class P4(Proc):
     plugin_opts = {"report": "<h1>P4</h1><p>{{envs.abc}}</p>"}
 
 
+@mark(board_config_hidden=True)
 class P5(Proc):
     """Emulate the recursive output directory being shown correctly in job tree
     """
