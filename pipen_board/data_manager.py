@@ -118,6 +118,12 @@ def _anno_to_argspec(anno: Mapping[str, Any] | None) -> Mapping[str, Any]:
             argspec[arg].setdefault("order", 999)
         if "btype" not in argspec[arg]:
             if (
+                argspec[arg].get("text")
+                or argspec[arg].get("mline")
+                or argspec[arg].get("mlines")
+            ):
+                argspec[arg]["type"] = "text"
+            elif (
                 argspec[arg].get("action") in ("store_true", "store_false")
                 or argspec[arg].get("flag")
             ):
