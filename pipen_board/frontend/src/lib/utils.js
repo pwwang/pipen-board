@@ -149,7 +149,7 @@ function _equal(val1, val2) {
     return false;
 }
 
-function updateConfig(config, option, value, ns=false) {
+function updateConfig(config, option, value, ns=false, pgargs=null) {
     value = value || {};
     if (moreLikeOption(option)) {
         return {
@@ -168,9 +168,15 @@ function updateConfig(config, option, value, ns=false) {
 
     if (ns) {
         for (let popt in value.value) {
-            config[option] = updateConfig(config[option] || {}, popt, value.value[popt]);
+            config[option] = updateConfig(config[option] || {}, popt, value.value[popt], false, pgargs);
         }
         return config;
+    }
+    if (pgargs && value.pgarg) {
+        const pgvalue = get_pgvalue(pgargs, value.pgarg === true ? option : value.pgarg);
+        if (pgvalue == value.value) {
+            return config;
+        }
     }
     if (value.value === undefined || value.value === null) {
         return config;
@@ -224,7 +230,8 @@ function finalizeConfig(schema) {
                     proc_conf,
                     option,
                     optinfo,
-                    option.endsWith("_opts") || option === "envs"
+                    option.endsWith("_opts") || option === "envs",
+                    groupinfo.ARGUMENTS
                 );
                 // remove options that are equal to the pipeline options
                 if (_equal(proc_conf[option], config[option])) { delete proc_conf[option]; }
