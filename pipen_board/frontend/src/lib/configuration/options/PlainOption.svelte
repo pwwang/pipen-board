@@ -1,7 +1,7 @@
 <script>
     import { onMount } from "svelte";
     import TextInput from "carbon-components-svelte/src/TextInput/TextInput.svelte";
-    import { applyAtomicType, validateData } from "../../utils.js";
+    import { applyAtomicType, validateData, get_pgvalue } from "../../utils.js";
 
     export let key;
     export let value;
@@ -12,6 +12,9 @@
     export let readonly = false;
     export let setError;
     export let removeError;
+    export let pgargs = {};
+    export let pgargkey = null;
+    export let changed = false;
 
     let invalid = false;
     let invalidText = "";
@@ -46,6 +49,11 @@
         value = applyAtomicType(strValue, optionType, false);
     }
 
+    $: pgvalue = get_pgvalue(pgargs, pgargkey === true ? key : pgargkey);
+    $: if (pgvalue !== undefined && !changed) {
+        strValue = pgvalue;
+    }
+
     onMount(() => {
         if (!readonly) {
             validateValue(strValue);
@@ -58,7 +66,7 @@
     on:mouseleave
     on:focus
     on:blur
-    on:input={e => validateValue(e.detail)}
+    on:input={e => {changed = true; validateValue(e.detail)}}
     {invalid}
     {invalidText}
     {readonly}

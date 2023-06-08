@@ -264,6 +264,7 @@
                                 {activeNavItem}
                                 general_filter={(k) => !k.endsWith("_opts") && k !== "envs" && k !== "in"}
                                 title="Process Options"
+                                pgargs={data[SECTION_PROCGROUPS][group].ARGUMENTS}
                             />
                             {/if}
                         {/if}

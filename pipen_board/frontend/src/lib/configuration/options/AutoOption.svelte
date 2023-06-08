@@ -4,7 +4,7 @@
     import { onMount } from "svelte";
     import TextArea from "carbon-components-svelte/src/TextArea/TextArea.svelte";
     import OptionFrame from "./OptionFrame.svelte";
-    import { validateData, applyAtomicType, autoHeight, insertTab } from "../../utils";
+    import { validateData, applyAtomicType, autoHeight, insertTab, get_pgvalue } from "../../utils";
 
     export let key;
     export let value;
@@ -14,6 +14,9 @@
     export let activeNavItem;
     export let setError;
     export let removeError;
+    export let pgargs = {};
+    export let pgargkey = null;
+    export let changed = false;
 
     let validator = [];
     let invalid = false;
@@ -21,8 +24,19 @@
     let strValue = value;
     let origValue = value;
     let textarea = null;
+
+    const stringify = (v) => {
+        if (v === null || v === undefined) {
+            return "";
+        }
+        if (typeof v === "string") {
+            return v;
+        }
+        return JSON.stringify(v, null, 2);
+    };
+
     if (value && typeof value === "object") {
-        strValue = JSON.stringify(value, null, 2);
+        strValue = stringify(value);
     }
 
     if (required) {
@@ -55,6 +69,12 @@
         autoHeight(textarea);
     };
 
+    $: pgvalue = get_pgvalue(pgargs, pgargkey === true ? key : pgargkey);
+    $: if (pgvalue !== undefined && !changed) {
+        strValue = stringify(pgvalue);
+        value = applyAtomicType(strValue, "auto");
+    }
+
     onMount(() => {
         if (!readonly) {
             validateValue(strValue, true);
@@ -68,7 +88,7 @@
         <TextArea
             on:focus
             on:blur
-            on:input={e => validateValue(e.target.value) }
+            on:input={e => { changed = true; validateValue(e.target.value)} }
             on:keydown={insertTab}
             {invalid}
             {invalidText}

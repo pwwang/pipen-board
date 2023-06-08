@@ -13,6 +13,7 @@
     export let readonly = false;
     export let setError;
     export let removeError;
+    export let pgargs = {};
 
 </script>
 
@@ -33,6 +34,7 @@
             {activeNavItem}
             {setError}
             {removeError}
+            pgargs={pgargs}
             bind:value={value[k].value}
         />
     {:else}
@@ -41,6 +43,7 @@
             {setError}
             {removeError}
             {activeNavItem}
+            pgargs={pgargs}
             readonly={readonly || value[k].readonly}
             bind:data={value[k]}
             bind:description

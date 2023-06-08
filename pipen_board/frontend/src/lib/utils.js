@@ -373,6 +373,21 @@ const fetchAPI = async function(url, options, result = "json") {
     }
 };
 
+function get_pgvalue(pgargs, pgargkey) {
+    // get the value of a process group argument
+    if (pgargs === undefined || pgargs === null) { return undefined; }
+    if (Object.keys(pgargs).length === 0) { return undefined; }
+    if (pgargkey === undefined || pgargkey === null) { return undefined; }
+    if (pgargkey === '') { return undefined; }
+    if (!pgargkey.includes('.')) { return pgargs[pgargkey] && pgargs[pgargkey].value; }
+    const keys = pgargkey.split('.');
+    let value = pgargs;
+    for (let key of keys) {
+        if (value === undefined || value === null) { return undefined; }
+        value = value[key] && value[key].value;
+    }
+    return value;
+}
 
 const IS_DEV = window.location.search.includes('dev=1');
 
@@ -390,5 +405,6 @@ export {
     insertTab,
     getStatusPercentage,
     fetchAPI,
+    get_pgvalue,
     IS_DEV,
 };

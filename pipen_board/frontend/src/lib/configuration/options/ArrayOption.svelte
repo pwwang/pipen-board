@@ -5,7 +5,7 @@
     import Button from "carbon-components-svelte/src/Button/Button.svelte";
     import Add from "carbon-icons-svelte/lib/Add.svelte";
     import OptionFrame from "./OptionFrame.svelte";
-    import { applyAtomicType, validateData } from "../../utils";
+    import { applyAtomicType, validateData, get_pgvalue } from "../../utils";
 
     export let key;
     export let value;
@@ -16,6 +16,9 @@
     export let readonly = false;
     export let setError;
     export let removeError;
+    export let pgargs = {};
+    export let pgargkey = null;
+    export let changed = false;
 
     let currValue = readonly ? "(readonly)" : "";
     let strValues = value || [];
@@ -37,8 +40,8 @@
         }
     };
 
-    const validateValue = (value, validateVals=true) => {
-        const error = validateData(value, iValidator);
+    const validateValue = (v, validateVals=true) => {
+        const error = validateData(v, iValidator);
         invalid = error !== null;
         invalidText = error;
         if (invalid) {
@@ -69,6 +72,12 @@
         validateValues(strValues);
     };
 
+    $: pgvalue = JSON.stringify(get_pgvalue(pgargs, pgargkey === true ? key : pgargkey));
+    $: if (pgvalue !== undefined && !changed) {
+        strValues = JSON.parse(pgvalue);
+        value = strValues.map((v) => applyAtomicType(v, itype));
+    }
+
     onMount(() => {
         if (!readonly) {
             validateValue(currValue);
@@ -87,7 +96,7 @@
                 {invalidText}
                 {readonly}
                 on:keyup={e => { if (e.key === "Enter" && !readonly) addTag() }}
-                on:input={e => validateValue(e.detail)}
+                on:input={e => { changed = true; validateValue(e.detail); }}
                 on:focus
                 on:blur
                 bind:value={currValue}

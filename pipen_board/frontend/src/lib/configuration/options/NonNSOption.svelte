@@ -18,6 +18,9 @@
     export let readonly = false;
     export let setError;
     export let removeError;
+    export let pgargs = {};
+
+    data = { changed: false, ...data };
 
     const focusTail = "                    "
     let oldDescription = description || "";
@@ -65,6 +68,9 @@
     on:focus={onFocus}
     on:blur={onBlur}
     {key}
+    {pgargs}
+    pgargkey={data.pgarg}
+    bind:changed={data.changed}
     readonly={readonly || data.readonly}
     bind:value={data.value}
     />
@@ -81,6 +87,9 @@
     {setError}
     {removeError}
     {key}
+    {pgargs}
+    pgargkey={data.pgarg}
+    bind:changed={data.changed}
     bind:value={data.value}
     />
 {:else if data.type === 'choice'}
@@ -95,6 +104,9 @@
     required={data.required}
     choices={data.choices}
     choicesDesc={data.choices_desc}
+    {pgargs}
+    pgargkey={data.pgarg}
+    bind:changed={data.changed}
     bind:value={data.value}
     />
 {:else if data.type === 'mchoices' || data.type === 'mchoice'}
@@ -111,6 +123,9 @@
     readonly={readonly || data.readonly}
     choices={data.choices}
     choicesDesc={data.choices_desc}
+    {pgargs}
+    pgargkey={data.pgarg}
+    bind:changed={data.changed}
     bind:value={data.value}
     />
 {:else if data.type === 'json'}
@@ -126,6 +141,9 @@
     {activeNavItem}
     {setError}
     {removeError}
+    {pgargs}
+    pgargkey={data.pgarg}
+    bind:changed={data.changed}
     bind:value={data.value}
     />
 {:else if data.type === 'auto'}
@@ -141,6 +159,9 @@
     {activeNavItem}
     {setError}
     {removeError}
+    {pgargs}
+    pgargkey={data.pgarg}
+    bind:changed={data.changed}
     bind:value={data.value}
     />
 {:else if data.type === 'list' || data.type === 'array'}
@@ -156,6 +177,9 @@
     {activeNavItem}
     {setError}
     {removeError}
+    {pgargs}
+    pgargkey={data.pgarg}
+    bind:changed={data.changed}
     bind:value={data.value}
     />
 {:else}
@@ -172,6 +196,9 @@
     {setError}
     {removeError}
     placeholder={data.placeholder}
+    {pgargs}
+    pgargkey={data.pgarg}
+    bind:changed={data.changed}
     bind:value={data.value}
     />
 {/if}

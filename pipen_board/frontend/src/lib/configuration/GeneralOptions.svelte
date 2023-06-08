@@ -14,6 +14,7 @@
     export let initDescription = undefined;
     export let general_filter = (x) => true;
     export let activeNavItem;
+    export let pgargs = {};
 
     if (initDescription) {
         description = initDescription;
@@ -30,6 +31,7 @@
                 {removeError}
                 {key}
                 {activeNavItem}
+                {pgargs}
                 bind:data={data[key]}
                 bind:description />
         {/each}
@@ -40,6 +42,7 @@
                     {removeError}
                     {key}
                     {activeNavItem}
+                    {pgargs}
                     bind:data={data[key]}
                     bind:description />
             {/each}
@@ -58,11 +61,25 @@
     {#each Object.keys(data).filter((k) => !general_filter(k)) as key}
         <AccordionItem open title="{key}: {data[key].desc}">
             {#each getKeysUnhidden(data[key].value, `${activeNavItem}/${key}`) as k}
-                <Option {setError} {removeError} {activeNavItem} key={k} bind:data={data[key].value[k]} bind:description />
+                <Option
+                    {setError}
+                    {removeError}
+                    {activeNavItem}
+                    pgargs={pgargs}
+                    key={k}
+                    bind:data={data[key].value[k]}
+                    bind:description />
             {/each}
             {#if showHiddens[key]}
                 {#each getKeysHidden(data[key].value, `${activeNavItem}/${key}`) as k}
-                    <Option {setError} {removeError} {activeNavItem} key={k} bind:data={data[key].value[k]} bind:description />
+                    <Option
+                        {setError}
+                        {removeError}
+                        {activeNavItem}
+                        pgargs={pgargs}
+                        key={k}
+                        bind:data={data[key].value[k]}
+                        bind:description />
                 {/each}
             {/if}
             {#if hasHidden(data[key].value, `${activeNavItem}/${key}`)}

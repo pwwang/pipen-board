@@ -2,7 +2,7 @@
     import { createEventDispatcher, onMount } from "svelte";
     import Dropdown from "carbon-components-svelte/src/Dropdown/Dropdown.svelte";
     import OptionFrame from "./OptionFrame.svelte";
-    import { validateData } from "../../utils";
+    import { validateData, get_pgvalue } from "../../utils";
     import { removeError, setError } from "../../store";
 
     export let key;
@@ -12,6 +12,9 @@
     export let activeNavItem;
     export let required = false;
     export let readonly = false;
+    export let pgargs = {};
+    export let pgargkey = null;
+    export let changed = false;
 
     let button = null;
     let selectedId = choices.indexOf(value);
@@ -43,6 +46,10 @@
 
     // Change the value and pass it to the parent component
     $: value = choices[selectedId];
+    $: pgvalue = get_pgvalue(pgargs, pgargkey === true ? key : pgargkey);
+    $: if (pgvalue !== undefined && !changed) {
+        selectedId = choices.indexOf(pgvalue);
+    }
 
     onMount(() => {
         button.onfocus = () => {
@@ -70,6 +77,7 @@
             bind:selectedId
             bind:ref={button}
             on:select={e => {
+                changed = true;
                 if (readonly)  {selectedId = origSelectedId;}
             }}
             items={choices.map((choice) => ({

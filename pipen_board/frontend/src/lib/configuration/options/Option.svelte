@@ -10,6 +10,7 @@
     export let activeNavItem;
     export let setError;
     export let removeError;
+    export let pgargs = {};
 </script>
 
 {#if data.type === 'ns' || data.type === 'namespace'}
@@ -19,6 +20,7 @@
     {activeNavItem}
     {setError}
     {removeError}
+    {pgargs}
     readonly={data.readonly}
     bind:description
     bind:value={data.value}
@@ -31,5 +33,6 @@
     {activeNavItem}
     {setError}
     {removeError}
+    {pgargs}
     />
 {/if}

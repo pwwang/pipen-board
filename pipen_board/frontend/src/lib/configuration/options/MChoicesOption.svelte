@@ -2,6 +2,7 @@
     import { onMount } from "svelte";
     import MultiSelect from "carbon-components-svelte/src/MultiSelect/MultiSelect.svelte";
     import OptionFrame from "./OptionFrame.svelte";
+    import { get_pgvalue } from "../../utils";
 
     export let key;
     export let value;
@@ -12,6 +13,11 @@
     export let readonly = false;
     export let setError;
     export let removeError;
+    export let pgargs = {};
+    export let pgargkey = null;
+    // Note that unlike other options, on:select/on:change is not
+    // appropriate. So we use on:focus instead.
+    export let changed = false;
 
     let invalid = false;
     let invalidText = "";
@@ -41,6 +47,15 @@
         }
     };
 
+    $: pgvalue = JSON.stringify(get_pgvalue(pgargs, pgargkey === true ? key : pgargkey));
+    $: if (pgvalue !== undefined && !changed) {
+        const pgv = JSON.parse(pgvalue);
+        selectedIds = pgv.map((v) => choices.indexOf(v));
+        // Change of selectedIds will trigger validateValue as
+        // the event on:select is triggered.
+        // value = selectedIds.map((i) => choices[i]);
+    }
+
     onMount(() => {
         if (!readonly) {
             validateValue(selectedIds);
@@ -62,6 +77,7 @@
             {invalid}
             {invalidText}
             bind:selectedIds
+            on:focus={() => { changed = true; }}
             on:select={(e) => {
                 if (readonly) { selectedIds = origSelectedIds; }
                 else { validateValue(e.detail.selectedIds); }
