@@ -13,9 +13,9 @@ generate-setup-file = true
 [tool.poetry.dependencies]
 python = "^3.8"
 quart = "^0.18"
-pipen-args = "^0.9.11"
+pipen-args = "^0.10.0"
 websocket-client = "^1.5"
-pipen-log2file = "^0.2.1"
+pipen-log2file = "^0.3.0"
 psutil = "^5.9.5"
 
 [tool.poetry.plugins.pipen]

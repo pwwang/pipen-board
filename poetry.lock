@@ -648,14 +648,14 @@ executing = ">1.1.0,<2.0"
 
 [[package]]
 name = "pipen"
-version = "0.9.11"
+version = "0.10.0"
 description = "A pipeline framework for python"
 category = "main"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "pipen-0.9.11-py3-none-any.whl", hash = "sha256:f6090f4eb152f28ff97cfdc24030276ee13ddc7a8c4c6bfd1590bdbc5d2c4dfc"},
-    {file = "pipen-0.9.11.tar.gz", hash = "sha256:f0617831aad710a23fec17038bbfdfaa00ea6e3f31965e31eac236e0eab8a9ea"},
+    {file = "pipen-0.10.0-py3-none-any.whl", hash = "sha256:7e0a8340976b2ad38e8dab3037a549e44046fb29170d61f616cf71ce185df8c9"},
+    {file = "pipen-0.10.0.tar.gz", hash = "sha256:0ee9b8f6709d847537e426061be7b295fbcd222243910fc78f11b86e8d09fe99"},
 ]
 
 [package.dependencies]
@@ -670,48 +670,48 @@ xqute = ">=0.2.1,<0.3.0"
 
 [[package]]
 name = "pipen-annotate"
-version = "0.8.0"
+version = "0.9.0"
 description = "Use docstring to annotate pipen processes"
 category = "main"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "pipen_annotate-0.8.0-py3-none-any.whl", hash = "sha256:e93c482e101378fdd42a1d3ce249144acd4122385df9a8f8b9648a049ddb5a3a"},
-    {file = "pipen_annotate-0.8.0.tar.gz", hash = "sha256:cdd5ded871f86a39172763d77657790d60c76c9f17003ae14d739f5f0da10a01"},
+    {file = "pipen_annotate-0.9.0-py3-none-any.whl", hash = "sha256:c2c0128ea8b07f291562b4757dc0a5493b93e71898ad590d6a366a3e8b66ab11"},
+    {file = "pipen_annotate-0.9.0.tar.gz", hash = "sha256:f49bc017c6238a98366775df6b50dc6acbe1f16f9dd0a320a4b5748e542e8b37"},
 ]
 
 [package.dependencies]
-pipen = ">=0.9,<0.10"
+pipen = ">=0.10,<0.11"
 
 [[package]]
 name = "pipen-args"
-version = "0.9.11"
+version = "0.10.0"
 description = "Command-line argument parser for pipen."
 category = "main"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "pipen_args-0.9.11-py3-none-any.whl", hash = "sha256:e5f0b9dd5608a5a9224cec76ecddf2a66fc6225f5bd34545f5d2893ed1f01a74"},
-    {file = "pipen_args-0.9.11.tar.gz", hash = "sha256:00b13c4a9ddb6575895f245a9edabb66a35fcb9294ef3b97f99421bfcc1eaba1"},
+    {file = "pipen_args-0.10.0-py3-none-any.whl", hash = "sha256:4e954820d23b7ac683ff30d5ecda643cd1d0d6cd622f435d074f47347c2a3286"},
+    {file = "pipen_args-0.10.0.tar.gz", hash = "sha256:6485f23d14f06b24a534bfba7961182aefb434638277770f26fb06b7cec73ac7"},
 ]
 
 [package.dependencies]
-pipen-annotate = ">=0.8.0,<0.9.0"
+pipen-annotate = ">=0.9.0,<0.10.0"
 
 [[package]]
 name = "pipen-log2file"
-version = "0.2.1"
+version = "0.3.0"
 description = "Add verbosal information in logs for pipen."
 category = "main"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "pipen_log2file-0.2.1-py3-none-any.whl", hash = "sha256:9ba84e7915cfcba6e4f2c4bc11e2c18ace1ed9a6aeb535cc3ebf7aa78ac5038e"},
-    {file = "pipen_log2file-0.2.1.tar.gz", hash = "sha256:5ea2fbae71bca0b7f9c60419298bfd255ff21a1b217552efc91b4c17cd4779ce"},
+    {file = "pipen_log2file-0.3.0-py3-none-any.whl", hash = "sha256:062ed0476ff3ec9074e757ebd71a44dad9e0108264db22bbf38c38da8b3d844a"},
+    {file = "pipen_log2file-0.3.0.tar.gz", hash = "sha256:be1a028c6c80f6238d11cb7eb21f10d198dd6fe476c784891a4ef61ad0671f82"},
 ]
 
 [package.dependencies]
-pipen = ">=0.9.2,<0.10.0"
+pipen = ">=0.10.0,<0.11.0"
 
 [[package]]
 name = "prefixed"
@@ -1079,14 +1079,14 @@ test = ["websockets"]
 
 [[package]]
 name = "werkzeug"
-version = "2.3.4"
+version = "2.3.6"
 description = "The comprehensive WSGI web application library."
 category = "main"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "Werkzeug-2.3.4-py3-none-any.whl", hash = "sha256:48e5e61472fee0ddee27ebad085614ebedb7af41e88f687aaf881afb723a162f"},
-    {file = "Werkzeug-2.3.4.tar.gz", hash = "sha256:1d5a58e0377d1fe39d061a5de4469e414e78ccb1e1e59c0f5ad6fa1c36c52b76"},
+    {file = "Werkzeug-2.3.6-py3-none-any.whl", hash = "sha256:935539fa1413afbb9195b24880778422ed620c0fc09670945185cce4d91a8890"},
+    {file = "Werkzeug-2.3.6.tar.gz", hash = "sha256:98c774df2f91b05550078891dee5f0eb0cb797a522c757a2452b9cee5b202330"},
 ]
 
 [package.dependencies]
@@ -1151,4 +1151,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "8c5647f1fde353d32c8df0b182c03bfedb7af10484a2f11e919b02efb70011d8"
+content-hash = "952fc2a5f93c1dc0d17086570b8d95dbf632486af5b1e5e3022c2cd446004982"
