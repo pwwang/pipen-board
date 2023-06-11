@@ -648,14 +648,14 @@ executing = ">1.1.0,<2.0"
 
 [[package]]
 name = "pipen"
-version = "0.10.0"
+version = "0.10.2"
 description = "A pipeline framework for python"
 category = "main"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "pipen-0.10.0-py3-none-any.whl", hash = "sha256:7e0a8340976b2ad38e8dab3037a549e44046fb29170d61f616cf71ce185df8c9"},
-    {file = "pipen-0.10.0.tar.gz", hash = "sha256:0ee9b8f6709d847537e426061be7b295fbcd222243910fc78f11b86e8d09fe99"},
+    {file = "pipen-0.10.2-py3-none-any.whl", hash = "sha256:0c65283f941930449af41d74160b9eaedba348a60fa1b5f09eafcd4b595cb82f"},
+    {file = "pipen-0.10.2.tar.gz", hash = "sha256:ef76d70ab7040332d32dff116c09634bf6bd8b733696b8a07e04b2e1b35152bc"},
 ]
 
 [package.dependencies]
@@ -685,14 +685,14 @@ pipen = ">=0.10,<0.11"
 
 [[package]]
 name = "pipen-args"
-version = "0.10.0"
+version = "0.10.1"
 description = "Command-line argument parser for pipen."
 category = "main"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "pipen_args-0.10.0-py3-none-any.whl", hash = "sha256:4e954820d23b7ac683ff30d5ecda643cd1d0d6cd622f435d074f47347c2a3286"},
-    {file = "pipen_args-0.10.0.tar.gz", hash = "sha256:6485f23d14f06b24a534bfba7961182aefb434638277770f26fb06b7cec73ac7"},
+    {file = "pipen_args-0.10.1-py3-none-any.whl", hash = "sha256:27dc4919428316bd8a6161b7594f5ce8471c2fc570d4152408260cf12617e15a"},
+    {file = "pipen_args-0.10.1.tar.gz", hash = "sha256:1055f2c785768793a6c32b64e165e6de55a5fc21da85c2284aa109640d2f9af2"},
 ]
 
 [package.dependencies]
@@ -700,14 +700,14 @@ pipen-annotate = ">=0.9.0,<0.10.0"
 
 [[package]]
 name = "pipen-log2file"
-version = "0.3.0"
+version = "0.3.2"
 description = "Add verbosal information in logs for pipen."
 category = "main"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "pipen_log2file-0.3.0-py3-none-any.whl", hash = "sha256:062ed0476ff3ec9074e757ebd71a44dad9e0108264db22bbf38c38da8b3d844a"},
-    {file = "pipen_log2file-0.3.0.tar.gz", hash = "sha256:be1a028c6c80f6238d11cb7eb21f10d198dd6fe476c784891a4ef61ad0671f82"},
+    {file = "pipen_log2file-0.3.2-py3-none-any.whl", hash = "sha256:2a96e2155ee5d247d009a474c39902f16ecdc9a19ec2e6e5d62e6cd22c731bac"},
+    {file = "pipen_log2file-0.3.2.tar.gz", hash = "sha256:3f1a6cdff82fd09fa32a428362ef08b06fc96f0f5a824d1a7b1c10af1f996472"},
 ]
 
 [package.dependencies]
@@ -1062,14 +1062,14 @@ files = [
 
 [[package]]
 name = "websocket-client"
-version = "1.5.2"
+version = "1.5.3"
 description = "WebSocket client for Python with low level API options"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "websocket-client-1.5.2.tar.gz", hash = "sha256:c7d67c13b928645f259d9b847ab5b57fd2d127213ca41ebd880de1f553b7c23b"},
-    {file = "websocket_client-1.5.2-py3-none-any.whl", hash = "sha256:f8c64e28cd700e7ba1f04350d66422b6833b82a796b525a51e740b8cc8dab4b1"},
+    {file = "websocket-client-1.5.3.tar.gz", hash = "sha256:b96f3bce3e54e3486ebe6504bc22bd4c140392bd2eb71764db29be8f2639aa65"},
+    {file = "websocket_client-1.5.3-py3-none-any.whl", hash = "sha256:3566f8467cd350874c4913816355642a4942f6c1ed1e9406e3d42fae6d6c072a"},
 ]
 
 [package.extras]
