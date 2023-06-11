@@ -40,14 +40,14 @@ class MyGroup(ProcGroup):
     """Group description
 
     Args:
-        arg (text): The arg
+        arg (type=text): The arg
         nsarg: The nsarg
             - a: The a
             - b: The b
     """
 
     DEFAULTS = {
-        "arg": "b",
+        "arg": "default arg",
         "nsarg": {"a": "default a", "b": "default b"},
     }
 
@@ -58,7 +58,7 @@ class MyGroup(ProcGroup):
             """The P2 process
 
             Envs:
-                arg (text;pgarg): The arg linked from the group
+                arg (type=text;pgarg): The arg linked from the group
                 p2arg2 (pgarg=nsarg.a): The nsarg.a linked from the group
             """
             requires = P1

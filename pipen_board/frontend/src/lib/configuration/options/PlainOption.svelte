@@ -61,19 +61,23 @@
     });
 </script>
 
-<TextInput
-    on:mouseenter
-    on:mouseleave
-    on:focus
-    on:blur
-    on:input={e => {changed = true; validateValue(e.detail)}}
-    {invalid}
-    {invalidText}
-    {readonly}
-    inline
-    size="sm"
-    class={readonly ? "readonly" : ""}
-    placeholder={placeholder}
-    labelText={key}
-    bind:value={strValue}
-/>
+<div
+    class="textinput-wrapper {pgargkey ? 'linked-pgarg' : ''}"
+    style='--pgarg: "This option is linked to Group Argument: {pgargkey === true ? key : pgargkey}"'>
+    <TextInput
+        on:mouseenter
+        on:mouseleave
+        on:focus
+        on:blur
+        on:input={e => {changed = true; validateValue(e.detail)}}
+        {invalid}
+        {invalidText}
+        {readonly}
+        inline
+        size="sm"
+        class={readonly ? "readonly" : ""}
+        placeholder={placeholder}
+        labelText={key}
+        bind:value={strValue}
+    />
+</div>

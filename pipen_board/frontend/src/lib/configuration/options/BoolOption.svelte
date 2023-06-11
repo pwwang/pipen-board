@@ -21,7 +21,10 @@
 </script>
 
 <OptionFrame on:mouseenter on:mouseleave>
-    <div slot="label" style="height: 1.2rem;" class={readonly ? "readonly-label" : ""}>{key}</div>
+    <div
+        slot="label"
+        style='--pgarg: "This option is linked to Group Argument: {pgargkey === true ? key : pgargkey}"'
+        class='{readonly ? "readonly-label" : ""}{pgargkey ? "linked-pgarg-label" : ""}'>{key}</div>
     <div slot="field" style="align-self: center;">
         <Toggle
             on:focus

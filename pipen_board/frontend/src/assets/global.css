@@ -254,6 +254,38 @@ div.tree .bx--tree-node {
     color: #ff8e4e;
     border: 1px solid #c55e24;
 }
+/* Make the tooltip below visible */
+.bx--text-input__label-helper-wrapper {
+    overflow: visible;
+}
+div.linked-pgarg-label,
+div.textinput-wrapper.linked-pgarg label.bx--label--inline {
+    text-decoration: underline;
+    cursor: alias;
+    position: relative;
+}
+div.linked-pgarg-label::after,
+div.textinput-wrapper.linked-pgarg label.bx--label--inline::after {
+    content: var(--pgarg);
+    position: absolute;
+    top: 50%;
+    left: 120%;
+    transform: translateY(-50%);
+    padding: 0.25rem 0.5rem;
+    background-color: #464646;
+    color: #fff;
+    border-radius: 0.2rem;
+    font-size: 0.75rem;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+    z-index: 9999;
+    font-weight: normal;
+    font-style: normal;
+}
+div.linked-pgarg-label:hover::after,
+div.textinput-wrapper.linked-pgarg label.bx--label--inline:hover::after {
+    opacity: 1;
+}
 div.description code, div.running-confirm-modal code {
     font-size: .8rem;
     border: 1px solid #aaa;
