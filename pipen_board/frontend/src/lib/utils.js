@@ -168,7 +168,12 @@ function updateConfig(config, option, value, ns=false, pgargs=null) {
 
     if (ns) {
         for (let popt in value.value) {
-            config[option] = updateConfig(config[option] || {}, popt, value.value[popt], false, pgargs);
+            const conf = updateConfig(config[option] || {}, popt, value.value[popt], false, pgargs);
+            if (Object.keys(conf).length === 0) {
+                continue;
+            } else {
+                config[option] = conf;
+            }
         }
         return config;
     }
@@ -178,7 +183,7 @@ function updateConfig(config, option, value, ns=false, pgargs=null) {
             return config;
         }
     }
-    if (value.value === undefined || value.value === null) {
+    if (value.value === undefined || value.value === null || _equal(value.value, value.default)) {
         return config;
     }
     return { ...config, [option]: value.value };
@@ -221,7 +226,10 @@ function finalizeConfig(schema) {
     }
     for (let [group, groupinfo] of Object.entries(schema[SECTION_PROCGROUPS] || {})) {
         for (let option in groupinfo.ARGUMENTS) {
-            config[group] = updateConfig(config[group] || {}, option, groupinfo.ARGUMENTS[option]);
+            const conf = updateConfig(config[group] || {}, option, groupinfo.ARGUMENTS[option]);
+            if (Object.keys(conf).length > 0) {
+                config[group] = conf;
+            }
         }
         for (let [proc, procinfo] of Object.entries(groupinfo.PROCESSES)) {
             let proc_conf = {};

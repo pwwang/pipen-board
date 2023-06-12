@@ -152,7 +152,7 @@ def _anno_to_argspec(anno: Mapping[str, Any] | None) -> Mapping[str, Any]:
         if t == "ns":
             argspec[arg]["value"] = _anno_to_argspec(arginfo.terms)
         elif t in ("choice", "mchoice"):
-            argspec[arg]["value"] = argspec[arg].pop("default", [])
+            argspec[arg]["value"] = argspec[arg].get("default", [])
             argspec[arg]["choices"] = list(arginfo.terms)
             argspec[arg]["choices_desc"] = [
                 term.help
@@ -166,7 +166,7 @@ def _anno_to_argspec(anno: Mapping[str, Any] | None) -> Mapping[str, Any]:
                 h = re.sub(r"([\.\?!:])\s*\n", "\\1<br />\n", term.help)
                 argspec[arg]["desc"] += f"- `{termname}`: {h}\n"
         else:
-            argspec[arg]["value"] = argspec[arg].pop("default", None)
+            argspec[arg]["value"] = argspec[arg].get("default", None)
 
         # determine the itype for list elements
         if t == "list":
@@ -186,7 +186,38 @@ def _anno_to_argspec(anno: Mapping[str, Any] | None) -> Mapping[str, Any]:
             if "bitype" in argspec[arg]:
                 argspec[arg]["itype"] = argspec[arg].pop("bitype")
 
+    # argspec.setdefault("default", argspec.get("value", None))
     return argspec
+
+
+def _get_default(argspec: Mapping[str, Any], force_ns: bool = False) -> Any:
+    """Set the default using the value for the argspec
+
+    This can be used to omit the argument in final config in frontend
+    in case the value is the same as the default
+    """
+    value = argspec.get("value", None)
+    if not force_ns and argspec.get("type") not in ("ns", "namespace"):
+        argspec.setdefault("default", value)
+        return argspec["default"]
+
+    # flatten the namespace
+    if value is None:
+        argspec.setdefault("default", {})
+        return argspec["default"]
+
+    default = {}
+    for arg, arginfo in value.items():
+        # placeholder
+        if arg.startswith("<") and arg.endswith(">"):
+            continue
+
+        # Set the default for sub-item
+        dlt = _get_default(arginfo)
+        default[arg] = dlt
+
+    argspec.setdefault("default", default)
+    return default
 
 
 def _proc_to_argspec(
@@ -223,20 +254,39 @@ def _proc_to_argspec(
         "desc": "Environment variables for the process, used across jobs",
         "value": _anno_to_argspec(anno.get("Envs", {})),
     }
+    _get_default(argspec["value"]["envs"], force_ns=True)
+
     argspec["value"]["plugin_opts"] = PIPELINE_OPTIONS["plugin_opts"]
+    _get_default(argspec["value"]["plugin_opts"], force_ns=True)
+
     argspec["value"]["scheduler_opts"] = PIPELINE_OPTIONS["scheduler_opts"]
+    _get_default(argspec["value"]["scheduler_opts"], force_ns=True)
+
     argspec["value"]["forks"] = PIPELINE_OPTIONS["forks"]
+    _get_default(argspec["value"]["forks"])
+
     argspec["value"]["cache"] = PIPELINE_OPTIONS["cache"]
+    _get_default(argspec["value"]["cache"])
+
     argspec["value"]["scheduler"] = PIPELINE_OPTIONS["scheduler"]
+    _get_default(argspec["value"]["scheduler"])
+
     argspec["value"]["dirsig"] = PIPELINE_OPTIONS["dirsig"]
+    _get_default(argspec["value"]["dirsig"])
+
     argspec["value"]["error_strategy"] = PIPELINE_OPTIONS["error_strategy"]
+    _get_default(argspec["value"]["error_strategy"])
+
     argspec["value"]["num_retries"] = PIPELINE_OPTIONS["num_retries"]
+    _get_default(argspec["value"]["num_retries"])
+
     argspec["value"]["lang"] = {
         "desc": "The interpreter to run the script",
         "hidden": True,
         "placeholder": proc.lang,
         # Don't include it in the config file if not specified
         "value": None,
+        "default": None,
     }
 
     return argspec
@@ -289,7 +339,13 @@ def _load_additional(additional: str, **kwargs) -> Mapping[str, Any]:
         f"{slugify(str(additional.resolve()))}.rendered{additional.suffix}"
     )
     configfile.write_text(tpl.render(**kwargs))
-    return Config.load(configfile)
+
+    out = Config.load(configfile)
+    if "ADDITIONAL_OPTIONS" in out:
+        for val in out["ADDITIONAL_OPTIONS"].values():
+            _get_default(val)
+
+    return out
 
 
 async def _get_config_data(args: Namespace) -> Mapping[str, Any]:
@@ -349,6 +405,9 @@ async def _get_config_data(args: Namespace) -> Mapping[str, Any]:
         "type": "str",
         "value": None,
     }
+    for key, val in data[SECTION_PIPELINE_OPTIONS].items():
+        _get_default(val, key in ("plugin_opts", "scheduler_opts"))
+
     data[SECTION_PROCESSES] = {}
 
     if pipeline.config.plugin_opts.get("args_flatten") is True or (
@@ -365,6 +424,7 @@ async def _get_config_data(args: Namespace) -> Mapping[str, Any]:
             ),
             "type": "bool",
             "value": True,
+            "default": True,
             "readonly": True,
         }
 
