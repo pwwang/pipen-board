@@ -36,6 +36,7 @@
         ) {
             value = origValue;
             invalid = false;
+            removeError(`${activeNavItem} / ${key}`);
             return;
         }
         const error = validateData(v, validator);

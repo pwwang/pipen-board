@@ -31,9 +31,9 @@
     const validateValue = (sid) => {
         if (sid !== -1 || !required) {
             invalid = false;
+            removeError(`${activeNavItem} / ${key}`);
             return;
         }
-
         const error = validateData(undefined, ["required"]);
         invalid = error !== null;
         invalidText = error;
@@ -82,6 +82,7 @@
             on:select={e => {
                 changed = true;
                 if (readonly)  {selectedId = origSelectedId;}
+                validateValue(selectedId);
             }}
             items={choices.map((choice) => ({
                 id: choices.indexOf(choice),
