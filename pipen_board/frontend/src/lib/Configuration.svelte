@@ -142,7 +142,7 @@
             type: "text/plain",
         });
         element.href = URL.createObjectURL(file);
-        element.download = "config.toml";
+        element.download = `${data[SECTION_PIPELINE_OPTS].name.value}config.toml`;
         document.body.appendChild(element);
         element.click();
         element.remove();
