@@ -384,6 +384,7 @@ async def _get_config_data(args: Namespace) -> Mapping[str, Any]:
     data[SECTION_PIPELINE_OPTIONS]["name"] = {
         "type": "str",
         "value": args.name or pipeline.name,
+        "default": None,  # Make sure it's included in the final toml
         "placeholder": args.name or pipeline.name,
         "readonly": True,
         "desc": (
