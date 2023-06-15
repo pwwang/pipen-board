@@ -109,7 +109,7 @@
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    data: JSON.stringify(data),
+                    data: JSON.stringify(data, null, 4),
                     configfile: configfile && !saveas ? configfile : null,
                 }),
             });
