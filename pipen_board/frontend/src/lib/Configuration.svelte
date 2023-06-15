@@ -199,7 +199,9 @@
         {/if}
         {#if data[SECTION_RUNNING_OPTS]}
             <NavDivider group="running options" />
-            {#each Object.keys(data[SECTION_RUNNING_OPTS]) as running}
+            {#each Object.keys(data[SECTION_RUNNING_OPTS]).sort(
+                (a, b) => (data[SECTION_RUNNING_OPTS][a].order || 0) - (data[SECTION_RUNNING_OPTS][b].order || 0)
+            ) as running}
                 <NavItem sub text={running} bind:activeNavItem />
             {/each}
         {/if}
