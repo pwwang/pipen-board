@@ -293,7 +293,13 @@ def _proc_to_argspec(
 
 
 def _load_additional(additional: str, **kwargs) -> Mapping[str, Any]:
-    """Load additional config files"""
+    """Load additional config files
+
+    Args:
+        additional: The additional config file to load
+        kwargs: Key-value pairs to render the additional config file,
+            which is a liquid/jinja2 template
+    """
     if not additional:
         return {}
 
