@@ -1,5 +1,7 @@
 <script>
     import * as itoml from "@iarna/toml";
+    import copy from "clipboard-copy";
+    import Copy from "carbon-icons-svelte/lib/Copy.svelte";
     import Accordion from "carbon-components-svelte/src/Accordion/Accordion.svelte";
     import AccordionItem from "carbon-components-svelte/src/Accordion/AccordionItem.svelte";
     import Button from "carbon-components-svelte/src/Button/Button.svelte";
@@ -174,6 +176,7 @@
             bind:value={generatedCommand}
             on:input={e => autoHeight(e.target)} />
         <div class="running-action-wrapper">
+            <Button size="small" kind="secondary" icon={Copy} on:click={()=>{ copy(generatedCommand); }} iconDescription="Copy the command" />
             {#if data.allow_run}
             <TooltipDefinition
                 direction="bottom"
