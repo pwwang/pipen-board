@@ -284,6 +284,7 @@
         grid-template-columns: var(--tree-width) .5rem auto;
         grid-template-rows: var(--jobs-height) .5rem auto;
         height: 100%;
+        overflow: auto;
     }
     div.procrun-wrap div.jobs {
         grid-area: jobs;
@@ -319,11 +320,13 @@
     div.procrun-wrap div.details {
         grid-area: details;
         height: 100%;
+        overflow: auto;
         background-color: #f7f7f7;
         display: flex;
     }
     div.procrun-wrap div.jobdetail {
         height: 100%;
         width: 100%;
+        overflow: auto;
     }
 </style>

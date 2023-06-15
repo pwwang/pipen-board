@@ -53,7 +53,7 @@
         {/if}
         <Button size="small" kind="tertiary" icon={Reset} on:click={reloadFileDetails}>Reload</Button>
     </div>
-    <div class="filepreview-content">
+    <div class="filepreview-content scrollable">
         {#if info.type === "text" }
             <textarea class="file-text" readonly>{info.content || "(empty)"}</textarea>
         {:else if info.type === "bigtext" }
@@ -86,6 +86,7 @@
         display: grid;
         grid-template-rows: auto 1fr;
         height: 100%;
+        overflow: auto;
     }
     .filepreview-actions {
         display: flex;
@@ -98,6 +99,9 @@
     }
     .filepreview-actions :global(button.bx--btn) {
         font-size: .8rem;
+    }
+    .filepreview-content {
+        overflow: auto;
     }
     .filepreview-content img {
         aspect-ratio: attr(width) / attr(height);
