@@ -334,7 +334,7 @@ def _load_additional(additional: str, **kwargs) -> Mapping[str, Any]:
 
     # kwargs passed, treat the file as a template
     additional = Path(additional)
-    tpl = Liquid(additional, mode="wild", from_file=True)
+    tpl = Liquid(additional.read_text(), mode="wild", from_file=False)
     configfile = cache_dir.joinpath(
         f"{slugify(str(additional.resolve()))}.rendered{additional.suffix}"
     )
