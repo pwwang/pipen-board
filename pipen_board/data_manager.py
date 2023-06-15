@@ -335,23 +335,30 @@ def _load_additional(additional: str, **kwargs) -> Mapping[str, Any]:
                     f"Could not retrieve remote path: {additional}"
                 ) from None
 
-    if not kwargs:
-        return Config.load(additional)
+    if kwargs:
+        # kwargs passed, treat the file as a template
+        additional = Path(additional)
+        tpl = Liquid(additional.read_text(), mode="wild", from_file=False)
+        additional = cache_dir.joinpath(
+            f"{slugify(str(additional.resolve()))}.rendered{additional.suffix}"
+        )
+        additional.write_text(tpl.render(**kwargs))
 
-    # kwargs passed, treat the file as a template
-    additional = Path(additional)
-    tpl = Liquid(additional.read_text(), mode="wild", from_file=False)
-    configfile = cache_dir.joinpath(
-        f"{slugify(str(additional.resolve()))}.rendered{additional.suffix}"
-    )
-    configfile.write_text(tpl.render(**kwargs))
-
-    out = Config.load(configfile)
+    out = Config.load(additional)
     if "ADDITIONAL_OPTIONS" in out:
         for val in out["ADDITIONAL_OPTIONS"].values():
             _get_default(val)
 
     return out
+
+
+def _update_dict(d1: Mapping[str, Any], d2: Mapping[str, Any]) -> None:
+    """Update d1 with d2 recursively"""
+    for key, val in d2.items():
+        if key in d1 and isinstance(val, dict) and isinstance(d1[key], dict):
+            _update_dict(d1[key], val)
+        else:
+            d1[key] = val
 
 
 async def _get_config_data(args: Namespace) -> Mapping[str, Any]:
@@ -372,20 +379,7 @@ async def _get_config_data(args: Namespace) -> Mapping[str, Any]:
     finally:
         sys.argv = old_argv
 
-    if args.additional:
-        logger.info(
-            "[bold][yellow]DBG[/yellow][/bold] "
-            "Loading additional configuration items ..."
-        )
-        data = _load_additional(
-            args.additional,
-            name=args.name,
-            pipeline=args.pipeline,
-            pipeline_args=args.pipeline_args,
-        )
-    else:
-        data = {}
-
+    data = {}
     data[SECTION_PIPELINE_OPTIONS] = PIPELINE_OPTIONS.copy()
     data[SECTION_PIPELINE_OPTIONS]["name"] = {
         "type": "str",
@@ -473,6 +467,20 @@ async def _get_config_data(args: Namespace) -> Mapping[str, Any]:
             )
 
     data[SECTION_PROCGROUPS] = pg_sec
+
+    if args.additional:
+        logger.info(
+            "[bold][yellow]DBG[/yellow][/bold] "
+            "Loading additional configuration items ..."
+        )
+        addi_data = _load_additional(
+            args.additional,
+            name=args.name,
+            pipeline=args.pipeline,
+            pipeline_args=args.pipeline_args,
+        )
+        _update_dict(data, addi_data)
+
     return data
 
 
