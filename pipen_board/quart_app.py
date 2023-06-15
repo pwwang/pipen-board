@@ -39,7 +39,7 @@ def get_app(args: Namespace):
     if args.dev:
         print(
             " * To enable dev mode in the UI, try: "
-            f"http://127.0.0.1:{args.port}?dev=1"
+            f"http://0.0.0.0:{args.port}?dev=1"
         )
 
     @app.after_request

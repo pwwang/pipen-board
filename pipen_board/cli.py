@@ -121,4 +121,9 @@ class PipenCliBoardPlugin(CLIPlugin):
         app = get_app(args)
         # See https://github.com/pallets/quart/issues/224
         # for customizing logger in the future
-        app.run(port=args.port, debug=args.dev, use_reloader=args.dev)
+        app.run(
+            host="0.0.0.0",
+            port=args.port,
+            debug=args.dev,
+            use_reloader=args.dev,
+        )
