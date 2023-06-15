@@ -519,11 +519,6 @@ class DataManager:
                 self._config_data = json.load(f)
                 return
 
-        if (
-            use_cached is True or (use_cached == "auto" and not args.dev)
-        ) and self._config_data:
-            return
-
         # Use multiprocessing to get a clean environment
         # to load the pipeline to avoid conflicts
         def target(conn):
