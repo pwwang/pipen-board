@@ -475,8 +475,18 @@ async def _get_config_data(
             "[bold][yellow]DBG[/yellow][/bold] "
             "Loading additional configuration items ..."
         )
+        if (
+            args.additional == "auto"
+            and args.pipeline.rpartition(":")[0].endswith(".py")
+        ):
+            additional = str(
+                Path(__file__).parent.joinpath("additional_auto.toml")
+            )
+        else:
+            additional = args.additional
+
         addi_data = _load_additional(
-            args.additional,
+            additional,
             name=name or pipeline.name,
             pipeline=args.pipeline,
             pipeline_args=args.pipeline_args,

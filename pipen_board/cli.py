@@ -15,7 +15,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 class PipenCliBoardPlugin(CLIPlugin):
-    """Configure and run pipen pipelines on the web"""
+    """Configure and run pipen pipelines from the web"""
 
     name = NAME
     __version__ = __version__
@@ -41,7 +41,14 @@ class PipenCliBoardPlugin(CLIPlugin):
             help=(
                 "Additional arguments for the pipeline, "
                 "in YAML, INI, JSON or TOML format. "
-                "Can have sections `ADDITIONAL_OPTIONS` and `RUNNING_OPTIONS`"
+                "Can have sections `ADDITIONAL_OPTIONS` and `RUNNING_OPTIONS`. "
+                "It can also have other sections and items to override the "
+                "configurations generated from the pipeline. "
+                "If the pipeline is provided as a python script, such as "
+                "`/path/to/pipeline.py:<pipeline>`, and `<pipeline>` runs "
+                "under `__name__ == '__main__'`, the additional file can also "
+                "be specified as `auto` to generate a `RUNNING OPTIONS/Local` "
+                "section to run the pipeline locally."
             ),
         )
         subparser.add_argument(

@@ -14,27 +14,42 @@ pip install pipen-board
 $ pipen board --help
 Usage: pipen board [options] <pipeline> -- [pipeline options]
 
-Visualize configuration and running of pipen pipelines on the web
+Configure and run pipen pipelines from the web
 
 Required Arguments:
-  pipeline              The pipeline and the CLI arguments to run the pipeline. For the
-                        pipeline either `/path/to/pipeline.py:<pipeline>` or
-                        `<module.submodule>:<pipeline>` `<pipeline>` must be an instance of
-                        `Pipen` and running the pipeline should be called under `__name__ ==
-                        '__main__'.
+  pipeline              The pipeline and the CLI arguments to run the pipeline.
+                        For the pipeline either
+                        `/path/to/pipeline.py:<pipeline>` or
+                        `<module.submodule>:<pipeline>` `<pipeline>` must be an
+                        instance of `Pipen` and running the pipeline should be
+                        called under `__name__ == '__main__'.
 
 Options:
   -h, --help            show help message and exit
-  --port PORT           Port to serve the UI wizard [default: 18521]
-  --additional FILE     Additional arguments for the pipeline, in YAML, INI, JSON or TOML
-                        format. Can have sections `ADDITIONAL_OPTIONS` and `RUNNING_OPTIONS`
-  --dev                 Run the pipeline in development mode. This will print verbosal
-                        logging information and reload the pipeline if a new instantce
-                        starts when page reloads.
-  -w, --workdir WORKDIR The working directory of the pipeline. [default: .pipen]
+  -p PORT, --port PORT  Port to serve the UI wizard [default: 18521]
+  -a FILE, --additional FILE
+                        Additional arguments for the pipeline, in YAML, INI,
+                        JSON or TOML format. Can have sections
+                        `ADDITIONAL_OPTIONS` and `RUNNING_OPTIONS`. It can also
+                        have other sections and items to override the
+                        configurations generated from the pipeline. If the
+                        pipeline is provided as a python script, such as
+                        `/path/to/pipeline.py:<pipeline>`, and `<pipeline>`
+                        runs under `__name__ == '__main__'`, the additional
+                        file can also be specified as `auto` to generate a
+                        `RUNNING OPTIONS/Local` section to run the pipeline
+                        locally.
   --loglevel {auto,debug,info,warning,error,critical}
-                        Logging level. If `auto`, set to `debug` if `--dev` is set,
-                        otherwise `info` [default: auto]
+                        The logging level. If `auto`, it will be set to `debug`
+                        if `--dev` is set, otherwise `info`. [default: auto]
+  --dev                 Run the pipeline in development/debug mode. This will
+                        reload the server when changes are made to this package
+                        and reload the pipeline when page reloads for new
+                        configurations. Page cache is also disabled in this
+                        mode.
+  -w WORKDIR, --workdir WORKDIR
+                        The working directory of the pipeline. [default:
+                        .pipen]
 ```
 
 ## Describing arguments in docstring
