@@ -73,7 +73,7 @@ async def history():
         out["histories"].append({
             "name": name,
             "configfile": histfile.name,
-            "root": base64.b64decode(
+            "workdir": base64.b64decode(
                 histfile.stem.split(".")[-1] + "=="
             ).decode(),
             # 2023-01-01_00-00-00 to
@@ -103,13 +103,11 @@ async def pipeline_data():
 
 
 async def reports(report_path):
-    root = request.args.get("root", None)
-    root = root or reports.root
-    if root is None:
-        return {"error": "No root directory for reports is specified"}
+    """Get the reports"""
+    root, rest = report_path.split('/', 1)
+    root = root.replace('|', '/')
 
-    reports.root = root
-    report_path = Path(root).parent / report_path
+    report_path = Path(root) / rest
     if report_path.is_dir():
         report_path = report_path / "index.html"
 
@@ -117,16 +115,10 @@ async def reports(report_path):
     return await send_file(report_path)
 
 
-# Cache the physical path of the reports
-# A better way?
-reports.root = None
-
-
 async def report_building_log():
     """Get the building log of a report"""
     args = request.cli_args
-    report_file = Path(args.root).joinpath(
-        ".pipen",
+    report_file = Path(args.workdir).joinpath(
         args.name,
         ".report-workdir",
         "pipen-report.log",
@@ -168,9 +160,9 @@ async def history_saveas():
         jdata[SECTION_PIPELINE_OPTIONS]["name"]["value"] = newname
 
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        root = Path(args.root).resolve().as_posix()
-        out = {"name": newname, "mtime": now, "ctime": now, "root": root}
-        enc = base64.b64encode(root.encode()).decode().rstrip("=")
+        workdir = Path(args.workdir).resolve().as_posix()
+        out = {"name": newname, "mtime": now, "ctime": now, "workdir": workdir}
+        enc = base64.b64encode(workdir.encode()).decode().rstrip("=")
         newconfigfile = PIPEN_BOARD_DIR.joinpath(
             f"{slugify(args.pipeline)}.{newname}.{enc}.json"
         )
@@ -202,11 +194,11 @@ async def config_save():
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     name = jdata[SECTION_PIPELINE_OPTIONS]["name"]["value"]
-    root = Path(args.root).resolve().as_posix()
+    workdir = Path(args.workdir).resolve().as_posix()
     out = {"name": name, "mtime": now}
-    enc = base64.b64encode(root.encode()).decode().rstrip("=")
+    enc = base64.b64encode(workdir.encode()).decode().rstrip("=")
     if not configfile:
-        # base64 encode the root path
+        # base64 encode the workdir path
         configfile = PIPEN_BOARD_DIR.joinpath(
             f"{slugify(args.pipeline)}.{name}.{enc}.json"
         )
@@ -218,7 +210,7 @@ async def config_save():
                 ) = f"{name}.config.toml"
 
         out["ctime"] = now
-        out["root"] = root
+        out["workdir"] = workdir
         logger.info(
             "[bold][yellow]API[/yellow][/bold] Saving config to a new file: "
             f"{configfile}"
@@ -242,7 +234,7 @@ async def config_save():
 
         out["name"] = name
         out["ctime"] = now
-        out["root"] = root
+        out["workdir"] = workdir
         logger.info(
             "[bold][yellow]API[/yellow][/bold] Saving config to a new file: "
             f"{configfile}"
@@ -265,8 +257,7 @@ async def job_get_tree():
         "[bold][yellow]API[/yellow][/bold] Fetching tree for: "
         f"{data['proc']}/{data['job']}"
     )
-    jobdir = Path(args.root).joinpath(
-        ".pipen",
+    jobdir = Path(args.workdir).joinpath(
         args.name,
         data["proc"],
         str(data["job"]),

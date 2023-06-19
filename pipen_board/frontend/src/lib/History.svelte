@@ -23,7 +23,7 @@
 
     const headers = [
         { key: "name", value: "Name" },
-        { key: "root", value: "Working Directory" },
+        { key: "workdir", value: "Working Directory" },
         { key: "ctime", value: "Created Time" },
         { key: "mtime", value: "Modified Time"},
         { key: "actions", empty: true },
@@ -33,7 +33,7 @@
         return {
             id: i,
             name: history.name,
-            root: history.root,
+            workdir: history.workdir,
             ctime: history.ctime,
             mtime: history.mtime,
             actions: [i, history.configfile]

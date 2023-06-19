@@ -105,7 +105,7 @@
         toastNotify.kind = "info";
         toastNotify.subtitle = "Saving data ...";
 
-        let new_name;
+        let new_name = data.PIPELINE_OPTIONS.name.value;
         let saved;
         if (saveas) {
             if (runStarted && !finished) {
@@ -305,6 +305,7 @@
                         initDescription={data[SECTION_RUNNING_OPTS][running].desc}
                         bind:data={data[SECTION_RUNNING_OPTS][running]}
                         {activeNavItem}
+                        {saveConfig}
                     />
                 {/if}
             {/each}

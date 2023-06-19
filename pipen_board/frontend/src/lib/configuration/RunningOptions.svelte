@@ -24,6 +24,7 @@
     export let initDescription = undefined;
     export let activeNavItem;
     export let runStarted;
+    export let saveConfig;
     export let openConfirm = false;
 
     if (initDescription) {
@@ -74,6 +75,7 @@
             invalid = true;
             return;
         }
+        await saveConfig();
         openConfirm = true;
     };
 

@@ -565,7 +565,7 @@ class DataManager:
         out = self._run_data = {SECTION_LOG: None, "FINISHED": True}
         self._get_config_data(args, configfile=configfile)
         name = self._config_data[SECTION_PIPELINE_OPTIONS]["name"]["value"]
-        pipeline_dir = Path(args.root).joinpath(".pipen", name)
+        pipeline_dir = Path(args.workdir).joinpath(name)
         if not pipeline_dir.is_dir():
             # no previous run, return defaults
             self._run_data = DEFAULT_RUN_DATA
@@ -575,16 +575,23 @@ class DataManager:
         logfile = pipeline_dir.joinpath("run-latest.log")
         if logfile.exists() and logfile.is_file():
             out[SECTION_LOG] = logfile.read_text()
+        else:
+            # no previous run, return defaults
+            self._run_data = DEFAULT_RUN_DATA
+            return
 
         config_data = self._config_data
         outdir = config_data[SECTION_PIPELINE_OPTIONS].get(
             "outdir",
             {"value": None},
         )["value"]
-        outdir = outdir or Path(args.root).joinpath(f"{name}-output")
-        reports_dir = outdir.joinpath("REPORTS")
-        if reports_dir.joinpath("index.html").is_file():
-            out[SECTION_REPORTS] = str(reports_dir)
+        outdir = outdir or Path(args.workdir).parent.joinpath(f"{name}-output")
+        report_procs_dir = outdir.joinpath("REPORTS", "procs")
+        if (
+            report_procs_dir.is_dir()
+            and [p for p in report_procs_dir.glob("*") if p.is_dir()]
+        ):
+            out[SECTION_REPORTS] = str(outdir)
 
         diagram = outdir.joinpath("diagram.svg")
         if diagram.is_file():

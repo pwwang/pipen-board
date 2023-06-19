@@ -64,9 +64,10 @@ class PipenCliBoardPlugin(CLIPlugin):
             ),
         )
         subparser.add_argument(
-            "--root",
-            help="The root directory of the pipeline.",
-            default=".",
+            "-w",
+            "--workdir",
+            help="The working directory of the pipeline.",
+            default=".pipen",
         )
         subparser.add_argument(
             "pipeline",
