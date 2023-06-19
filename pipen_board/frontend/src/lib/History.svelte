@@ -4,6 +4,7 @@
     import Button from "carbon-components-svelte/src/Button/Button.svelte";
     import ToastNotification from "carbon-components-svelte/src/Notification/ToastNotification.svelte";
     import RowDelete from "carbon-icons-svelte/lib/RowDelete.svelte";
+    import SaveModel from "carbon-icons-svelte/lib/SaveModel.svelte";
     import DocumentDownload from "carbon-icons-svelte/lib/DocumentDownload.svelte";
     import GroupObjectsNew from "carbon-icons-svelte/lib/GroupObjectsNew.svelte";
     import Header from "./Header.svelte";
@@ -22,7 +23,7 @@
 
     const headers = [
         { key: "name", value: "Name" },
-        { key: "configfile", value: "Config File" },
+        { key: "root", value: "Working Directory" },
         { key: "ctime", value: "Created Time" },
         { key: "mtime", value: "Modified Time"},
         { key: "actions", empty: true },
@@ -32,7 +33,7 @@
         return {
             id: i,
             name: history.name,
-            configfile: history.configfile,
+            root: history.root,
             ctime: history.ctime,
             mtime: history.mtime,
             actions: [i, history.configfile]
@@ -63,6 +64,43 @@
         }
     };
 
+    const history_saveas = async (i, configfile) => {
+        const name = prompt("Please enter a new name for this configuration: \n\n" + configfile);
+        if (!name) {
+            deleting = undefined;
+            return;
+        }
+
+        let resp;
+        try {
+            resp = await fetchAPI("/api/history/saveas", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ configfile, new_name: name }),
+            });
+            if (resp.error) {
+                throw new Error(resp.error);
+            }
+        } catch (e) {
+            error = `<strong>Failed to save configuration with a new name:</strong> <br /><br /><pre>${e}</pre>`;
+        } finally {
+            deleting = undefined;
+        }
+        if (!error) {
+            const existedHistory = histories.find(h => h.configfile === resp.configfile);
+            if (existedHistory) {
+                histories = [
+                    ...histories.filter(h => h.configfile !== resp.configfile),
+                    {...existedHistory, ...resp}
+                ]
+            } else {
+                histories = [...histories, resp];
+            }
+        }
+    };
+
 </script>
 
 {#if error}
@@ -86,9 +124,18 @@
             icon={GroupObjectsNew}
             iconDescription="Create a New Instance"
             on:click={() => {
+                const new_name = prompt(
+                    "Please enter a name for the new instance:\n\n" +
+                    "- Leave it empty to use the default name\n" +
+                    "- Use existing name will overwrite the existing instance\n"
+                );
+                if (new_name === null) {
+                    return;
+                }
+                // Clear up the errors
                 updateErrors({});
                 updateConfigfile("");
-                configfile = null;
+                configfile = `new:${new_name}`;
             }}
             size="small">
             Create a New Instance
@@ -121,6 +168,17 @@
                             configfile = cell.value[1];
                         }}
                         >Load</Button>
+                    <Button
+                        size="small"
+                        kind="tertiary"
+                        icon={SaveModel}
+                        iconDescription="Save the configuration as a new one"
+                        disabled={deleting === cell.value[0]}
+                        on:click={() => {
+                            deleting = cell.value[0];
+                            history_saveas(...cell.value);
+                        }}
+                        >Save As</Button>
                     <Button
                         size="small"
                         kind="danger-tertiary"

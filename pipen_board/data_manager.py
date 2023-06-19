@@ -86,7 +86,8 @@ def parse_pipeline(pipeline: str) -> Pipen:
         pipeline = Pipen(name=f"{pipeline.name}Pipeline").set_starts(pipeline)
 
     if isinstance(pipeline, type) and issubclass(pipeline, Pipen):
-        pipeline = pipeline()
+        # Avoid "pipeline" to be used as pipeline name
+        [pipeline] = [pipeline()]
 
     if isinstance(pipeline, type) and issubclass(pipeline, ProcGroup):
         pipeline = pipeline().as_pipen()
@@ -361,7 +362,10 @@ def _update_dict(d1: Mapping[str, Any], d2: Mapping[str, Any]) -> None:
             d1[key] = val
 
 
-async def _get_config_data(args: Namespace) -> Mapping[str, Any]:
+async def _get_config_data(
+    args: Namespace,
+    name: str | None,
+) -> Mapping[str, Any]:
     """Get the pipeline data"""
     old_argv = sys.argv
     sys.argv = ["@pipen-board"] + args.pipeline_args
@@ -372,7 +376,9 @@ async def _get_config_data(args: Namespace) -> Mapping[str, Any]:
         pipeline = parse_pipeline(args.pipeline)
         # Initialize the pipeline so that the arguments definied by
         # other plugins (i.e. pipen-args) to take in place.
-        pipeline.workdir = Path(pipeline.config.workdir) / args.name
+        pipeline.workdir = Path(pipeline.config.workdir).joinpath(
+            name or pipeline.name
+        )
         await pipeline._init()
         pipeline.workdir.mkdir(parents=True, exist_ok=True)
         pipeline.build_proc_relationships()
@@ -383,9 +389,9 @@ async def _get_config_data(args: Namespace) -> Mapping[str, Any]:
     data[SECTION_PIPELINE_OPTIONS] = PIPELINE_OPTIONS.copy()
     data[SECTION_PIPELINE_OPTIONS]["name"] = {
         "type": "str",
-        "value": args.name or pipeline.name,
-        "default": None,  # Make sure it's included in the final toml
-        "placeholder": args.name or pipeline.name,
+        "value": name or pipeline.name,
+        "default": pipeline.name,
+        "placeholder": name or pipeline.name,
         "readonly": True,
         "desc": (
             "The name of the pipeline. "
@@ -475,7 +481,7 @@ async def _get_config_data(args: Namespace) -> Mapping[str, Any]:
         )
         addi_data = _load_additional(
             args.additional,
-            name=args.name,
+            name=name or pipeline.name,
             pipeline=args.pipeline,
             pipeline_args=args.pipeline_args,
         )
@@ -501,49 +507,65 @@ class DataManager:
     def _get_config_data(
         self,
         args: Namespace,
-        configfile: str | None = None,
-        use_cached: bool | str = "auto",
+        configfile: str,
     ):
         """Get the config data of the pipeline
 
         Args:
             args: The arguments from the CLI
             configfile: The name to the config file
-            use_cached: Whether to use the cached data
-                - auto: use the cached data if args.dev is True, otherwise don't
-                - True: use the cached data regardless of args.dev
-                - False: don't use the cached data anyway regardless of args.dev
         """
-        if configfile:
+        if configfile and not configfile.startswith("new:") and not args.dev:
             with PIPEN_BOARD_DIR.joinpath(configfile).open() as f:
                 self._config_data = json.load(f)
                 return
 
-        # Use multiprocessing to get a clean environment
-        # to load the pipeline to avoid conflicts
-        def target(conn):
-            conn.send(json.dumps(asyncio.run(_get_config_data(args))).encode())
-            conn.close()
+        self._config_data = None
+        if not configfile:
+            name = None
+        elif configfile.startswith("new:"):
+            name = configfile[4:]
+        else:
+            self._config_data = json.loads(
+                PIPEN_BOARD_DIR.joinpath(configfile).read_text()
+            )
+            name = self._config_data[SECTION_PIPELINE_OPTIONS]["name"]["value"]
 
-        parent_conn, child_conn = Pipe()
-        p = Process(target=target, args=(child_conn,))
-        p.start()
-        data = parent_conn.recv()
-        p.join()
+        if not self._config_data:
+            # Use multiprocessing to get a clean environment
+            # to load the pipeline to avoid conflicts
+            def target(conn):
+                conn.send(
+                    json.dumps(asyncio.run(_get_config_data(args, name))).encode()
+                )
+                conn.close()
 
-        self._config_data = json.loads(data)
+            parent_conn, child_conn = Pipe()
+            p = Process(target=target, args=(child_conn,))
+            p.start()
+            data = parent_conn.recv()
+            p.join()
 
-    def _get_prev_run(self, args: Namespace, configfile: str | None = None):
+            self._config_data = json.loads(data)
+
+        self._config_data[SECTION_PIPELINE_OPTIONS]["name"]["value"] = (
+            name
+            or self._config_data[SECTION_PIPELINE_OPTIONS]["name"]["default"]
+        )
+
+    def _get_prev_run(self, args: Namespace, configfile: str | None):
         """Get data for the previous run
 
         Args:
             args: The parsed arguments from cli
             configfile: The config file to use, if not specified, use a
                 fresh one loaded from the pipeline object
+                It could also be "new:<name>" for a new instance.
         """
         out = self._run_data = {SECTION_LOG: None, "FINISHED": True}
-        pipeline_dir = Path(args.root).joinpath(".pipen", args.name)
         self._get_config_data(args, configfile=configfile)
+        name = self._config_data[SECTION_PIPELINE_OPTIONS]["name"]["value"]
+        pipeline_dir = Path(args.root).joinpath(".pipen", name)
         if not pipeline_dir.is_dir():
             # no previous run, return defaults
             self._run_data = DEFAULT_RUN_DATA
@@ -551,7 +573,7 @@ class DataManager:
 
         # Get the log
         logfile = pipeline_dir.joinpath("run-latest.log")
-        if logfile.is_file():
+        if logfile.exists() and logfile.is_file():
             out[SECTION_LOG] = logfile.read_text()
 
         config_data = self._config_data
@@ -559,7 +581,7 @@ class DataManager:
             "outdir",
             {"value": None},
         )["value"]
-        outdir = outdir or Path(args.root).joinpath(f"{args.name}-output")
+        outdir = outdir or Path(args.root).joinpath(f"{name}-output")
         reports_dir = outdir.joinpath("REPORTS")
         if reports_dir.joinpath("index.html").is_file():
             out[SECTION_REPORTS] = str(reports_dir)
@@ -616,19 +638,19 @@ class DataManager:
             self._run_data = deepcopy(DEFAULT_RUN_DATA)
             self._run_data[SECTION_LOG] = log
 
-    def get_data(self, args: Namespace, configfile: str | None = None):
+    def get_data(self, args: Namespace, configfile: str | None):
         """Get the data"""
         if not self.running:
             self._get_prev_run(args, configfile=configfile)
             return {
-                "isRunning": False,
+                "runStarted": False,
                 "config": self._config_data,
                 "run": self._run_data,
             }
 
         self._get_config_data(args, configfile=configfile)
         return {
-            "isRunning": True,
+            "runStarted": True,
             "config": self._config_data,
             "run": self._run_data,
         }

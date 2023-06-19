@@ -31,7 +31,7 @@
     // reactive
     export let statusPercent;
     // reactive
-    export let isRunning;
+    export let runStarted;
     // reactive
     export let finished;
 
@@ -48,7 +48,7 @@
     // the log of building the report
     let report_building_log = "Click 'building log' above to load.";
 
-    if (isRunning > 0) {
+    if (runStarted > 0) {
         // fetch the updated running data
         data = undefined;
         const ws = new WebSocket(`ws://${location.host}/ws`);
@@ -171,7 +171,7 @@
 </div>
 {:else}
 
-{#if isRunning > 0}
+{#if runStarted > 0}
 <div class="running-control">
     {#if finished}
         <Button disabled={rerunningOrStopping} size="small" kind="primary" icon={Redo} on:click={rerun}>Re-Run</Button>

@@ -40,7 +40,7 @@ class MyGroup(ProcGroup):
     """Group description
 
     Args:
-        arg (type=text): The arg
+        arg (text): The arg
         nsarg: The nsarg
             - a: The a
             - b: The b
@@ -58,7 +58,7 @@ class MyGroup(ProcGroup):
             """The P2 process
 
             Envs:
-                arg (type=text;pgarg): The arg linked from the group
+                arg (text;pgarg): The arg linked from the group
                 p2arg2 (pgarg=nsarg.a): The nsarg.a linked from the group
             """
             requires = P1

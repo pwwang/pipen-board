@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import base64
+import json
 import re
 from datetime import datetime
 from pathlib import Path
@@ -10,7 +11,7 @@ from quart import request, redirect, send_file
 from slugify import slugify
 
 from .version import __version__
-from .defaults import JOB_STATUS, PIPEN_BOARD_DIR, logger
+from .defaults import JOB_STATUS, PIPEN_BOARD_DIR, SECTION_PIPELINE_OPTIONS, logger
 from .data_manager import data_manager
 
 
@@ -67,19 +68,19 @@ async def history():
     out["pipeline"] = args.pipeline
     out["histories"] = []
 
-    for histfile in PIPEN_BOARD_DIR.glob(
-        f"{slugify(args.pipeline)}.{args.name}.*.json"
-    ):
+    for histfile in PIPEN_BOARD_DIR.glob(f"{slugify(args.pipeline)}.*.*.json"):
+        name = histfile.stem.split(".")[-2]
         out["histories"].append({
-            "name": args.name,
+            "name": name,
             "configfile": histfile.name,
+            "root": base64.b64decode(
+                histfile.stem.split(".")[-1] + "=="
+            ).decode(),
             # 2023-01-01_00-00-00 to
             # 2023-01-01 00:00:00
             "ctime": (
-                histfile.stem.split(".")[-1]
-                .replace("_", " ")
-                .replace("-", ":")
-                .replace(":", "-", 2)
+                datetime.fromtimestamp(histfile.stat().st_ctime)
+                .strftime("%Y-%m-%d %H:%M:%S")
             ),
             "mtime": (
                 datetime.fromtimestamp(histfile.stat().st_mtime)
@@ -93,6 +94,12 @@ async def history():
 async def version():
     """Get the version of pipen-board"""
     return __version__
+
+
+async def pipeline_data():
+    logger.info("[bold][yellow]API[/yellow][/bold] Getting pipeline data")
+    configfile = (await request.get_json()).get("configfile")
+    return data_manager.get_data(request.cli_args, configfile)
 
 
 async def reports(report_path):
@@ -145,10 +152,45 @@ async def history_del():
     return {"ok": True}
 
 
-async def pipeline_data():
-    logger.info("[bold][yellow]API[/yellow][/bold] Getting pipeline data")
-    configfile = (await request.get_json()).get("configfile")
-    return data_manager.get_data(request.cli_args, configfile)
+async def history_saveas():
+    req = await request.get_json()
+    args = request.cli_args
+    configfile = req["configfile"]
+    newname = req["new_name"]
+
+    logger.info(
+        "[bold][yellow]API[/yellow][/bold] Save history: %s with new name: %s",
+        configfile,
+        newname,
+    )
+    try:
+        jdata = json.loads(PIPEN_BOARD_DIR.joinpath(configfile).read_text())
+        jdata[SECTION_PIPELINE_OPTIONS]["name"]["value"] = newname
+
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        root = Path(args.root).resolve().as_posix()
+        out = {"name": newname, "mtime": now, "ctime": now, "root": root}
+        enc = base64.b64encode(root.encode()).decode().rstrip("=")
+        newconfigfile = PIPEN_BOARD_DIR.joinpath(
+            f"{slugify(args.pipeline)}.{newname}.{enc}.json"
+        )
+
+        if newconfigfile.is_file():
+            return {"ok": False, "error": "File already exists."}
+
+        for val in jdata.get("RUNNING_OPTIONS", {}).values():
+            configfile_opt = val.get("configfile", "configfile")
+            if not val["value"][configfile_opt].get("changed"):
+                val["value"][configfile_opt]["value"] = (
+                    val["value"][configfile_opt]["placeholder"]
+                ) = f"{newname}.config.toml"
+
+        newconfigfile.write_text(json.dumps(jdata, indent=4))
+        out["configfile"] = newconfigfile.name
+
+    except Exception as exc:
+        return {"ok": False, "error": str(exc)}
+    return out
 
 
 async def config_save():
@@ -156,15 +198,51 @@ async def config_save():
     data = await request.get_json()
     configfile = data.get("configfile")
     configdata = data["data"]
+    jdata = json.loads(configdata)
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    out = {"name": args.name, "mtime": now}
+    name = jdata[SECTION_PIPELINE_OPTIONS]["name"]["value"]
+    root = Path(args.root).resolve().as_posix()
+    out = {"name": name, "mtime": now}
+    enc = base64.b64encode(root.encode()).decode().rstrip("=")
     if not configfile:
+        # base64 encode the root path
         configfile = PIPEN_BOARD_DIR.joinpath(
-            f"{slugify(args.pipeline)}.{args.name}."
-            f"{now.replace(' ', '_').replace(':', '-')}.json"
+            f"{slugify(args.pipeline)}.{name}.{enc}.json"
         )
+        for val in jdata.get("RUNNING_OPTIONS", {}).values():
+            configfile_opt = val.get("configfile", "configfile")
+            if not val["value"][configfile_opt].get("changed"):
+                val["value"][configfile_opt]["value"] = (
+                    val["value"][configfile_opt]["placeholder"]
+                ) = f"{name}.config.toml"
+
         out["ctime"] = now
+        out["root"] = root
+        logger.info(
+            "[bold][yellow]API[/yellow][/bold] Saving config to a new file: "
+            f"{configfile}"
+        )
+    elif configfile.startswith("new:"):
+        name = configfile[4:] or jdata[SECTION_PIPELINE_OPTIONS]["name"]["default"]
+        jdata[SECTION_PIPELINE_OPTIONS]["name"]["value"] = name
+        for val in jdata.get("RUNNING_OPTIONS", {}).values():
+            configfile_opt = val.get("configfile", "configfile")
+            if not val["value"][configfile_opt].get("changed"):
+                val["value"][configfile_opt]["value"] = (
+                    val["value"][configfile_opt]["placeholder"]
+                ) = f"{name}.config.toml"
+
+        configdata = json.dumps(jdata, indent=4)
+        configfile = PIPEN_BOARD_DIR.joinpath(
+            f"{slugify(args.pipeline)}.{name}.{enc}.json"
+        )
+        if configfile.exists():
+            return {"ok": False, "error": "File already exists."}
+
+        out["name"] = name
+        out["ctime"] = now
+        out["root"] = root
         logger.info(
             "[bold][yellow]API[/yellow][/bold] Saving config to a new file: "
             f"{configfile}"
@@ -309,6 +387,7 @@ GETS = {
 POSTS = {
     "/api/pipeline": pipeline_data,
     "/api/history/del": history_del,
+    "/api/history/saveas": history_saveas,
     "/api/config/save": config_save,
     "/api/job/get_tree": job_get_tree,
     "/api/job/get_file": job_get_file,
