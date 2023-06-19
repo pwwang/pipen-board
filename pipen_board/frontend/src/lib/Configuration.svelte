@@ -168,6 +168,18 @@
         element.click();
         element.remove();
     };
+
+    const shortenConfigfile = (cfile) => {
+        // shorten configfile name shown in the footer
+        // from
+        // example-example-py-examplepipeline.Ex2.L2hvbWUvcHd3YW5nL2dpdGh1Yi9waXBlbi1ib2FyZC8ucGlwZW4.json
+        // to
+        // example-example-py-examplepipeline.Ex2.L2hvbW...json
+        const parts = cfile.split(".");
+        const shortened = parts.at(-2).substring(0, 6) + '..';
+        parts.splice(-2, 1, shortened);
+        return parts.join(".");
+    };
 </script>
 
 <svelte:window
@@ -337,8 +349,8 @@
             {/if}
         </div>
         <div class="actions-right">
-            {#if configfile}
-            Loaded from <i>{configfile}</i>
+            {#if configfile && !configfile.startsWith("new:")}
+            Loaded from <i>{shortenConfigfile(configfile)}</i>
             {/if}
         </div>
     </div>
