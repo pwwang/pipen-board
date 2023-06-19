@@ -683,6 +683,8 @@ class DataManager:
         if isinstance(data, str):
             data = json.loads(data)
 
+        logger.info("WS/PIPELINE Received: Pipeline started")
+
         if SECTION_DIAGRAM in data:
             self._run_data[SECTION_DIAGRAM] = data[SECTION_DIAGRAM]
 
@@ -710,6 +712,11 @@ class DataManager:
         if isinstance(data, str):
             data = json.loads(data)
 
+        logger.info(
+            "WS/PIPELINE Received: Pipeline completed (succeeded=%s)",
+            data['succeeded'],
+        )
+
         if SECTION_REPORTS in data:
             self._run_data[SECTION_REPORTS] = data[SECTION_REPORTS]
 
@@ -723,6 +730,12 @@ class DataManager:
             data = json.loads(data)
 
         proc, group, njobs = data["proc"], data["procgroup"], data["njobs"]
+
+        logger.info(
+            "WS/PIPELINE Received: Process started: %s (size=%s)",
+            proc,
+            njobs,
+        )
 
         if not group:
             self._run_data[SECTION_PROCESSES][proc][
@@ -753,6 +766,13 @@ class DataManager:
             data["procgroup"],
             data["succeeded"],
         )
+
+        logger.info(
+            "WS/PIPELINE Received: Process done: %s (succeeded=%s)",
+            proc,
+            succeeded,
+        )
+
         procdata = (
             self._run_data[SECTION_PROCESSES][proc]
             if not group
@@ -768,6 +788,13 @@ class DataManager:
             data = json.loads(data)
 
         proc, group, job = data["proc"], data["procgroup"], data["job"]
+
+        logger.info(
+            "WS/PIPELINE Received: Job %s (%s#%s)",
+            status,
+            proc,
+            job,
+        )
 
         if not group:
             self._run_data[SECTION_PROCESSES][proc]["jobs"][job] = status

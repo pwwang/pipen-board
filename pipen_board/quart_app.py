@@ -36,12 +36,6 @@ def get_app(args: Namespace):
     )
     app.request_class = PipenBoardRequrest
 
-    if args.dev:
-        print(
-            " * To enable dev mode in the UI, try: "
-            f"http://0.0.0.0:{args.port}?dev=1"
-        )
-
     @app.after_request
     async def _(r):
         if args.dev:

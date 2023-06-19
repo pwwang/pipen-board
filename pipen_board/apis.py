@@ -351,11 +351,11 @@ async def ws_web(data, clients):
 
 
 async def ws_pipeline(data, clients):
-    logdata = str(data)
+    # logdata = str(data)
     # if len(logdata) > 100:
     #     logdata = logdata[:100] + "..."
 
-    logger.info(f"WS/PIPELINE Received: {logdata}")
+    # logger.info(f"WS/PIPELINE Received: {logdata}")
     type = data.get("type")
     if (
         type
