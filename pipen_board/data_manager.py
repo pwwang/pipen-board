@@ -823,7 +823,10 @@ class DataManager:
             line = await p.stdout.readline()
             if not line:
                 break
+
             self._run_data[SECTION_LOG] += line.decode()
+            # In case it's too long to data between hooks
+            await self.send_run_data(ws_clients.get("web"))
 
         await p.wait()
         # In case the pipeline fails to start
