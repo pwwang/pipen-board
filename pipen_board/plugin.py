@@ -132,7 +132,7 @@ class PipenBoardPlugin:
                     "proc": proc.name,
                     "procgroup": group,
                     "njobs": len(proc.jobs),
-                }
+                },
             },
             log=proc.log,
         )
@@ -150,7 +150,7 @@ class PipenBoardPlugin:
                     "proc": proc.name,
                     "procgroup": group,
                     "succeeded": succeeded,
-                }
+                },
             },
             log=proc.log,
         )
@@ -168,7 +168,7 @@ class PipenBoardPlugin:
                     "proc": proc.name,
                     "procgroup": group,
                     "job": job.index,
-                }
+                },
             },
             log=job.log,
         )
@@ -186,7 +186,7 @@ class PipenBoardPlugin:
                     "proc": proc.name,
                     "procgroup": group,
                     "job": job.index,
-                }
+                },
             },
             log=job.log,
         )
@@ -204,7 +204,7 @@ class PipenBoardPlugin:
                     "proc": proc.name,
                     "procgroup": group,
                     "job": job.index,
-                }
+                },
             },
             log=job.log,
         )
@@ -222,7 +222,7 @@ class PipenBoardPlugin:
                     "proc": proc.name,
                     "procgroup": group,
                     "job": job.index,
-                }
+                },
             },
             log=job.log,
         )
@@ -240,7 +240,7 @@ class PipenBoardPlugin:
                     "proc": proc.name,
                     "procgroup": group,
                     "job": job.index,
-                }
+                },
             },
             log=job.log,
         )
@@ -258,7 +258,7 @@ class PipenBoardPlugin:
                     "proc": proc.name,
                     "procgroup": group,
                     "job": job.index,
-                }
+                },
             },
             log=job.log,
         )
@@ -276,7 +276,7 @@ class PipenBoardPlugin:
                     "proc": proc.name,
                     "procgroup": group,
                     "job": job.index,
-                }
+                },
             },
             log=job.log,
         )

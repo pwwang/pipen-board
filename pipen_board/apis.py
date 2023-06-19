@@ -11,7 +11,12 @@ from quart import request, redirect, send_file
 from slugify import slugify
 
 from .version import __version__
-from .defaults import JOB_STATUS, PIPEN_BOARD_DIR, SECTION_PIPELINE_OPTIONS, logger
+from .defaults import (
+    JOB_STATUS,
+    PIPEN_BOARD_DIR,
+    SECTION_PIPELINE_OPTIONS,
+    logger,
+)
 from .data_manager import data_manager
 
 
@@ -57,8 +62,8 @@ def _is_text_file(file_path: str | Path) -> bool:
 async def index():
     """Redirect to the index.html"""
     if request.cli_args.dev:
-        return redirect('index.html?dev=1')
-    return redirect('index.html')
+        return redirect("index.html?dev=1")
+    return redirect("index.html")
 
 
 async def history():
@@ -70,23 +75,27 @@ async def history():
 
     for histfile in PIPEN_BOARD_DIR.glob(f"{slugify(args.pipeline)}.*.*.json"):
         name = histfile.stem.split(".")[-2]
-        out["histories"].append({
-            "name": name,
-            "configfile": histfile.name,
-            "workdir": base64.b64decode(
-                histfile.stem.split(".")[-1] + "=="
-            ).decode(),
-            # 2023-01-01_00-00-00 to
-            # 2023-01-01 00:00:00
-            "ctime": (
-                datetime.fromtimestamp(histfile.stat().st_ctime)
-                .strftime("%Y-%m-%d %H:%M:%S")
-            ),
-            "mtime": (
-                datetime.fromtimestamp(histfile.stat().st_mtime)
-                .strftime("%Y-%m-%d %H:%M:%S")
-            ),
-        })
+        out["histories"].append(
+            {
+                "name": name,
+                "configfile": histfile.name,
+                "workdir": base64.b64decode(
+                    histfile.stem.split(".")[-1] + "=="
+                ).decode(),
+                # 2023-01-01_00-00-00 to
+                # 2023-01-01 00:00:00
+                "ctime": (
+                    datetime.fromtimestamp(histfile.stat().st_ctime).strftime(
+                        "%Y-%m-%d %H:%M:%S"
+                    )
+                ),
+                "mtime": (
+                    datetime.fromtimestamp(histfile.stat().st_mtime).strftime(
+                        "%Y-%m-%d %H:%M:%S"
+                    )
+                ),
+            }
+        )
 
     return out
 
@@ -104,8 +113,8 @@ async def pipeline_data():
 
 async def reports(report_path):
     """Get the reports"""
-    root, rest = report_path.split('/', 1)
-    root = root.replace('|', '/')
+    root, rest = report_path.split("/", 1)
+    root = root.replace("|", "/")
 
     report_path = Path(root) / rest
     if report_path.is_dir():
@@ -131,8 +140,8 @@ async def report_building_log():
     if not report_file.is_file():
         return {"ok": False, "content": "No report building log file found."}
 
-    pattern =  re.compile(r'\x1B\[\d+(;\d+){0,2}m')
-    return {"ok": True, "content": pattern.sub('', report_file.read_text())}
+    pattern = re.compile(r"\x1B\[\d+(;\d+){0,2}m")
+    return {"ok": True, "content": pattern.sub("", report_file.read_text())}
 
 
 async def history_del():
@@ -174,9 +183,9 @@ async def history_saveas():
         for val in jdata.get("RUNNING_OPTIONS", {}).values():
             configfile_opt = val.get("configfile", "configfile")
             if not val["value"][configfile_opt].get("changed"):
-                val["value"][configfile_opt]["value"] = (
-                    val["value"][configfile_opt]["placeholder"]
-                ) = f"{newname}.config.toml"
+                val["value"][configfile_opt]["value"] = val["value"][
+                    configfile_opt
+                ]["placeholder"] = f"{newname}.config.toml"
 
         newconfigfile.write_text(json.dumps(jdata, indent=4))
         out["configfile"] = newconfigfile.name
@@ -206,9 +215,9 @@ async def config_save():
         for val in jdata.get("RUNNING_OPTIONS", {}).values():
             configfile_opt = val.get("configfile", "configfile")
             if not val["value"][configfile_opt].get("changed"):
-                val["value"][configfile_opt]["value"] = (
-                    val["value"][configfile_opt]["placeholder"]
-                ) = f"{name}.config.toml"
+                val["value"][configfile_opt]["value"] = val["value"][
+                    configfile_opt
+                ]["placeholder"] = f"{name}.config.toml"
 
         out["ctime"] = now
         out["workdir"] = workdir
@@ -217,14 +226,17 @@ async def config_save():
             f"{configfile}"
         )
     elif configfile.startswith("new:"):
-        name = configfile[4:] or jdata[SECTION_PIPELINE_OPTIONS]["name"]["default"]
+        name = (
+            configfile[4:]
+            or jdata[SECTION_PIPELINE_OPTIONS]["name"]["default"]
+        )
         jdata[SECTION_PIPELINE_OPTIONS]["name"]["value"] = name
         for val in jdata.get("RUNNING_OPTIONS", {}).values():
             configfile_opt = val.get("configfile", "configfile")
             if not val["value"][configfile_opt].get("changed"):
-                val["value"][configfile_opt]["value"] = (
-                    val["value"][configfile_opt]["placeholder"]
-                ) = f"{name}.config.toml"
+                val["value"][configfile_opt]["value"] = val["value"][
+                    configfile_opt
+                ]["placeholder"] = f"{name}.config.toml"
 
         configdata = json.dumps(jdata, indent=4)
         configfile = PIPEN_BOARD_DIR.joinpath(
@@ -281,15 +293,19 @@ async def job_get_file():
             "[bold][yellow]API[/yellow][/bold] Fetching file for "
             f"{data['proc']}/{data['job']}: {path} ({how})"
         )
-        return {"type": "bigtext-part", "content": _get_file_content(path, how)}
+        return {
+            "type": "bigtext-part",
+            "content": _get_file_content(path, how),
+        }
 
     logger.info(
         "[bold][yellow]API[/yellow][/bold] Fetching file for "
         f"{data['proc']}/{data['job']}: {path}"
     )
-    if (
-        path.name.startswith("job.wrapped.")
-        or path.name in ("job.script", "job.signature.toml", "job.rc")
+    if path.name.startswith("job.wrapped.") or path.name in (
+        "job.script",
+        "job.signature.toml",
+        "job.rc",
     ):
         return {"type": "text", "content": path.read_text()}
 

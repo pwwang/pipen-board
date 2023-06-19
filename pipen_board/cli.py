@@ -87,7 +87,7 @@ class PipenCliBoardPlugin(CLIPlugin):
         # the second part is the args for the pipeline
         args = sys.argv[1:]
         idx = args.index("--") if "--" in args else len(args)
-        args, rest = args[:idx], args[idx + 1:]
+        args, rest = args[:idx], args[idx + 1 :]
         parsed = self.parser.parse_args(args=args)
         parsed.pipeline_args = rest
         return parsed

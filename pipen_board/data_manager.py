@@ -124,10 +124,10 @@ def _anno_to_argspec(anno: Mapping[str, Any] | None) -> Mapping[str, Any]:
                 or argspec[arg].get("mlines")
             ):
                 argspec[arg]["type"] = "text"
-            elif (
-                argspec[arg].get("action") in ("store_true", "store_false")
-                or argspec[arg].get("flag")
-            ):
+            elif argspec[arg].get("action") in (
+                "store_true",
+                "store_false",
+            ) or argspec[arg].get("flag"):
                 argspec[arg]["type"] = "bool"
             elif (
                 argspec[arg].get("action") in ("ns", "namespace")
@@ -156,9 +156,7 @@ def _anno_to_argspec(anno: Mapping[str, Any] | None) -> Mapping[str, Any]:
             argspec[arg]["value"] = argspec[arg].get("default", [])
             argspec[arg]["choices"] = list(arginfo.terms)
             argspec[arg]["choices_desc"] = [
-                term.help
-                if not term.help
-                else term.help.splitlines()[0]
+                term.help if not term.help else term.help.splitlines()[0]
                 for term in arginfo.terms.values()
             ]
             argspec[arg]["desc"] += "\n"
@@ -369,9 +367,7 @@ async def _get_config_data(
     """Get the pipeline data"""
     old_argv = sys.argv
     sys.argv = ["@pipen-board"] + args.pipeline_args
-    logger.info(
-        "[bold][yellow]DBG[/yellow][/bold] Fetching pipeline data ..."
-    )
+    logger.info("[bold][yellow]DBG[/yellow][/bold] Fetching pipeline data ...")
     try:
         pipeline = parse_pipeline(args.pipeline)
         # Initialize the pipeline so that the arguments definied by
@@ -449,9 +445,9 @@ async def _get_config_data(
                 pg_anno = annotate(pg.__class__)
                 # desc
                 pg_summ = pg_anno.get("Summary", {"short": "", "long": ""})
-                pg_sec[pg.name]["desc"] = (
-                    f'# {pg_summ["short"]}\n\n{pg_summ["long"]}'
-                )
+                pg_sec[pg.name][
+                    "desc"
+                ] = f'# {pg_summ["short"]}\n\n{pg_summ["long"]}'
                 # args
                 pg_args = _anno_to_argspec(pg_anno.get("Args")) or {}
                 # Implemented by pipen-annotate 0.7.3
@@ -536,7 +532,9 @@ class DataManager:
             # to load the pipeline to avoid conflicts
             def target(conn):
                 conn.send(
-                    json.dumps(asyncio.run(_get_config_data(args, name))).encode()
+                    json.dumps(
+                        asyncio.run(_get_config_data(args, name))
+                    ).encode()
                 )
                 conn.close()
 
@@ -587,10 +585,9 @@ class DataManager:
         )["value"]
         outdir = outdir or Path(args.workdir).parent.joinpath(f"{name}-output")
         report_procs_dir = outdir.joinpath("REPORTS", "procs")
-        if (
-            report_procs_dir.is_dir()
-            and [p for p in report_procs_dir.glob("*") if p.is_dir()]
-        ):
+        if report_procs_dir.is_dir() and [
+            p for p in report_procs_dir.glob("*") if p.is_dir()
+        ]:
             out[SECTION_REPORTS] = str(outdir)
 
         diagram = outdir.joinpath("diagram.svg")
@@ -854,7 +851,7 @@ class DataManager:
                 "msg": (
                     "Pipeline probably failed to start. You may want to "
                     "restart the pipen-board server and try again."
-                )
+                ),
             }
 
         await asyncio.sleep(3)
