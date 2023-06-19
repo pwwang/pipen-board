@@ -1,4 +1,5 @@
 <script>
+    import { onMount } from "svelte";
     import InlineNotification from "carbon-components-svelte/src/Notification/InlineNotification.svelte";
     import Button from "carbon-components-svelte/src/Button/Button.svelte";
     import TreeView from "carbon-components-svelte/src/TreeView/TreeView.svelte";
@@ -10,6 +11,7 @@
     import { fetchAPI } from "../utils";
     import FilePreview from "./FilePreview.svelte";
 
+    export let name;
     export let status;
     export let proc;
     // job rcs
@@ -89,7 +91,7 @@
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ proc, job: jobid }),
+                body: JSON.stringify({ name, proc, job: jobid }),
             })
         } catch (error) {
             toastNotify.kind = "error";
@@ -180,6 +182,15 @@
             fileDetails = { ...fd, path: item.full, text: item.text};
         }
     };
+
+    onMount(async () => {
+        // load job tree
+        // loadJobTree();
+        if (jobs.length > 0 && job === undefined) {
+            job = 0;
+            jobTree = await loadJobTree(0);
+        }
+    });
 
 </script>
 

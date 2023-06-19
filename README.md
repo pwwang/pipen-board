@@ -26,15 +26,12 @@ Required Arguments:
 Options:
   -h, --help            show help message and exit
   --port PORT           Port to serve the UI wizard [default: 18521]
-  --name NAME           The name of the pipeline. Default to the pipeline class name. You
-                        can use a different name to associate with a different set of
-                        configurations.
   --additional FILE     Additional arguments for the pipeline, in YAML, INI, JSON or TOML
                         format. Can have sections `ADDITIONAL_OPTIONS` and `RUNNING_OPTIONS`
   --dev                 Run the pipeline in development mode. This will print verbosal
                         logging information and reload the pipeline if a new instantce
                         starts when page reloads.
-  --root ROOT           The root directory of the pipeline. [default: .]
+  -w, --workdir WORKDIR The working directory of the pipeline. [default: .pipen]
   --loglevel {auto,debug,info,warning,error,critical}
                         Logging level. If `auto`, set to `debug` if `--dev` is set,
                         otherwise `info` [default: auto]

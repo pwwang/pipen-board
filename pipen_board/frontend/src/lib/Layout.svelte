@@ -25,7 +25,7 @@
     // 0: not run, show previous run data
     // 1: first run trial
     // 2: 2nd run trial
-    let isRunning = 0;
+    let runStarted = 0;
     // If the pipeline is running, whether it is finished
     let finished = false;
     let config_data;
@@ -41,7 +41,7 @@
 
     let selectedTab = 0;
 
-    $: if (isRunning) {
+    $: if (runStarted) {
         statusPercent = [0, 0, 0, 100];
         selectedTab = 1;
     }
@@ -51,9 +51,7 @@
         try {
             data = await fetchAPI("/api/pipeline", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ configfile }),
             });
         } catch (e) {
@@ -67,7 +65,7 @@
                 window.data = data;
             }
 
-            isRunning = data.isRunning + 0;
+            runStarted = data.runStarted + 0;
             config_data = data.config;
             run_data = data.run;
             pipelineName = config_data[SECTION_PIPELINE_OPTS].name.value;
@@ -115,17 +113,17 @@
     description="Loading pipeline data ..." />
 {:else}
   <div class="body">
-    <Header {pipelineName} {pipelineDesc} backToHistory bind:configfile {histories} />
+    <Header {pipelineName} {pipelineDesc} isRunning={runStarted && !finished} backToHistory bind:configfile {histories} />
     <div class="pipen-tabs">
         <Tabs style="border-bottom: 2px solid #e0e0e0" bind:selected={selectedTab}>
             <Tab><Settings />Configuration</Tab>
             <Tab
-                class="run-tab {isRunning && (statusPercent[2] > 0 || !finished) ? 'running' : ''}"
+                class="run-tab {runStarted && (statusPercent[2] > 0 || !finished) ? 'running' : ''}"
                 style="--n_succ: {statusPercent[0]}%; --n_fail: {statusPercent[1]}%; --n_run: {statusPercent[2]}%; --n_init: {statusPercent[3]}%"
             >
-                {#if isRunning && finished}
+                {#if runStarted && finished}
                 <CheckmarkOutline /><span class="runtab-title">Finished</span>
-                {:else if isRunning && !finished}
+                {:else if runStarted && !finished}
                 <ContinueFilled /><span class="runtab-title">Running</span>
                 {:else}
                 <WatsonHealthStatusAcknowledge /><span class="runtab-title">Previous Run</span>
@@ -135,14 +133,15 @@
                 <TabContent>
                     <Configuration
                         data={config_data}
-                        bind:isRunning
+                        {finished}
+                        bind:runStarted
                         bind:histories
                         bind:configfile
                         bind:pipelineDesc />
                 </TabContent>
                 <TabContent>
-                    {#key isRunning}
-                        <Run data={run_data} bind:finished bind:statusPercent bind:isRunning />
+                    {#key runStarted}
+                        <Run data={run_data} name={pipelineName} bind:finished bind:statusPercent bind:runStarted />
                     {/key}
                 </TabContent>
             </svelte:fragment>

@@ -30,7 +30,8 @@
     export let pipelineDesc;
     export let configfile;
     export let histories;
-    export let isRunning;
+    export let runStarted;
+    export let finished;
     export let data;
 
     let activeNavItem = SECTION_PIPELINE_OPTS;
@@ -40,7 +41,7 @@
     let dragStartX = null;
     let initWidth = null;
 
-    let toastNotify = { kind: undefined, subtitle: undefined };
+    let toastNotify = { kind: undefined, subtitle: undefined, timeout: 3000 };
 
     let itemDescription;
 
@@ -103,16 +104,36 @@
         saving = true;
         toastNotify.kind = "info";
         toastNotify.subtitle = "Saving data ...";
+
+        let new_name = data.PIPELINE_OPTIONS.name.value;
         let saved;
+        if (saveas) {
+            if (runStarted && !finished) {
+                saving = false;
+                toastNotify.kind = "error";
+                toastNotify.subtitle = "Pipeline is running. Please stop it or wait it to finish before saving as a new configuration.";
+                return;
+            }
+            new_name = prompt("Please enter a new name for the configuration:");
+            if (new_name === null || new_name === "") {
+                saving = false;
+                toastNotify.kind = "error";
+                toastNotify.subtitle = "Failed to save as: no name provided";
+                return;
+            }
+        }
         try {
             saved = await fetchAPI("/api/config/save", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     data: JSON.stringify(data, null, 4),
-                    configfile: configfile && !saveas ? configfile : null,
+                    configfile: configfile && !saveas ? configfile : `new:${new_name}`,
                 }),
             });
+            if (saved.error) {
+                throw new Error(saved.error);
+            }
         } catch (error) {
             toastNotify.kind = "error";
             toastNotify.subtitle = `Failed to save: ${error}`;
@@ -279,11 +300,12 @@
                 {#if running === activeNavItem}
                     <RunningOptions
                         config_data={data}
-                        bind:isRunning
+                        bind:runStarted
                         bind:description={itemDescription}
                         initDescription={data[SECTION_RUNNING_OPTS][running].desc}
                         bind:data={data[SECTION_RUNNING_OPTS][running]}
                         {activeNavItem}
+                        {saveConfig}
                     />
                 {/if}
             {/each}
@@ -337,7 +359,7 @@
     <ToastNotification
         lowContrast
         kind={toastNotify.kind}
-        timeout={3000}
+        timeout={toastNotify.timeout}
         on:close={() => (toastNotify.kind = undefined)}
         caption={new Date().toLocaleString()}
     >

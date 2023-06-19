@@ -48,7 +48,7 @@ def get_app(args: Namespace):
             r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
             r.headers["Pragma"] = "no-cache"
             r.headers["Expires"] = "0"
-            r.headers['Cache-Control'] = 'public, max-age=0'
+            r.headers["Cache-Control"] = "public, max-age=0"
         return r
 
     for route, handler in GETS.items():
@@ -91,14 +91,14 @@ def get_app(args: Namespace):
                     "Config file already exists. "
                     "Check the box to overwrite it, "
                     "or use a different configuration file name."
-                )
+                ),
             }
         try:
             tomlfile.write_text(config)
         except Exception as ex:
             return {
                 "ok": False,
-                "msg": f"Failed to write the configuration file: {ex}"
+                "msg": f"Failed to write the configuration file: {ex}",
             }
 
         if data_manager.running:
@@ -107,7 +107,7 @@ def get_app(args: Namespace):
                 "msg": (
                     "Pipeline is already running. "
                     "Please wait for it to finish, or stop it first."
-                )
+                ),
             }
 
         logger.info(

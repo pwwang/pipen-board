@@ -42,12 +42,11 @@ class PluginNameLogFilter(logging.Filter):
 
 
 logger.addFilter(PluginNameLogFilter())
-logging.getLogger('asyncio').setLevel(logging.WARNING)
+logging.getLogger("asyncio").setLevel(logging.WARNING)
 
 
 # Subclass Quart to allow using logger
 class Quart(_Quart):
-
     def run_task(
         self,
         host: str = "127.0.0.1",
@@ -90,8 +89,7 @@ PIPELINE_OPTIONS = {
         "value": "info",
         "hidden": True,
         "desc": (
-            "Logging level. "
-            "This affects the log level of the main plugin."
+            "Logging level. " "This affects the log level of the main plugin."
         ),
     },
     "cache": {
@@ -140,7 +138,7 @@ effect immediately, especially when the job takes long time to run.
                 "desc": "The value of the option",
                 "order": 999,
             }
-        }
+        },
     },
     "plugin_opts": {
         "desc": "The plugin options of your pipeline",
@@ -153,7 +151,7 @@ effect immediately, especially when the job takes long time to run.
                 "type": "str",
                 "order": 999,
             }
-        }
+        },
     },
     "forks": {
         "type": "int",
@@ -192,7 +190,7 @@ the jobs will be submitted to the slurm scheduler and run in parallel.
         "value": None,
         "hidden": True,
         "desc": "Number of retries when a job fails. ",
-    }
+    },
 }
 
 # See https://github.com/pwwang/xqute/blob/master/xqute/defaults.py#L34

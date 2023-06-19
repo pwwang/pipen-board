@@ -23,7 +23,8 @@
     export let description;
     export let initDescription = undefined;
     export let activeNavItem;
-    export let isRunning;
+    export let runStarted;
+    export let saveConfig;
     export let openConfirm = false;
 
     if (initDescription) {
@@ -74,6 +75,7 @@
             invalid = true;
             return;
         }
+        await saveConfig();
         openConfirm = true;
     };
 
@@ -98,7 +100,7 @@
             if (!response.ok) {
                 throw new Error(`Failed to run command: ${response.msg}`);
             } else {
-                isRunning = isRunning + 1;
+                runStarted = runStarted + 1;
             }
         } catch (error) {
             toastNotify.kind = "error";

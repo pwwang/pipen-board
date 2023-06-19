@@ -165,3 +165,4 @@ test.py
 frontend_source.env
 /t_*.py
 test_ws.py
+*.config.toml

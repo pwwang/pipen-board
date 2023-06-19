@@ -4,12 +4,14 @@
     import DirectionLoopLeftFilled from "carbon-icons-svelte/lib/DirectionLoopLeftFilled.svelte";
     import Button from "carbon-components-svelte/src/Button/Button.svelte";
     import { fetchAPI } from "./utils";
+    import { storedConfigfile } from "./store";
 
     export let pipelineName;
     export let pipelineDesc = undefined;
     export let backToHistory = false;
     export let configfile = undefined;
     export let histories;
+    export let isRunning = false;
 
     let version = "0.0.0";
 
@@ -36,8 +38,13 @@
         {#if backToHistory}
             <Button
                 on:click={() => {
-                    if (histories.length > 0) {
-                        configfile = undefined;
+                    if (isRunning) {
+                        alert("Please wait until the pipeline is finished or stop it before switching to a different configuration");
+                    } else if (histories.length > 0) {
+                        if (confirm("Make sure your current configuration is saved before going back to history")) {
+                            configfile = undefined;
+                            storedConfigfile.set(undefined);
+                        }
                     } else {
                         alert("No history available")
                     }

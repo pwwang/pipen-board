@@ -75,7 +75,9 @@
         {#if histories.length > 0 && configfile === undefined}
         <History {pipeline} bind:histories bind:configfile />
         {:else}
-        <Layout bind:histories bind:configfile />
+            {#key configfile}
+                <Layout bind:histories bind:configfile />
+            {/key}
         {/if}
     {/if}
 {/if}

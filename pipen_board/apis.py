@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import base64
+import json
 import re
 from datetime import datetime
 from pathlib import Path
@@ -10,7 +11,12 @@ from quart import request, redirect, send_file
 from slugify import slugify
 
 from .version import __version__
-from .defaults import JOB_STATUS, PIPEN_BOARD_DIR, logger
+from .defaults import (
+    JOB_STATUS,
+    PIPEN_BOARD_DIR,
+    SECTION_PIPELINE_OPTIONS,
+    logger,
+)
 from .data_manager import data_manager
 
 
@@ -56,8 +62,8 @@ def _is_text_file(file_path: str | Path) -> bool:
 async def index():
     """Redirect to the index.html"""
     if request.cli_args.dev:
-        return redirect('index.html?dev=1')
-    return redirect('index.html')
+        return redirect("index.html?dev=1")
+    return redirect("index.html")
 
 
 async def history():
@@ -67,25 +73,29 @@ async def history():
     out["pipeline"] = args.pipeline
     out["histories"] = []
 
-    for histfile in PIPEN_BOARD_DIR.glob(
-        f"{slugify(args.pipeline)}.{args.name}.*.json"
-    ):
-        out["histories"].append({
-            "name": args.name,
-            "configfile": histfile.name,
-            # 2023-01-01_00-00-00 to
-            # 2023-01-01 00:00:00
-            "ctime": (
-                histfile.stem.split(".")[-1]
-                .replace("_", " ")
-                .replace("-", ":")
-                .replace(":", "-", 2)
-            ),
-            "mtime": (
-                datetime.fromtimestamp(histfile.stat().st_mtime)
-                .strftime("%Y-%m-%d %H:%M:%S")
-            ),
-        })
+    for histfile in PIPEN_BOARD_DIR.glob(f"{slugify(args.pipeline)}.*.*.json"):
+        name = histfile.stem.split(".")[-2]
+        out["histories"].append(
+            {
+                "name": name,
+                "configfile": histfile.name,
+                "workdir": base64.b64decode(
+                    histfile.stem.split(".")[-1] + "=="
+                ).decode(),
+                # 2023-01-01_00-00-00 to
+                # 2023-01-01 00:00:00
+                "ctime": (
+                    datetime.fromtimestamp(histfile.stat().st_ctime).strftime(
+                        "%Y-%m-%d %H:%M:%S"
+                    )
+                ),
+                "mtime": (
+                    datetime.fromtimestamp(histfile.stat().st_mtime).strftime(
+                        "%Y-%m-%d %H:%M:%S"
+                    )
+                ),
+            }
+        )
 
     return out
 
@@ -95,14 +105,18 @@ async def version():
     return __version__
 
 
-async def reports(report_path):
-    root = request.args.get("root", None)
-    root = root or reports.root
-    if root is None:
-        return {"error": "No root directory for reports is specified"}
+async def pipeline_data():
+    logger.info("[bold][yellow]API[/yellow][/bold] Getting pipeline data")
+    configfile = (await request.get_json()).get("configfile")
+    return data_manager.get_data(request.cli_args, configfile)
 
-    reports.root = root
-    report_path = Path(root).parent / report_path
+
+async def reports(report_path):
+    """Get the reports"""
+    root, rest = report_path.split("/", 1)
+    root = root.replace("|", "/")
+
+    report_path = Path(root) / rest
     if report_path.is_dir():
         report_path = report_path / "index.html"
 
@@ -110,17 +124,12 @@ async def reports(report_path):
     return await send_file(report_path)
 
 
-# Cache the physical path of the reports
-# A better way?
-reports.root = None
-
-
 async def report_building_log():
     """Get the building log of a report"""
     args = request.cli_args
-    report_file = Path(args.root).joinpath(
-        ".pipen",
-        args.name,
+    name = request.args["name"]
+    report_file = Path(args.workdir).joinpath(
+        name,
         ".report-workdir",
         "pipen-report.log",
     )
@@ -131,8 +140,8 @@ async def report_building_log():
     if not report_file.is_file():
         return {"ok": False, "content": "No report building log file found."}
 
-    pattern =  re.compile(r'\x1B\[\d+(;\d+){0,2}m')
-    return {"ok": True, "content": pattern.sub('', report_file.read_text())}
+    pattern = re.compile(r"\x1B\[\d+(;\d+){0,2}m")
+    return {"ok": True, "content": pattern.sub("", report_file.read_text())}
 
 
 async def history_del():
@@ -145,10 +154,45 @@ async def history_del():
     return {"ok": True}
 
 
-async def pipeline_data():
-    logger.info("[bold][yellow]API[/yellow][/bold] Getting pipeline data")
-    configfile = (await request.get_json()).get("configfile")
-    return data_manager.get_data(request.cli_args, configfile)
+async def history_saveas():
+    req = await request.get_json()
+    args = request.cli_args
+    configfile = req["configfile"]
+    newname = req["new_name"]
+
+    logger.info(
+        "[bold][yellow]API[/yellow][/bold] Save history: %s with new name: %s",
+        configfile,
+        newname,
+    )
+    try:
+        jdata = json.loads(PIPEN_BOARD_DIR.joinpath(configfile).read_text())
+        jdata[SECTION_PIPELINE_OPTIONS]["name"]["value"] = newname
+
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        workdir = Path(args.workdir).resolve().as_posix()
+        out = {"name": newname, "mtime": now, "ctime": now, "workdir": workdir}
+        enc = base64.b64encode(workdir.encode()).decode().rstrip("=")
+        newconfigfile = PIPEN_BOARD_DIR.joinpath(
+            f"{slugify(args.pipeline)}.{newname}.{enc}.json"
+        )
+
+        if newconfigfile.is_file():
+            return {"ok": False, "error": "File already exists."}
+
+        for val in jdata.get("RUNNING_OPTIONS", {}).values():
+            configfile_opt = val.get("configfile", "configfile")
+            if not val["value"][configfile_opt].get("changed"):
+                val["value"][configfile_opt]["value"] = val["value"][
+                    configfile_opt
+                ]["placeholder"] = f"{newname}.config.toml"
+
+        newconfigfile.write_text(json.dumps(jdata, indent=4))
+        out["configfile"] = newconfigfile.name
+
+    except Exception as exc:
+        return {"ok": False, "error": str(exc)}
+    return out
 
 
 async def config_save():
@@ -156,15 +200,54 @@ async def config_save():
     data = await request.get_json()
     configfile = data.get("configfile")
     configdata = data["data"]
+    jdata = json.loads(configdata)
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    out = {"name": args.name, "mtime": now}
+    name = jdata[SECTION_PIPELINE_OPTIONS]["name"]["value"]
+    workdir = Path(args.workdir).resolve().as_posix()
+    out = {"name": name, "mtime": now}
+    enc = base64.b64encode(workdir.encode()).decode().rstrip("=")
     if not configfile:
+        # base64 encode the workdir path
         configfile = PIPEN_BOARD_DIR.joinpath(
-            f"{slugify(args.pipeline)}.{args.name}."
-            f"{now.replace(' ', '_').replace(':', '-')}.json"
+            f"{slugify(args.pipeline)}.{name}.{enc}.json"
         )
+        for val in jdata.get("RUNNING_OPTIONS", {}).values():
+            configfile_opt = val.get("configfile", "configfile")
+            if not val["value"][configfile_opt].get("changed"):
+                val["value"][configfile_opt]["value"] = val["value"][
+                    configfile_opt
+                ]["placeholder"] = f"{name}.config.toml"
+
         out["ctime"] = now
+        out["workdir"] = workdir
+        logger.info(
+            "[bold][yellow]API[/yellow][/bold] Saving config to a new file: "
+            f"{configfile}"
+        )
+    elif configfile.startswith("new:"):
+        name = (
+            configfile[4:]
+            or jdata[SECTION_PIPELINE_OPTIONS]["name"]["default"]
+        )
+        jdata[SECTION_PIPELINE_OPTIONS]["name"]["value"] = name
+        for val in jdata.get("RUNNING_OPTIONS", {}).values():
+            configfile_opt = val.get("configfile", "configfile")
+            if not val["value"][configfile_opt].get("changed"):
+                val["value"][configfile_opt]["value"] = val["value"][
+                    configfile_opt
+                ]["placeholder"] = f"{name}.config.toml"
+
+        configdata = json.dumps(jdata, indent=4)
+        configfile = PIPEN_BOARD_DIR.joinpath(
+            f"{slugify(args.pipeline)}.{name}.{enc}.json"
+        )
+        if configfile.exists():
+            return {"ok": False, "error": "File already exists."}
+
+        out["name"] = name
+        out["ctime"] = now
+        out["workdir"] = workdir
         logger.info(
             "[bold][yellow]API[/yellow][/bold] Saving config to a new file: "
             f"{configfile}"
@@ -187,9 +270,8 @@ async def job_get_tree():
         "[bold][yellow]API[/yellow][/bold] Fetching tree for: "
         f"{data['proc']}/{data['job']}"
     )
-    jobdir = Path(args.root).joinpath(
-        ".pipen",
-        args.name,
+    jobdir = Path(args.workdir).joinpath(
+        data["name"],
         data["proc"],
         str(data["job"]),
     )
@@ -211,15 +293,19 @@ async def job_get_file():
             "[bold][yellow]API[/yellow][/bold] Fetching file for "
             f"{data['proc']}/{data['job']}: {path} ({how})"
         )
-        return {"type": "bigtext-part", "content": _get_file_content(path, how)}
+        return {
+            "type": "bigtext-part",
+            "content": _get_file_content(path, how),
+        }
 
     logger.info(
         "[bold][yellow]API[/yellow][/bold] Fetching file for "
         f"{data['proc']}/{data['job']}: {path}"
     )
-    if (
-        path.name.startswith("job.wrapped.")
-        or path.name in ("job.script", "job.signature.toml", "job.rc")
+    if path.name.startswith("job.wrapped.") or path.name in (
+        "job.script",
+        "job.signature.toml",
+        "job.rc",
     ):
         return {"type": "text", "content": path.read_text()}
 
@@ -309,6 +395,7 @@ GETS = {
 POSTS = {
     "/api/pipeline": pipeline_data,
     "/api/history/del": history_del,
+    "/api/history/saveas": history_saveas,
     "/api/config/save": config_save,
     "/api/job/get_tree": job_get_tree,
     "/api/job/get_file": job_get_file,

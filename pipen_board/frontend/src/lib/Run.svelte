@@ -31,9 +31,11 @@
     // reactive
     export let statusPercent;
     // reactive
-    export let isRunning;
+    export let runStarted;
     // reactive
     export let finished;
+    // pipeline name
+    export let name;
 
     // if we are fetching the inital data
     let fetching = true;
@@ -48,7 +50,7 @@
     // the log of building the report
     let report_building_log = "Click 'building log' above to load.";
 
-    if (isRunning > 0) {
+    if (runStarted > 0) {
         // fetch the updated running data
         data = undefined;
         const ws = new WebSocket(`ws://${location.host}/ws`);
@@ -146,7 +148,7 @@
         report_building_log = 'Loading ...';
         let d;
         try {
-            d = await fetchAPI("/api/report_building_log");
+            d = await fetchAPI(`/api/report_building_log?name=${name}`);
         } catch (e) {
             report_building_log = `Error: ${e}`;
         }
@@ -171,7 +173,7 @@
 </div>
 {:else}
 
-{#if isRunning > 0}
+{#if runStarted > 0}
 <div class="running-control">
     {#if finished}
         <Button disabled={rerunningOrStopping} size="small" kind="primary" icon={Redo} on:click={rerun}>Re-Run</Button>
@@ -196,14 +198,22 @@
         {/if}
         {#if data[SECTION_PROCESSES] && Object.keys(data[SECTION_PROCESSES]).length > 0}
             <NavDivider group="processes" />
-            {#each Object.keys(data[SECTION_PROCESSES]).sort((a, b) => data[SECTION_PROCESSES][a].order - data[SECTION_PROCESSES][b].order) as proc}
+            {#each Object.keys(data[SECTION_PROCESSES]).sort(
+                (a, b) => data[SECTION_PROCESSES][a].order - data[SECTION_PROCESSES][b].order === 0
+                    ? a.localeCompare(b)
+                    : data[SECTION_PROCESSES][a].order - data[SECTION_PROCESSES][b].order
+            ) as proc}
                 <NavItem class="run-status-{data[SECTION_PROCESSES][proc].status}" noerror text={proc} sub bind:activeNavItem />
             {/each}
         {/if}
         {#if data[SECTION_PROCGROUPS]}
             {#each Object.keys(data[SECTION_PROCGROUPS]) as procgroup}
                 <NavDivider group="group: {procgroup}" />
-                {#each Object.keys(data[SECTION_PROCGROUPS][procgroup]).sort((a, b) => data[SECTION_PROCGROUPS][procgroup][a].order - data[SECTION_PROCGROUPS][procgroup][b].order) as proc}
+                {#each Object.keys(data[SECTION_PROCGROUPS][procgroup]).sort(
+                    (a, b) => data[SECTION_PROCGROUPS][procgroup][a].order - data[SECTION_PROCGROUPS][procgroup][b].order === 0
+                        ? a.localeCompare(b)
+                        : data[SECTION_PROCGROUPS][procgroup][a].order - data[SECTION_PROCGROUPS][procgroup][b].order
+                ) as proc}
                     <NavItem class="run-status-{data[SECTION_PROCGROUPS][procgroup][proc].status}" noerror sub text={proc} bind:activeNavItem />
                 {/each}
             {/each}
@@ -229,7 +239,7 @@
                             <ul>
                                 <li>Check them out by directly visiting <code>{data[SECTION_REPORTS]}/index.html</code></li>
                                 <li>Run <code>pipen report serve -r {data[SECTION_REPORTS].substring(0, data[SECTION_REPORTS].lastIndexOf('/'))}</code>, and go to <code>REPORTS</code> directory.</li>
-                                <li>Visit <a target="_blank" href="/reports/REPORTS/index.html?root={data[SECTION_REPORTS]}">the reports</a> served by this plugin</li>
+                                <li>Visit <a target="_blank" href="/reports/{data[SECTION_REPORTS].replaceAll('/', '|')}/REPORTS/index.html">the reports</a> served by this plugin</li>
                                 <li>Or check the
                                     <a href={'javascript:void(0)'} on:click|preventDefault={loadReportBuildingLog}>building log</a>
                                     if necessary.
@@ -245,6 +255,7 @@
         {:else if activeNavItem in data[SECTION_PROCESSES]}
             {#key activeNavItem}
             <ProcRun
+                {name}
                 status={data[SECTION_PROCESSES][activeNavItem].status}
                 proc={activeNavItem}
                 jobs={data[SECTION_PROCESSES][activeNavItem].jobs}
@@ -255,6 +266,7 @@
                 {#if activeNavItem in data[SECTION_PROCGROUPS][procgroup]}
                     {#key activeNavItem}
                     <ProcRun
+                        {name}
                         status={data[SECTION_PROCGROUPS][procgroup][activeNavItem].status}
                         proc={activeNavItem}
                         jobs={data[SECTION_PROCGROUPS][procgroup][activeNavItem].jobs}
