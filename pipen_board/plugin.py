@@ -113,8 +113,12 @@ class PipenBoardPlugin:
         data = {"succeeded": succeeded}
         if succeeded:
             reports_dir = pipen.outdir.joinpath("REPORTS")
-            if reports_dir.joinpath("index.html").is_file():
-                data[SECTION_REPORTS] = str(reports_dir)
+            if (
+                reports_dir.joinpath("index.html").is_file()
+                and reports_dir.joinpath("procs").is_dir()
+                and [p for p in reports_dir.joinpath("procs").iterdir()]
+            ):
+                data[SECTION_REPORTS] = str(reports_dir.parent)
 
         self._send({"type": "on_complete", "data": data})
         self._disconnect()
