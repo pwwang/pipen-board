@@ -1,4 +1,5 @@
 <script>
+    import { onMount } from "svelte";
     import InlineNotification from "carbon-components-svelte/src/Notification/InlineNotification.svelte";
     import Button from "carbon-components-svelte/src/Button/Button.svelte";
     import TreeView from "carbon-components-svelte/src/TreeView/TreeView.svelte";
@@ -181,6 +182,15 @@
             fileDetails = { ...fd, path: item.full, text: item.text};
         }
     };
+
+    onMount(async () => {
+        // load job tree
+        // loadJobTree();
+        if (jobs.length > 0 && job === undefined) {
+            job = 0;
+            jobTree = await loadJobTree(0);
+        }
+    });
 
 </script>
 
