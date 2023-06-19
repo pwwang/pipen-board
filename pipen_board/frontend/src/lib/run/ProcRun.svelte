@@ -10,6 +10,7 @@
     import { fetchAPI } from "../utils";
     import FilePreview from "./FilePreview.svelte";
 
+    export let name;
     export let status;
     export let proc;
     // job rcs
@@ -89,7 +90,7 @@
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ proc, job: jobid }),
+                body: JSON.stringify({ name, proc, job: jobid }),
             })
         } catch (error) {
             toastNotify.kind = "error";

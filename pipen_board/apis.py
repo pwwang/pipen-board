@@ -118,8 +118,9 @@ async def reports(report_path):
 async def report_building_log():
     """Get the building log of a report"""
     args = request.cli_args
+    name = request.args["name"]
     report_file = Path(args.workdir).joinpath(
-        args.name,
+        name,
         ".report-workdir",
         "pipen-report.log",
     )
@@ -258,7 +259,7 @@ async def job_get_tree():
         f"{data['proc']}/{data['job']}"
     )
     jobdir = Path(args.workdir).joinpath(
-        args.name,
+        data["name"],
         data["proc"],
         str(data["job"]),
     )

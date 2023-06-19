@@ -141,7 +141,7 @@
                 </TabContent>
                 <TabContent>
                     {#key runStarted}
-                        <Run data={run_data} bind:finished bind:statusPercent bind:runStarted />
+                        <Run data={run_data} name={pipelineName} bind:finished bind:statusPercent bind:runStarted />
                     {/key}
                 </TabContent>
             </svelte:fragment>

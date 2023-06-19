@@ -34,6 +34,8 @@
     export let runStarted;
     // reactive
     export let finished;
+    // pipeline name
+    export let name;
 
     // if we are fetching the inital data
     let fetching = true;
@@ -146,7 +148,7 @@
         report_building_log = 'Loading ...';
         let d;
         try {
-            d = await fetchAPI("/api/report_building_log");
+            d = await fetchAPI(`/api/report_building_log?name=${name}`);
         } catch (e) {
             report_building_log = `Error: ${e}`;
         }
@@ -245,6 +247,7 @@
         {:else if activeNavItem in data[SECTION_PROCESSES]}
             {#key activeNavItem}
             <ProcRun
+                {name}
                 status={data[SECTION_PROCESSES][activeNavItem].status}
                 proc={activeNavItem}
                 jobs={data[SECTION_PROCESSES][activeNavItem].jobs}
@@ -255,6 +258,7 @@
                 {#if activeNavItem in data[SECTION_PROCGROUPS][procgroup]}
                     {#key activeNavItem}
                     <ProcRun
+                        {name}
                         status={data[SECTION_PROCGROUPS][procgroup][activeNavItem].status}
                         proc={activeNavItem}
                         jobs={data[SECTION_PROCGROUPS][procgroup][activeNavItem].jobs}
