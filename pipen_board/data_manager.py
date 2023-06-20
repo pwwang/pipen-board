@@ -365,133 +365,138 @@ async def _get_config_data(
     name: str | None,
 ) -> Mapping[str, Any]:
     """Get the pipeline data"""
-    old_argv = sys.argv
-    sys.argv = ["@pipen-board"] + args.pipeline_args
-    logger.info("[bold][yellow]DBG[/yellow][/bold] Fetching pipeline data ...")
     try:
-        pipeline = parse_pipeline(args.pipeline)
-        # Initialize the pipeline so that the arguments definied by
-        # other plugins (i.e. pipen-args) to take in place.
-        pipeline.workdir = Path(pipeline.config.workdir).joinpath(
-            name or pipeline.name
-        )
-        await pipeline._init()
-        pipeline.workdir.mkdir(parents=True, exist_ok=True)
-        pipeline.build_proc_relationships()
-    finally:
-        sys.argv = old_argv
+        old_argv = sys.argv
+        sys.argv = ["@pipen-board"] + args.pipeline_args
+        logger.info("[bold][yellow]DBG[/yellow][/bold] Fetching pipeline data ...")
+        try:
+            pipeline = parse_pipeline(args.pipeline)
+            # Initialize the pipeline so that the arguments definied by
+            # other plugins (i.e. pipen-args) to take in place.
+            pipeline.workdir = Path(pipeline.config.workdir).joinpath(
+                name or pipeline.name
+            )
+            await pipeline._init()
+            pipeline.workdir.mkdir(parents=True, exist_ok=True)
+            pipeline.build_proc_relationships()
+        finally:
+            sys.argv = old_argv
 
-    data = {}
-    data[SECTION_PIPELINE_OPTIONS] = PIPELINE_OPTIONS.copy()
-    data[SECTION_PIPELINE_OPTIONS]["name"] = {
-        "type": "str",
-        "value": name or pipeline.name,
-        "default": pipeline.name,
-        "placeholder": name or pipeline.name,
-        "readonly": True,
-        "desc": (
-            "The name of the pipeline. "
-            "It will affect the names of working directory and "
-            "the result directory"
-        ),
-    }
-    data[SECTION_PIPELINE_OPTIONS]["desc"] = {
-        "type": "str",
-        "value": pipeline.desc,
-        "desc": (
-            "The description of the pipeline, " "shows in the log and report."
-        ),
-    }
-    data[SECTION_PIPELINE_OPTIONS]["outdir"] = {
-        "desc": "The output directory of your pipeline",
-        "placeholder": "./<name>-output",
-        "type": "str",
-        "value": None,
-    }
-    for key, val in data[SECTION_PIPELINE_OPTIONS].items():
-        _get_default(val, key in ("plugin_opts", "scheduler_opts"))
-
-    data[SECTION_PROCESSES] = {}
-
-    if pipeline.config.plugin_opts.get("args_flatten") is True or (
-        "args_flatten" not in pipeline.config.plugin_opts
-        and len(pipeline.procs) == 1
-    ):
-        data[SECTION_PIPELINE_OPTIONS]["plugin_opts"]["value"][
-            "args_flatten"
-        ] = {
-            "desc": (
-                "Flatten the arguments of the pipeline. "
-                "For example, [envs] will ba treated as [<Process>.envs]. "
-                "Only works for single-process pipeline"
-            ),
-            "type": "bool",
-            "value": True,
-            "default": True,
+        data = {}
+        data[SECTION_PIPELINE_OPTIONS] = PIPELINE_OPTIONS.copy()
+        data[SECTION_PIPELINE_OPTIONS]["name"] = {
+            "type": "str",
+            "value": name or pipeline.name,
+            "default": pipeline.name,
+            "placeholder": name or pipeline.name,
             "readonly": True,
+            "desc": (
+                "The name of the pipeline. "
+                "It will affect the names of working directory and "
+                "the result directory"
+            ),
         }
+        data[SECTION_PIPELINE_OPTIONS]["desc"] = {
+            "type": "str",
+            "value": pipeline.desc,
+            "desc": (
+                "The description of the pipeline, " "shows in the log and report."
+            ),
+        }
+        data[SECTION_PIPELINE_OPTIONS]["outdir"] = {
+            "desc": "The output directory of your pipeline",
+            "placeholder": "./<name>-output",
+            "type": "str",
+            "value": None,
+        }
+        for key, val in data[SECTION_PIPELINE_OPTIONS].items():
+            _get_default(val, key in ("plugin_opts", "scheduler_opts"))
 
-    pg_sec = {}
-    for i, proc in enumerate(pipeline.procs):
-        logger.info(
-            "[bold][yellow]DBG[/yellow][/bold] Parsing process: %s ...",
-            proc,
-        )
+        data[SECTION_PROCESSES] = {}
 
-        pg = proc.__meta__["procgroup"]
-        if pg:
-            if pg.name not in pg_sec:
-                pg_sec[pg.name] = {"PROCESSES": {}}
-                pg_anno = annotate(pg.__class__)
-                # desc
-                pg_summ = pg_anno.get("Summary", {"short": "", "long": ""})
-                pg_sec[pg.name][
-                    "desc"
-                ] = f'# {pg_summ["short"]}\n\n{pg_summ["long"]}'
-                # args
-                pg_args = _anno_to_argspec(pg_anno.get("Args")) or {}
-                # Implemented by pipen-annotate 0.7.3
-                # for arg, arginfo in pg_args.items():
-                #     arginfo["value"] = pg.DEFAULTS.get(arg)
-                pg_sec[pg.name]["ARGUMENTS"] = pg_args
-            pg_sec[pg.name][SECTION_PROCESSES][proc.name] = _proc_to_argspec(
-                proc,
-                proc in pipeline.starts,
-                get_marked(proc, "board_config_hidden", False),
-                order=i,
-            )
-        else:
-            data[SECTION_PROCESSES][proc.name] = _proc_to_argspec(
-                proc,
-                proc in pipeline.starts,
-                get_marked(proc, "board_config_hidden", False),
-                order=i,
-            )
-
-    data[SECTION_PROCGROUPS] = pg_sec
-
-    if args.additional:
-        logger.info(
-            "[bold][yellow]DBG[/yellow][/bold] "
-            "Loading additional configuration items ..."
-        )
-        if (
-            args.additional == "auto"
-            and args.pipeline.rpartition(":")[0].endswith(".py")
+        if pipeline.config.plugin_opts.get("args_flatten") is True or (
+            "args_flatten" not in pipeline.config.plugin_opts
+            and len(pipeline.procs) == 1
         ):
-            additional = str(
-                Path(__file__).parent.joinpath("additional_auto.toml")
-            )
-        else:
-            additional = args.additional
+            data[SECTION_PIPELINE_OPTIONS]["plugin_opts"]["value"][
+                "args_flatten"
+            ] = {
+                "desc": (
+                    "Flatten the arguments of the pipeline. "
+                    "For example, [envs] will ba treated as [<Process>.envs]. "
+                    "Only works for single-process pipeline"
+                ),
+                "type": "bool",
+                "value": True,
+                "default": True,
+                "readonly": True,
+            }
 
-        addi_data = _load_additional(
-            additional,
-            name=name or pipeline.name,
-            pipeline=args.pipeline,
-            pipeline_args=args.pipeline_args,
-        )
-        _update_dict(data, addi_data)
+        pg_sec = {}
+        for i, proc in enumerate(pipeline.procs):
+            logger.info(
+                "[bold][yellow]DBG[/yellow][/bold] Parsing process: %s ...",
+                proc,
+            )
+
+            pg = proc.__meta__["procgroup"]
+            if pg:
+                if pg.name not in pg_sec:
+                    pg_sec[pg.name] = {"PROCESSES": {}}
+                    pg_anno = annotate(pg.__class__)
+                    # desc
+                    pg_summ = pg_anno.get("Summary", {"short": "", "long": ""})
+                    pg_sec[pg.name][
+                        "desc"
+                    ] = f'# {pg_summ["short"]}\n\n{pg_summ["long"]}'
+                    # args
+                    pg_args = _anno_to_argspec(pg_anno.get("Args")) or {}
+                    # Implemented by pipen-annotate 0.7.3
+                    # for arg, arginfo in pg_args.items():
+                    #     arginfo["value"] = pg.DEFAULTS.get(arg)
+                    pg_sec[pg.name]["ARGUMENTS"] = pg_args
+                pg_sec[pg.name][SECTION_PROCESSES][proc.name] = _proc_to_argspec(
+                    proc,
+                    proc in pipeline.starts,
+                    get_marked(proc, "board_config_hidden", False),
+                    order=i,
+                )
+            else:
+                data[SECTION_PROCESSES][proc.name] = _proc_to_argspec(
+                    proc,
+                    proc in pipeline.starts,
+                    get_marked(proc, "board_config_hidden", False),
+                    order=i,
+                )
+
+        data[SECTION_PROCGROUPS] = pg_sec
+
+        if args.additional:
+            logger.info(
+                "[bold][yellow]DBG[/yellow][/bold] "
+                "Loading additional configuration items ..."
+            )
+            if (
+                args.additional == "auto"
+                and args.pipeline.rpartition(":")[0].endswith(".py")
+            ):
+                additional = str(
+                    Path(__file__).parent.joinpath("additional_auto.toml")
+                )
+            else:
+                additional = args.additional
+
+            addi_data = _load_additional(
+                additional,
+                name=name or pipeline.name,
+                pipeline=args.pipeline,
+                pipeline_args=args.pipeline_args,
+            )
+            _update_dict(data, addi_data)
+
+    except Exception as e:
+        import traceback
+        return {"error": traceback.format_exc()}
 
     return data
 
@@ -555,6 +560,12 @@ class DataManager:
             p.join()
 
             self._config_data = json.loads(data)
+            if "error" in self._config_data:
+                for line in self._config_data["error"].splitlines():
+                    logger.error(line)
+
+                from quart import abort
+                abort(500)
 
         self._config_data[SECTION_PIPELINE_OPTIONS]["name"]["value"] = (
             name
