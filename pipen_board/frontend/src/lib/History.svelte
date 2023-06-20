@@ -127,7 +127,7 @@
                 const new_name = prompt(
                     "Please enter a name for the new instance:\n\n" +
                     "- Leave it empty to use the default name\n" +
-                    "- Use existing name will overwrite the existing instance\n"
+                    "- Do NOT use existing names under same working directory. You will not be able to save the configuration.\n"
                 );
                 if (new_name === null) {
                     return;
