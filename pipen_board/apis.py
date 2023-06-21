@@ -208,6 +208,34 @@ async def history_download():
     )
 
 
+async def history_upload():
+    # get form data
+    form = await request.files
+    # load as json
+    jdata = json.load(form["schema_file"])
+    name = jdata[SECTION_PIPELINE_OPTIONS]["name"]["value"]
+    logger.info(
+        "[bold][yellow]API[/yellow][/bold] Receiving schema file with name: %s",
+        name,
+    )
+    workdir = Path(request.cli_args.workdir).resolve().as_posix()
+    enc = base64.b64encode(workdir.encode()).decode().rstrip("=")
+    schema_file = PIPEN_BOARD_DIR.joinpath(
+        f"{slugify(request.cli_args.pipeline)}.{name}.{enc}.json"
+    )
+    if schema_file.is_file():
+        return {"ok": False, "error": "File already exists."}
+
+    schema_file.write_text(json.dumps(jdata, indent=4))
+    return {
+        "name": name,
+        "mtime": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "ctime": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "workdir": workdir,
+        "configfile": schema_file.name,
+    }
+
+
 async def config_save():
     args = request.cli_args
     data = await request.get_json()
@@ -410,6 +438,7 @@ POSTS = {
     "/api/history/del": history_del,
     "/api/history/saveas": history_saveas,
     "/api/history/download": history_download,
+    "/api/history/upload": history_upload,
     "/api/config/save": config_save,
     "/api/job/get_tree": job_get_tree,
     "/api/job/get_file": job_get_file,

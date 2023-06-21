@@ -21,6 +21,7 @@
 
     let error;
     let deleting;
+    let uploading;
 
     const headers = [
         { key: "name", value: "Name" },
@@ -124,6 +125,43 @@
         a.remove();
     };
 
+    const openSchemaFile = () => {
+        const input = document.getElementById("schema_file");
+        // @ts-ignore
+        input.value = "";
+        input.click();
+    };
+
+    const loadSchemaFile = async (e) => {
+        uploading = true;
+        const target = e.target;
+        if (target.files.length === 0) {
+            uploading = false;
+            return;
+        }
+        // Upload the file and come back with the new history item with
+        // the name in the file and current working directory
+        const formData = new FormData();
+        formData.append("schema_file", target.files[0]);
+        let resp;
+        try {
+            resp = await fetchAPI("/api/history/upload", {
+                method: "POST",
+                body: formData,
+            });
+            if (resp.error) {
+                throw new Error(resp.error);
+            }
+        } catch (e) {
+            error = `<strong>Failed to upload the schema file:</strong> <br /><br /><pre>${e}</pre>`;
+        } finally {
+            uploading = false;
+        }
+        if (!error) {
+            histories = [...histories, resp];
+        }
+    };
+
 </script>
 
 {#if error}
@@ -162,7 +200,17 @@
             }}
             size="small">
             Create a New Instance
-        </Button>
+        </Button>,
+        <Button
+            kind="secondary"
+            icon={DocumentDownload}
+            iconDescription="Load From a Schema File"
+            on:click={openSchemaFile}
+            disabled={uploading}
+            size="small">
+            Load From a Schema File ...
+        </Button>,
+        <input type="file" id="schema_file" on:change={loadSchemaFile} style="display: none;" />
         <span>or load from a saved configuration:</span>
     </div>
 
