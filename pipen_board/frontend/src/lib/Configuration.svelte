@@ -159,15 +159,25 @@
     const downloadConfig = function () {
         const element = document.createElement("a");
         // @ts-ignore
-        const file = new Blob([toml], {
-            type: "text/plain",
-        });
+        const file = new Blob([toml], { type: "text/plain" });
         element.href = URL.createObjectURL(file);
         element.download = `${data[SECTION_PIPELINE_OPTS].name.value}config.toml`;
         document.body.appendChild(element);
         element.click();
         element.remove();
     };
+
+    const downloadSchema = function () {
+        const schema = JSON.stringify(data, null, 4);
+        const element = document.createElement("a");
+        // @ts-ignore
+        const file = new Blob([schema], { type: "text/json" });
+        element.href = URL.createObjectURL(file);
+        element.download = `${data[SECTION_PIPELINE_OPTS].name.value}.schema.json`;
+        document.body.appendChild(element);
+        element.click();
+        element.remove();
+    }
 
     const shortenConfigfile = (cfile) => {
         // shorten configfile name shown in the footer
@@ -328,7 +338,12 @@
             <Button
                 icon={IbmWatsonNaturalLanguageUnderstanding}
                 size="small"
-                on:click={generateTOML}>Generate TOML Configuration</Button
+                on:click={generateTOML}>Generate Configuration</Button
+            >
+            <Button
+                icon={Download}
+                size="small"
+                on:click={downloadSchema}>Download Schema File</Button
             >
             <span class="separator"></span>
             <Button
