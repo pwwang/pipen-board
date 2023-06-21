@@ -7,6 +7,7 @@
     import SaveModel from "carbon-icons-svelte/lib/SaveModel.svelte";
     import DocumentDownload from "carbon-icons-svelte/lib/DocumentDownload.svelte";
     import GroupObjectsNew from "carbon-icons-svelte/lib/GroupObjectsNew.svelte";
+    import Download from "carbon-icons-svelte/lib/Download.svelte";
     import Header from "./Header.svelte";
     import { updateConfigfile, updateErrors } from "./store";
     import { fetchAPI } from "./utils";
@@ -101,6 +102,28 @@
         }
     };
 
+    const history_download = async (i, configfile) => {
+        let resp;
+        try {
+            resp = await fetchAPI("/api/history/download", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ configfile }),
+            }, "blob");
+        } catch (e) {
+            error = `<strong>Failed to download the schema file:</strong> <br /><br /><pre>${e}</pre>`;
+        } finally {
+            deleting = undefined;
+        }
+        const blob = new Blob([resp], { type: "text/json" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = histories[i].name + ".schema.json";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+    };
+
 </script>
 
 {#if error}
@@ -179,6 +202,17 @@
                             history_saveas(...cell.value);
                         }}
                         >Save As</Button>
+                    <Button
+                        size="small"
+                        kind="tertiary"
+                        icon={Download}
+                        iconDescription="Download the schema file"
+                        disabled={deleting === cell.value[0]}
+                        on:click={() => {
+                            deleting = cell.value[0];
+                            history_download(...cell.value);
+                        }}
+                        >Download</Button>
                     <Button
                         size="small"
                         kind="danger-tertiary"

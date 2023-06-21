@@ -195,6 +195,19 @@ async def history_saveas():
     return out
 
 
+async def history_download():
+    req = await request.get_json()
+    configfile = req["configfile"]
+    logger.info(
+        "[bold][yellow]API[/yellow][/bold] Downloading schema: %s",
+        configfile,
+    )
+    return await send_file(
+        PIPEN_BOARD_DIR.joinpath(configfile),
+        as_attachment=True,
+    )
+
+
 async def config_save():
     args = request.cli_args
     data = await request.get_json()
@@ -396,6 +409,7 @@ POSTS = {
     "/api/pipeline": pipeline_data,
     "/api/history/del": history_del,
     "/api/history/saveas": history_saveas,
+    "/api/history/download": history_download,
     "/api/config/save": config_save,
     "/api/job/get_tree": job_get_tree,
     "/api/job/get_file": job_get_file,

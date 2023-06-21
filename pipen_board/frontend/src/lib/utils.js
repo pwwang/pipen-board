@@ -383,6 +383,8 @@ const fetchAPI = async function(url, options, result = "json") {
         return await response.json();
     } else if (result === "text") {
         return await response.text();
+    } else if (result === "blob") {
+        return await response.blob();
     } else {
         return response;
     }
