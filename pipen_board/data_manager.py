@@ -604,7 +604,11 @@ class DataManager:
             "outdir",
             {"value": None},
         )["value"]
-        outdir = outdir or Path(args.workdir).parent.joinpath(f"{name}-output")
+        if not outdir:
+            outdir = Path(args.workdir).parent.joinpath(f"{name}-output")
+        else:
+            outdir = Path(outdir)
+
         report_procs_dir = outdir.joinpath("REPORTS", "procs")
         if report_procs_dir.is_dir() and [
             p for p in report_procs_dir.glob("*") if p.is_dir()
