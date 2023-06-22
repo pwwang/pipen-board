@@ -2,6 +2,7 @@
     // Used by Layout.svelte
     import * as itoml from "@iarna/toml";
     import Button from "carbon-components-svelte/src/Button/Button.svelte";
+    import Link from "carbon-components-svelte/src/Link/Link.svelte";
     import Modal from "carbon-components-svelte/src/Modal/Modal.svelte";
     import CodeSnippet from "carbon-components-svelte/src/CodeSnippet/CodeSnippet.svelte";
     import ToastNotification from "carbon-components-svelte/src/Notification/ToastNotification.svelte";
@@ -345,11 +346,6 @@
                 size="small"
                 on:click={generateTOML}>Generate Configuration</Button
             >
-            <Button
-                icon={Download}
-                size="small"
-                on:click={downloadSchema}>Download Schema File</Button
-            >
             <span class="separator"></span>
             <Button
                 icon={Save}
@@ -370,7 +366,7 @@
         </div>
         <div class="actions-right">
             {#if configfile && !configfile.startsWith("new:")}
-            Loaded from <i>{shortenConfigfile(configfile)}</i>
+            Loaded from <Link class="configfile-link" title="Download the schema file" on:click={downloadSchema}>{shortenConfigfile(configfile)}</Link>
             {/if}
         </div>
     </div>
@@ -469,5 +465,9 @@
     span.separator {
         display: inline-block;
         width: 1rem;
+    }
+    :global(.configfile-link) {
+        font-style: italic;
+        cursor: pointer;
     }
 </style>

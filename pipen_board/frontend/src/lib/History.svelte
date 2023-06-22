@@ -2,6 +2,7 @@
     // Used by ../App.svelte
     import DataTable from "carbon-components-svelte/src/DataTable/DataTable.svelte";
     import Button from "carbon-components-svelte/src/Button/Button.svelte";
+    import TextInput from "carbon-components-svelte/src/TextInput/TextInput.svelte";
     import ToastNotification from "carbon-components-svelte/src/Notification/ToastNotification.svelte";
     import RowDelete from "carbon-icons-svelte/lib/RowDelete.svelte";
     import SaveModel from "carbon-icons-svelte/lib/SaveModel.svelte";
@@ -163,6 +164,44 @@
         }
     };
 
+    const loadFromURL = async (event) => {
+        // if key is Enter, try upload
+        // otherwise, do nothing
+        if (event.key !== "Enter") {
+            return;
+        }
+        if (uploading) {
+            error = "Please wait for the previous upload to finish.";
+            return;
+        }
+        const url = event.target.value;
+        if (!url) {
+            return;
+        }
+        uploading = true;
+        let resp;
+        try {
+            resp = await fetchAPI("/api/history/fromurl", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ url }),
+            });
+            if (resp.error) {
+                throw new Error(resp.error);
+            }
+        } catch (e) {
+            error = `<strong>Failed to upload the schema file:</strong> <br /><br /><pre>${e}</pre>`;
+        } finally {
+            uploading = false;
+        }
+        if (!error) {
+            histories = [...histories, resp];
+            event.target.value = "";
+        }
+    };
+
 </script>
 
 {#if error}
@@ -210,7 +249,7 @@
             }}
             size="small">
             Create a New Instance
-        </Button>,
+        </Button> /
         <Button
             kind="secondary"
             icon={DocumentDownload}
@@ -219,9 +258,10 @@
             disabled={uploading}
             size="small">
             Load From a Schema File ...
-        </Button>,
-        <input type="file" id="schema_file" on:change={loadSchemaFile} style="display: none;" />
+        </Button> /
+        <TextInput on:keyup={loadFromURL} placeholder="Load Schema File from a URL (Enter to confirm)" light hideLabel  /> /
         <span>or load from a saved configuration:</span>
+        <input type="file" id="schema_file" on:change={loadSchemaFile} style="display: none;" />
     </div>
 
     <div class="pipen-history">
