@@ -244,7 +244,7 @@
                 storedGlobalChanged.set(false);
                 // Clear up the errors
                 updateErrors({});
-                updateConfigfile("");
+                updateConfigfile(undefined);
                 configfile = `new:${new_name}`;
             }}
             size="small">
