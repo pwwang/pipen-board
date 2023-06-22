@@ -3,9 +3,11 @@
     import Button from "carbon-components-svelte/src/Button/Button.svelte";
     import Add from "carbon-icons-svelte/lib/Add.svelte";
     import Subtract from "carbon-icons-svelte/lib/Subtract.svelte";
+    import { storedGlobalChanged } from "../../store";
 
     export let key;
     export let value;
+    export let changed;
 
     let newkey;
     let newvalue;
@@ -52,7 +54,7 @@
             size="small"
             kind="tertiary"
             iconDescription="Add a new key-value pair"
-            on:click={() => {value = [...value, [newkey, newvalue]]; newkey = null; newvalue = null} }
+            on:click={() => {changed = true; storedGlobalChanged.set(true); value = [...value, [newkey, newvalue]]; newkey = null; newvalue = null} }
         />
         {:else}
         <Button
@@ -60,7 +62,7 @@
             size="small"
             kind="danger"
             iconDescription="Delete this key-value pair"
-            on:click={() => value = value.filter((_, j) => j != i)}
+            on:click={() => {changed = true; storedGlobalChanged.set(true); value = value.filter((_, j) => j != i)}}
         />
         {/if}
     </div>

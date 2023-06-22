@@ -12,6 +12,7 @@
     import ContinueFilled from "carbon-icons-svelte/lib/ContinueFilled.svelte";
     import SkipBack from "carbon-icons-svelte/lib/SkipBack.svelte";
     import CheckmarkOutline from "carbon-icons-svelte/lib/CheckmarkOutline.svelte";
+    import { storedGlobalChanged } from "./store";
 
     import { IS_DEV, getStatusPercentage, fetchAPI } from "./utils";
     import Header from "./Header.svelte";
@@ -72,6 +73,7 @@
             pipelineDesc = config_data[SECTION_PIPELINE_OPTS].desc.value;
             statusPercent = getStatusPercentage(run_data);
         }
+        storedGlobalChanged.set(false);
     };
 
     onMount(loadData);

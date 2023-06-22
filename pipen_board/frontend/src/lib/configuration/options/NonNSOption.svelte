@@ -59,6 +59,7 @@
     on:focus={onFocus}
     on:blur={onBlur}
     {key}
+    bind:changed={data.changed}
     bind:value={data.value}
     />
 {:else if data.type === 'bool'}

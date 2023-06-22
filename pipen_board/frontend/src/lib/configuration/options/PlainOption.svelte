@@ -2,6 +2,7 @@
     import { onMount } from "svelte";
     import TextInput from "carbon-components-svelte/src/TextInput/TextInput.svelte";
     import { applyAtomicType, validateData, get_pgvalue } from "../../utils.js";
+    import { storedGlobalChanged } from "../../store.js";
 
     export let key;
     export let value;
@@ -70,7 +71,7 @@
         on:mouseleave
         on:focus
         on:blur
-        on:input={e => {changed = true; validateValue(e.detail)}}
+        on:input={e => {changed = true; storedGlobalChanged.set(true); validateValue(e.detail)}}
         {invalid}
         {invalidText}
         {readonly}

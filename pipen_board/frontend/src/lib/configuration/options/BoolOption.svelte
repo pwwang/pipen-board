@@ -2,6 +2,7 @@
     import Toggle from "carbon-components-svelte/src/Toggle/Toggle.svelte";
     import OptionFrame from "./OptionFrame.svelte";
     import { get_pgvalue } from "../../utils";
+    import { storedGlobalChanged } from "../../store";
 
     export let key;
     export let value;
@@ -30,7 +31,7 @@
             on:focus
             on:blur
             {readonly}
-            on:toggle={e => { changed = true; if (readonly) value = !e.detail.toggled} }
+            on:toggle={e => { changed = true; storedGlobalChanged.set(true); if (readonly) value = !e.detail.toggled} }
             size="sm"
             labelText={key}
             bind:toggled={value}

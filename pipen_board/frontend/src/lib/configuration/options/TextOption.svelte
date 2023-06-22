@@ -5,6 +5,7 @@
     import TextArea from "carbon-components-svelte/src/TextArea/TextArea.svelte";
     import OptionFrame from "./OptionFrame.svelte";
     import { validateData, autoHeight, insertTab, get_pgvalue } from "../../utils";
+    import { storedGlobalChanged } from "../../store";
 
     export let key;
     export let value;
@@ -71,7 +72,7 @@
         <TextArea
             on:focus
             on:blur
-            on:input={e => { changed = true; validateValue(e.target.value) }}
+            on:input={e => { changed = true; storedGlobalChanged.set(true); validateValue(e.target.value) }}
             on:keydown={insertTab}
             {invalid}
             {invalidText}

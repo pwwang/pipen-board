@@ -4,7 +4,7 @@
     import DirectionLoopLeftFilled from "carbon-icons-svelte/lib/DirectionLoopLeftFilled.svelte";
     import Button from "carbon-components-svelte/src/Button/Button.svelte";
     import { fetchAPI } from "./utils";
-    import { storedConfigfile } from "./store";
+    import { storedConfigfile, storedGlobalChanged } from "./store";
 
     export let pipelineName;
     export let pipelineDesc = undefined;
@@ -41,7 +41,7 @@
                     if (isRunning) {
                         alert("Please wait until the pipeline is finished or stop it before switching to a different configuration");
                     } else if (histories.length > 0) {
-                        if (confirm("Make sure your current configuration is saved before going back to history")) {
+                        if (!$storedGlobalChanged || confirm("You have unsaved changes. Are you sure to discard them?")) {
                             configfile = undefined;
                             storedConfigfile.set(undefined);
                         }

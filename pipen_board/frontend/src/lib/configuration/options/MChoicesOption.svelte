@@ -3,6 +3,7 @@
     import MultiSelect from "carbon-components-svelte/src/MultiSelect/MultiSelect.svelte";
     import OptionFrame from "./OptionFrame.svelte";
     import { get_pgvalue } from "../../utils";
+    import { storedGlobalChanged } from "../../store";
 
     export let key;
     export let value;
@@ -80,7 +81,7 @@
             {invalid}
             {invalidText}
             bind:selectedIds
-            on:focus={() => { changed = true; }}
+            on:focus={() => { changed = true; storedGlobalChanged.set(true); }}
             on:select={(e) => {
                 if (readonly) { selectedIds = origSelectedIds; }
                 else { validateValue(e.detail.selectedIds); }

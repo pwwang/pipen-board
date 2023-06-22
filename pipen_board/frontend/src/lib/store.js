@@ -1,5 +1,6 @@
 import { writable } from "svelte/store";
 
+export const storedGlobalChanged = writable(false);
 export const storedErrors = writable({});
 export const storedConfigfile = writable(
     localStorage.getItem("configfile") || ""

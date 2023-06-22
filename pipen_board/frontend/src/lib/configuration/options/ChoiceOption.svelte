@@ -3,7 +3,7 @@
     import Dropdown from "carbon-components-svelte/src/Dropdown/Dropdown.svelte";
     import OptionFrame from "./OptionFrame.svelte";
     import { validateData, get_pgvalue } from "../../utils";
-    import { removeError, setError } from "../../store";
+    import { removeError, setError, storedGlobalChanged } from "../../store";
 
     export let key;
     export let value;
@@ -81,6 +81,7 @@
             bind:ref={button}
             on:select={e => {
                 changed = true;
+                storedGlobalChanged.set(true);
                 if (readonly)  {selectedId = origSelectedId;}
                 validateValue(selectedId);
             }}

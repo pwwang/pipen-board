@@ -6,6 +6,7 @@
     import Add from "carbon-icons-svelte/lib/Add.svelte";
     import OptionFrame from "./OptionFrame.svelte";
     import { applyAtomicType, validateData, get_pgvalue } from "../../utils";
+    import { storedGlobalChanged } from "../../store";
 
     export let key;
     export let value;
@@ -99,7 +100,7 @@
                 {invalidText}
                 {readonly}
                 on:keyup={e => { if (e.key === "Enter" && !readonly) addTag() }}
-                on:input={e => { changed = true; validateValue(e.detail); }}
+                on:input={e => { changed = true; storedGlobalChanged.set(true); validateValue(e.detail); }}
                 on:focus
                 on:blur
                 bind:value={currValue}

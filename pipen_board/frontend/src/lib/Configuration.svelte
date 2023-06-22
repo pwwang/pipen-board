@@ -9,6 +9,7 @@
     import SaveModel from "carbon-icons-svelte/lib/SaveModel.svelte";
     import Download from "carbon-icons-svelte/lib/Download.svelte";
     import IbmWatsonNaturalLanguageUnderstanding from "carbon-icons-svelte/lib/IbmWatsonNaturalLanguageUnderstanding.svelte";
+    import { storedGlobalChanged } from "./store.js";
 
     import {
         SECTION_PIPELINE_OPTS,
@@ -89,6 +90,9 @@
     };
 
     const saveConfig = async function (saveas = false) {
+        if (!$storedGlobalChanged) {
+            return;
+        }
         if (Object.keys($storedErrors).length > 0) {
             const errkeys = Object.keys($storedErrors);
             toastNotify.kind = "error";
@@ -153,6 +157,7 @@
             } else {
                 histories = [...histories, saved];
             }
+            storedGlobalChanged.set(false);
         }
     };
 
@@ -349,7 +354,7 @@
             <Button
                 icon={Save}
                 size="small"
-                disabled={saving}
+                disabled={saving || !$storedGlobalChanged}
                 kind="secondary"
                 on:click={e => saveConfig()}>Save</Button
             >

@@ -9,7 +9,7 @@
     import GroupObjectsNew from "carbon-icons-svelte/lib/GroupObjectsNew.svelte";
     import Download from "carbon-icons-svelte/lib/Download.svelte";
     import Header from "./Header.svelte";
-    import { updateConfigfile, updateErrors } from "./store";
+    import { updateConfigfile, updateErrors, storedGlobalChanged } from "./store";
     import { fetchAPI } from "./utils";
 
     // example.py:ExamplePipeline
@@ -201,6 +201,8 @@
                     error = `The name "${new_name}" is already used under current working directory.`;
                     return;
                 }
+                // Set globalChanged to false
+                storedGlobalChanged.set(false);
                 // Clear up the errors
                 updateErrors({});
                 updateConfigfile("");
@@ -242,6 +244,7 @@
                         iconDescription="Load the configuration"
                         disabled={deleting === cell.value[0]}
                         on:click={() => {
+                            storedGlobalChanged.set(false);
                             updateErrors({});
                             updateConfigfile(cell.value[1]);
                             configfile = cell.value[1];
