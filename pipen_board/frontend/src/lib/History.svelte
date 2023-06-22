@@ -22,6 +22,7 @@
     let error;
     let deleting;
     let uploading;
+    let pipelineName = pipeline.split(":").at(-1);
 
     const headers = [
         { key: "name", value: "Name" },
@@ -178,19 +179,26 @@
 {/if}
 
 <div class="history-wrapper">
-    <Header {histories} pipelineName={pipeline.split(":").at(-1)} />
+    <Header {histories} {pipelineName} />
     <div class="new-inst">
         <Button
             kind="primary"
             icon={GroupObjectsNew}
             iconDescription="Create a New Instance"
             on:click={() => {
-                const new_name = prompt(
+                let new_name = prompt(
                     "Please enter a name for the new instance:\n\n" +
-                    "- Leave it empty to use the default name\n" +
-                    "- Do NOT use existing names under same working directory. You will not be able to save the configuration.\n"
+                    `- Leave it empty to use the default name (${pipelineName})\n`
                 );
                 if (new_name === null) {
+                    error = `Cancelled creating a new instance.`;
+                    return;
+                }
+                if (new_name === "") {
+                    new_name = pipelineName;
+                }
+                if (histories.find(h => h.is_current && h.name === new_name)) {
+                    error = `The name "${new_name}" is already used under current working directory.`;
                     return;
                 }
                 // Clear up the errors

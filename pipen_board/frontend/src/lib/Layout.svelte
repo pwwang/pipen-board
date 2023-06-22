@@ -109,7 +109,7 @@
 {:else if loadingData}
 <Loading
     class="pipen-cli-config-loading"
-    style="--content: 'Loading pipeline data ...\A(Large pipelines may take longer)'"
+    style="--content: 'Loading pipeline data ...\A'"
     description="Loading pipeline data ..." />
 {:else}
   <div class="body">

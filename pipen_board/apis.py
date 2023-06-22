@@ -72,16 +72,19 @@ async def history():
     out = {}
     out["pipeline"] = args.pipeline
     out["histories"] = []
+    curr_workdir = Path(args.workdir).resolve()
 
     for histfile in PIPEN_BOARD_DIR.glob(f"{slugify(args.pipeline)}.*.*.json"):
         name = histfile.stem.split(".")[-2]
+        workdir = base64.b64decode(
+            histfile.stem.split(".")[-1] + "=="
+        ).decode()
         out["histories"].append(
             {
                 "name": name,
                 "configfile": histfile.name,
-                "workdir": base64.b64decode(
-                    histfile.stem.split(".")[-1] + "=="
-                ).decode(),
+                "workdir": workdir,
+                "is_current": Path(workdir).resolve() == curr_workdir,
                 # 2023-01-01_00-00-00 to
                 # 2023-01-01 00:00:00
                 "ctime": (
@@ -171,7 +174,13 @@ async def history_saveas():
 
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         workdir = Path(args.workdir).resolve().as_posix()
-        out = {"name": newname, "mtime": now, "ctime": now, "workdir": workdir}
+        out = {
+            "name": newname,
+            "is_current": True,
+            "mtime": now,
+            "ctime": now,
+            "workdir": workdir,
+        }
         enc = base64.b64encode(workdir.encode()).decode().rstrip("=")
         newconfigfile = PIPEN_BOARD_DIR.joinpath(
             f"{slugify(args.pipeline)}.{newname}.{enc}.json"
@@ -232,6 +241,7 @@ async def history_upload():
         "mtime": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "ctime": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "workdir": workdir,
+        "is_current": True,
         "configfile": schema_file.name,
     }
 
@@ -261,6 +271,7 @@ async def config_save():
                 ]["placeholder"] = f"{name}.config.toml"
 
         out["ctime"] = now
+        out["is_current"] = True
         out["workdir"] = workdir
         logger.info(
             "[bold][yellow]API[/yellow][/bold] Saving config to a new file: "
@@ -288,6 +299,7 @@ async def config_save():
 
         out["name"] = name
         out["ctime"] = now
+        out["is_current"] = True
         out["workdir"] = workdir
         logger.info(
             "[bold][yellow]API[/yellow][/bold] Saving config to a new file: "
