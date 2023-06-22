@@ -99,11 +99,7 @@
         kind="tertiary"
         size="small"
         on:click={() => {
-            if (histories.length > 0) {
-                configfile = undefined;
-            } else {
-                alert("No history available");
-            }
+            configfile = undefined;
         }}
         icon={SkipBack}
     >Back to History</Button>

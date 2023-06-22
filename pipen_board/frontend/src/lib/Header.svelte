@@ -40,13 +40,11 @@
                 on:click={() => {
                     if (isRunning) {
                         alert("Please wait until the pipeline is finished or stop it before switching to a different configuration");
-                    } else if (histories.length > 0) {
+                    } else {
                         if (!$storedGlobalChanged || confirm("You have unsaved changes. Are you sure to discard them?")) {
                             configfile = undefined;
                             storedConfigfile.set(undefined);
                         }
-                    } else {
-                        alert("No history available")
                     }
                 }}
                 icon={DirectionLoopLeftFilled}

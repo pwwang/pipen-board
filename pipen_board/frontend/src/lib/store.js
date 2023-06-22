@@ -3,7 +3,7 @@ import { writable } from "svelte/store";
 export const storedGlobalChanged = writable(false);
 export const storedErrors = writable({});
 export const storedConfigfile = writable(
-    localStorage.getItem("configfile") || ""
+    localStorage.getItem("configfile") === "undefined" ? undefined : localStorage.getItem("configfile")
 );
 export const storedCommand = writable(undefined);
 export const descFocused = writable(false);

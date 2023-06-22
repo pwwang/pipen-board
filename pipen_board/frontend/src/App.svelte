@@ -72,7 +72,7 @@
         description="Fetching history ..." />
 
     {:else}
-        {#if histories.length > 0 && configfile === undefined}
+        {#if configfile === undefined}
         <History {pipeline} bind:histories bind:configfile />
         {:else}
             {#key configfile}
