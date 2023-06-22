@@ -242,7 +242,7 @@
                         kind="tertiary"
                         icon={DocumentDownload}
                         iconDescription="Load the configuration"
-                        disabled={deleting === cell.value[0]}
+                        disabled={deleting === cell.value[0] || !histories[cell.value[0]].is_current}
                         on:click={() => {
                             storedGlobalChanged.set(false);
                             updateErrors({});

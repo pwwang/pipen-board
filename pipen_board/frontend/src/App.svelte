@@ -37,7 +37,7 @@
         if (!error) {
             pipeline = fetched_history.pipeline;
             histories = fetched_history.histories;
-            const stored = histories.find(h => h.configfile === $storedConfigfile);
+            const stored = histories.find(h => h.configfile === $storedConfigfile && h.is_current);
             if (stored) {
                 configfile = stored.configfile;
             }
