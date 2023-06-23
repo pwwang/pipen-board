@@ -863,8 +863,12 @@ class DataManager:
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.STDOUT,
         )
-        p.stdin.write(f"pipen-board:{port}\n".encode())
-        p.stdin.close()
+        try:
+            p.stdin.write(f"pipen-board:{port}\n".encode())
+            p.stdin.close()
+        except RuntimeError:
+            # command is already finished, probably due to an error
+            pass
         self.running = p.pid
         self._command = command
 
