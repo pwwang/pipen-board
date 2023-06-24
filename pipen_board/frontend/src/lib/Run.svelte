@@ -98,6 +98,9 @@
         let d;
         try {
             d = await fetchAPI("/api/pipeline/rerun", { method: "POST" });
+            if (d.error) {
+                throw new Error(d.error);
+            }
         } catch (e) {
             toastNotify = { kind: "error", subtitle: `Run re-submission failed: ${e}.`, timeout: 5000 };
         } finally {

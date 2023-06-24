@@ -10,7 +10,6 @@
     export let pipelineDesc = undefined;
     export let backToHistory = false;
     export let configfile = undefined;
-    export let histories;
     export let isRunning = false;
 
     let version = "0.0.0";

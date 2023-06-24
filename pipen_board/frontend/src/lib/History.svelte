@@ -218,7 +218,7 @@
 {/if}
 
 <div class="history-wrapper">
-    <Header {histories} {pipelineName} />
+    <Header {pipelineName} />
     <div class="new-inst">
         <Button
             kind="primary"

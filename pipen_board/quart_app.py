@@ -122,6 +122,13 @@ def get_app(args: Namespace):
             f"[bold][yellow]API[/yellow][/bold] Re-Running pipeline: %s",
             data_manager._command,
         )
+
+        if not data_manager._command:
+            return {
+                "ok": False,
+                "error": "Pipeline never ran. Please reload the page.",
+            }
+
         # Run command at background
         app.add_background_task(
             data_manager.run_pipeline,

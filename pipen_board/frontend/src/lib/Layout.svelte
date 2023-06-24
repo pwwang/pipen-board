@@ -111,7 +111,7 @@
     description="Loading pipeline data ..." />
 {:else}
   <div class="body">
-    <Header {pipelineName} {pipelineDesc} isRunning={runStarted && !finished} backToHistory bind:configfile {histories} />
+    <Header {pipelineName} {pipelineDesc} isRunning={runStarted && !finished} backToHistory bind:configfile />
     <div class="pipen-tabs">
         <Tabs style="border-bottom: 2px solid #e0e0e0" bind:selected={selectedTab}>
             <Tab><Settings />Configuration</Tab>
