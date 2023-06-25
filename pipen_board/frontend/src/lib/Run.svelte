@@ -162,6 +162,14 @@
 
 </script>
 
+<svelte:head>
+    {#if runStarted > 0 && !finished}
+        <link rel="icon" type="image/png" href="./assets/favicon-running.png" />
+    {:else}
+        <link rel="icon" type="image/png" href="./assets/favicon.png" />
+    {/if}
+</svelte:head>
+
 {#if !data && fetching}
 <div class="center-wrapper">
     <InlineLoading description="Collecting information of the run ..." />
