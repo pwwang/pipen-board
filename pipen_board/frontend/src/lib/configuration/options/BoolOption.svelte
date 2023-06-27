@@ -25,7 +25,7 @@
     <div
         slot="label"
         style='--pgarg: "This option is linked to Group Argument: {pgargkey === true ? key : pgargkey}"'
-        class='{readonly ? "readonly-label" : ""}{pgargkey ? "linked-pgarg-label" : ""}'>{key}</div>
+        class='{readonly ? "readonly-label" : ""} {pgargkey ? "linked-pgarg-label" : ""}'>{key}</div>
     <div slot="field" style="align-self: center;">
         <Toggle
             on:focus
