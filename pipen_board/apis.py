@@ -7,7 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from quart import request, redirect, send_file
+from quart import abort, request, redirect, send_file
 from slugify import slugify
 
 from .version import __version__
@@ -123,6 +123,8 @@ async def reports(report_path):
     if report_path.is_dir():
         report_path = report_path / "index.html"
 
+    if not report_path.is_file():
+        return abort(404)
     # Serve the file
     return await send_file(report_path)
 
