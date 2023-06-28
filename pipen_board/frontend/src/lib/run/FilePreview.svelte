@@ -1,5 +1,6 @@
 <script>
     import copy from "clipboard-copy";
+    import hljs from 'highlight.js';
     import Button from "carbon-components-svelte/src/Button/Button.svelte";
     import InlineNotification from "carbon-components-svelte/src/Notification/InlineNotification.svelte";
     import Copy from "carbon-icons-svelte/lib/Copy.svelte";
@@ -58,8 +59,6 @@
             let msg = "Meta information of the file:\n\n";
             for (let [key, value] of Object.entries(out)) {
                 switch (key) {
-                    case "size":
-                        break;
                     case "ctime":
                         key = "Created";
                         break;
@@ -80,8 +79,8 @@
                     msg += `${key}: ${value}\n`;
                 }
             }
+            console.log(out);
             alert(msg);
-            console.log(msg);
         }
     };
 </script>
@@ -101,8 +100,12 @@
         <Button size="small" kind="tertiary" icon={Reset} on:click={reloadFileDetails}>Reload</Button>
     </div>
     <div class="filepreview-content scrollable">
-        {#if info.type === "text" }
-            <textarea class="file-text" readonly>{info.content || "(empty)"}</textarea>
+        {#if info.type === "text"}
+            {#if info.content === "" || info.content === null}
+                <pre class="file-text">(empty)</pre>
+            {:else}
+                <pre class="file-text">{@html hljs.highlightAuto(info.content).value}</pre>
+            {/if}
         {:else if info.type === "bigtext" }
             <textarea class="file-text" readonly>{bigtextContent || "(empty)"}</textarea>
         {:else if info.type === "image"}
@@ -158,6 +161,9 @@
     .filepreview-content .content-wrapper {
         height: 100%;
         padding: 1rem;
+    }
+    pre.file-text {
+        margin-bottom: 3.5rem;
     }
     .file-text {
         width: 100%;

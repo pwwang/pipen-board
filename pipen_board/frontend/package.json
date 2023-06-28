@@ -20,6 +20,7 @@
     "carbon-components-svelte": "^0.75.1",
     "carbon-icons-svelte": "^11.4.0",
     "clipboard-copy": "^4.0.1",
+    "highlight.js": "^11.8.0",
     "marked": "^5.0.5"
   }
 }
