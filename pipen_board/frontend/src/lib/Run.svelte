@@ -57,6 +57,10 @@
         ws.onopen = function() {
             ws.send(JSON.stringify({ type: "connect", client: "web" }));
         };
+        ws.onclose = function() {
+            rerunningOrStopping = true;
+            toastNotify = { kind: "error", subtitle: "Connection to the server is lost.", timeout: 0 };
+        };
         ws.onmessage = async function(event) {
             data = JSON.parse(event.data);
             fetching = false;
