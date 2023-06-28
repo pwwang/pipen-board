@@ -104,7 +104,8 @@
         overflow: auto;
     }
     .filepreview-content img {
-        aspect-ratio: attr(width) / attr(height);
+        max-width: 100%;
+        max-height: 100%;
         object-fit: contain;
     }
     .filepreview-content .content-wrapper {
