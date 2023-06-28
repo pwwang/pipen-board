@@ -4,6 +4,7 @@
     import InlineNotification from "carbon-components-svelte/src/Notification/InlineNotification.svelte";
     import Copy from "carbon-icons-svelte/lib/Copy.svelte";
     import Reset from "carbon-icons-svelte/lib/Reset.svelte";
+    import DocumentPreliminary from "carbon-icons-svelte/lib/DocumentPreliminary.svelte";
     import { fetchAPI } from "../utils";
     // {type, content}
     export let proc;
@@ -37,7 +38,52 @@
         if (out) {
             bigtextContent = out.content;
         }
-    }
+    };
+
+    const showMetadata = async function() {
+        fetching = true;
+        let out;
+        try {
+            out = await fetchAPI("/api/job/get_file_metadata", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ proc, job, path: info.path }),
+            })
+        } catch (error) {
+            alert(`Failed to get file metadata: ${error}`);
+        } finally {
+            fetching = false;
+        }
+        if (out) {
+            let msg = "Meta information of the file:\n\n";
+            for (let [key, value] of Object.entries(out)) {
+                switch (key) {
+                    case "size":
+                        break;
+                    case "ctime":
+                        key = "Created";
+                        break;
+                    case "mtime":
+                        key = "Modified";
+                        break;
+                    case "size_human":
+                        key = "Size";
+                        value = `${value} (${out.size.toLocaleString()})`;
+                        break;
+                    case "name":
+                        key = "File Name";
+                        break;
+                    default:
+                        break;
+                }
+                if (key !== "size") {
+                    msg += `${key}: ${value}\n`;
+                }
+            }
+            alert(msg);
+            console.log(msg);
+        }
+    };
 </script>
 
 <div class="filepreview-wrapper">
@@ -51,6 +97,7 @@
                 <Button size="small" disabled={bigtextShowing === showing || fetching} kind="tertiary" on:click={e => bigtextShow(showing)}>{showing}</Button>
             {/each}
         {/if}
+        <Button size="small" kind="tertiary" icon={DocumentPreliminary} on:click={showMetadata}>Metadata</Button>
         <Button size="small" kind="tertiary" icon={Reset} on:click={reloadFileDetails}>Reload</Button>
     </div>
     <div class="filepreview-content scrollable">

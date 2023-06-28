@@ -432,6 +432,35 @@ async def job_get_file():
     return {"type": "binary"}
 
 
+async def job_get_file_metadata():
+    data = await request.get_json()
+    path = Path(data["path"])
+    logger.info(
+        "[bold][yellow]API[/yellow][/bold] Fetching file metadata for "
+        f"{data['proc']}/{data['job']}: {path}"
+    )
+
+    size = size_human = path.stat().st_size
+    base = 1024
+    size_human = abs(float(size_human))
+    for unit in ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB"]:
+        if size_human < base:
+            break
+        size_human /= base
+
+    return {
+        "name": path.name,
+        "size": size,
+        "size_human": f"{size_human:.2f} {unit}",
+        "ctime": datetime.fromtimestamp(path.stat().st_ctime).isoformat(
+            sep=" ", timespec="seconds"
+        ),
+        "mtime": datetime.fromtimestamp(path.stat().st_mtime).isoformat(
+            sep=" ", timespec="seconds"
+        ),
+    }
+
+
 async def pipeline_stop():
     return await data_manager.stop_pipeline()
 
@@ -492,6 +521,7 @@ POSTS = {
     "/api/config/save": config_save,
     "/api/job/get_tree": job_get_tree,
     "/api/job/get_file": job_get_file,
+    "/api/job/get_file_metadata": job_get_file_metadata,
     "/api/pipeline/stop": pipeline_stop,
 }
 
