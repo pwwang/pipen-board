@@ -798,14 +798,14 @@ executing = ">1.1.0,<2.0"
 
 [[package]]
 name = "pipen"
-version = "0.10.5"
+version = "0.10.6"
 description = "A pipeline framework for python"
 category = "main"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "pipen-0.10.5-py3-none-any.whl", hash = "sha256:a1f7e7da847f0c562d316343b8dcdd915d1a7752ad21793bab7e12c403bc823a"},
-    {file = "pipen-0.10.5.tar.gz", hash = "sha256:02c3041d09180506615f8cbda140df85997188b2b89365127999bca69141e89a"},
+    {file = "pipen-0.10.6-py3-none-any.whl", hash = "sha256:d746eb788b91c504075f552e24ec4ba586cb1a8c5e8cdc518973ed9d3ead289a"},
+    {file = "pipen-0.10.6.tar.gz", hash = "sha256:da7ea52e4df5525885410cecbbfbb1e24c62cb055c6496f924e6dadd01a43912"},
 ]
 
 [package.dependencies]
@@ -1197,21 +1197,20 @@ files = [
 
 [[package]]
 name = "pyyaml-include"
-version = "1.3"
+version = "1.3.1"
 description = "Extending PyYAML with a custom constructor for including YAML files within YAML files"
 category = "main"
 optional = true
-python-versions = ">=3.5"
+python-versions = ">=3.7"
 files = [
-    {file = "pyyaml-include-1.3.tar.gz", hash = "sha256:f7fbeb8e71b50be0e6e07472f7c79dbfb1a15bade9c93a078369ff49e57e6771"},
-    {file = "pyyaml_include-1.3-py3-none-any.whl", hash = "sha256:5142a0b0f93d9b1e5872d5a814f3681ffbc70638128ced1acfd9fb57da7825ca"},
+    {file = "pyyaml-include-1.3.1.tar.gz", hash = "sha256:4cb3b4e1baae2ec251808fe1e8aed5d3d20699c541864c8e47ed866ab2f15039"},
+    {file = "pyyaml_include-1.3.1-py3-none-any.whl", hash = "sha256:e58525721a2938d29c4046350f8aad86f848660a770c29605e6f2700925fa753"},
 ]
 
 [package.dependencies]
 PyYAML = ">=5.1,<7.0"
 
 [package.extras]
-all = ["toml"]
 toml = ["toml"]
 
 [[package]]
@@ -1402,14 +1401,14 @@ files = [
 
 [[package]]
 name = "typing-extensions"
-version = "4.6.3"
+version = "4.7.0"
 description = "Backported and Experimental Type Hints for Python 3.7+"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "typing_extensions-4.6.3-py3-none-any.whl", hash = "sha256:88a4153d8505aabbb4e13aacb7c486c2b4a33ca3b3f807914a9b4c844c471c26"},
-    {file = "typing_extensions-4.6.3.tar.gz", hash = "sha256:d91d5919357fe7f681a9f2b5b4cb2a5f1ef0a1e9f59c4d8ff0d3491e05c0ffd5"},
+    {file = "typing_extensions-4.7.0-py3-none-any.whl", hash = "sha256:5d8c9dac95c27d20df12fb1d97b9793ab8b2af8a3a525e68c80e21060c161771"},
+    {file = "typing_extensions-4.7.0.tar.gz", hash = "sha256:935ccf31549830cda708b42289d44b6f74084d616a00be651601a4f968e77c82"},
 ]
 
 [[package]]
