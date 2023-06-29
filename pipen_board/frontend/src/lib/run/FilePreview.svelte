@@ -4,6 +4,8 @@
     import Button from "carbon-components-svelte/src/Button/Button.svelte";
     import InlineNotification from "carbon-components-svelte/src/Notification/InlineNotification.svelte";
     import Copy from "carbon-icons-svelte/lib/Copy.svelte";
+    import CopyFile from "carbon-icons-svelte/lib/CopyFile.svelte";
+    import TextWrap from "carbon-icons-svelte/lib/TextWrap.svelte";
     import Reset from "carbon-icons-svelte/lib/Reset.svelte";
     import DocumentPreliminary from "carbon-icons-svelte/lib/DocumentPreliminary.svelte";
     import { fetchAPI } from "../utils";
@@ -14,6 +16,7 @@
     export let reloadFileDetails;
 
     let fetching = false;
+    let wordwrap = false;
     let bigtextShowing = "Head 100";
     let bigtextContent;
     if (info.type === "bigtext") {
@@ -42,7 +45,6 @@
     };
 
     const showMetadata = async function() {
-        fetching = true;
         let out;
         try {
             out = await fetchAPI("/api/job/get_file_metadata", {
@@ -52,8 +54,6 @@
             })
         } catch (error) {
             alert(`Failed to get file metadata: ${error}`);
-        } finally {
-            fetching = false;
         }
         if (out) {
             let msg = "Meta information of the file:\n\n";
@@ -83,28 +83,46 @@
             alert(msg);
         }
     };
+
 </script>
 
 <div class="filepreview-wrapper">
     <div class="filepreview-actions">
-        <Button size="small" kind="tertiary" icon={Copy} on:click={() => copy(info.path)}>Copy Path</Button>
+        <Button size="small" kind="tertiary" icon={Copy} on:click={() => copy(info.path)} iconDescription="Copy File Path" />
+        <Button size="small" kind="tertiary" icon={Copy} on:click={() => copy(info.path)} iconDescription="Copy File Path" />
         {#if info.type === "text" }
-            <Button size="small" kind="tertiary" icon={Copy} on:click={() => copy(info.content)}>Copy Content</Button>
+            <Button size="small" kind="tertiary" icon={CopyFile} on:click={() => copy(info.content)} iconDescription="Copy Content" />
         {:else if info.type === "bigtext"}
-            <Button size="small" kind="tertiary" icon={Copy} on:click={() => copy(info.content)}>Copy Content</Button>
+            <Button size="small" kind="tertiary" icon={CopyFile} on:click={() => copy(info.content)} iconDescription="Copy Content" />
             {#each ["Head 100", "Head 500", "Tail 100", "Tail 500"] as showing}
                 <Button size="small" disabled={bigtextShowing === showing || fetching} kind="tertiary" on:click={e => bigtextShow(showing)}>{showing}</Button>
             {/each}
         {/if}
-        <Button size="small" kind="tertiary" icon={DocumentPreliminary} on:click={showMetadata}>Metadata</Button>
-        <Button size="small" kind="tertiary" icon={Reset} on:click={reloadFileDetails}>Reload</Button>
+        <Button size="small" kind="tertiary" icon={DocumentPreliminary} on:click={showMetadata} iconDescription="Show Metadata" />
+        <Button
+            size="small"
+            kind="tertiary"
+            icon={Reset}
+            on:click={reloadFileDetails}
+            iconDescription="Reload the File" />
+        {#if info.type === "text"}
+        <Button
+            size="small"
+            kind="ghost"
+            icon={TextWrap}
+            isSelected={wordwrap}
+            on:click={() => {wordwrap = !wordwrap;}}
+            iconDescription="Toggle word wrap" />
+        {/if}
     </div>
     <div class="filepreview-content scrollable">
-        {#if info.type === "text"}
+        {#if fetching}
+            <div class="content-wrapper">Loading ...</div>
+        {:else if info.type === "text"}
             {#if info.content === "" || info.content === null}
-                <pre class="file-text">(empty)<hr /></pre>
+                <pre class="file-text {wordwrap ? 'text-wrap' : ''}">(empty)<hr /></pre>
             {:else}
-                <pre class="file-text">{@html hljs.highlightAuto(info.content).value}<hr /></pre>
+                <pre class="file-text {wordwrap ? 'text-wrap' : ''}">{@html hljs.highlightAuto(info.content).value}<hr /></pre>
             {/if}
         {:else if info.type === "bigtext" }
             <textarea class="file-text" readonly>{bigtextContent || "(empty)"}</textarea>
@@ -146,9 +164,18 @@
         padding: 1rem;
         background-color: #e6e6e6;
         flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
     }
     .filepreview-actions :global(button.bx--btn) {
         font-size: .8rem;
+    }
+    .filepreview-actions :global(button.bx--btn--icon-only.bx--btn--ghost) {
+        background: #e4e4e4;
+        outline: 1px solid #797979
+    }
+    .filepreview-actions :global(button.bx--btn--icon-only.bx--btn--selected) {
+        background: #6ea5ff;
     }
     .filepreview-content {
         overflow: auto;
@@ -181,5 +208,8 @@
     }
     .file-text:focus {
         outline: none;
+    }
+    .file-text.text-wrap {
+        white-space: pre-wrap;
     }
 </style>
