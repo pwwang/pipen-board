@@ -102,9 +102,9 @@
     <div class="filepreview-content scrollable">
         {#if info.type === "text"}
             {#if info.content === "" || info.content === null}
-                <pre class="file-text">(empty)</pre>
+                <pre class="file-text">(empty)<hr /></pre>
             {:else}
-                <pre class="file-text">{@html hljs.highlightAuto(info.content).value}</pre>
+                <pre class="file-text">{@html hljs.highlightAuto(info.content).value}<hr /></pre>
             {/if}
         {:else if info.type === "bigtext" }
             <textarea class="file-text" readonly>{bigtextContent || "(empty)"}</textarea>
@@ -162,8 +162,10 @@
         height: 100%;
         padding: 1rem;
     }
-    pre.file-text {
-        margin-bottom: 3.5rem;
+    .filepreview-content pre hr {
+        margin: 0;
+        height: 0;
+        border: 0;
     }
     .file-text {
         width: 100%;
