@@ -362,6 +362,10 @@
     div.pipen-history :global(table tr td:last-of-type) {
         white-space: nowrap;
     }
+    div.pipen-history :global(table tr td:nth-child(2)) {
+        white-space: pre-wrap;
+        word-break: break-all;
+    }
     @media (max-width: 1200px) {
         div.pipen-history {
             padding-left: 5%;
