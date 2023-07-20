@@ -132,6 +132,10 @@ div.draggable:hover {
     background-color: #868686;
 }
 
+div.joblist button {
+    min-width: 3rem;
+}
+
 div.joblist button.bx--tag span {
     font-family: IBM Plex Mono,Menlo,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier,monospace;
 }
