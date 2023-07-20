@@ -53,7 +53,8 @@
     if (runStarted > 0) {
         // fetch the updated running data
         data = undefined;
-        const ws = new WebSocket(`ws://${location.host}/ws`);
+        const wsProtocal = window.location.protocol === "https:" ? "wss" : "ws";
+        const ws = new WebSocket(`${wsProtocal}://${location.host}/ws`);
         ws.onopen = function() {
             ws.send(JSON.stringify({ type: "connect", client: "web" }));
         };
