@@ -302,6 +302,10 @@ def _load_additional(additional: str, **kwargs) -> Mapping[str, Any]:
     if not additional:
         return {}
 
+    if additional.startswith("gh://"):
+        # To avoid the first part being parsed as hostname
+        additional = f"gh:{additional[5:]}"
+
     parsed = urlparse(additional)
     cache_dir = Path(gettempdir()) / "pipen-cli-config-additional-configs"
     cache_dir.mkdir(parents=True, exist_ok=True)
