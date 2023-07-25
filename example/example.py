@@ -41,6 +41,7 @@ class MyGroup(ProcGroup):
 
     Args:
         arg (text): The arg
+        jsarg (type=json): The json arg
         nsarg: The nsarg
             - a: The a
             - b: The b
@@ -48,6 +49,7 @@ class MyGroup(ProcGroup):
 
     DEFAULTS = {
         "arg": "default arg",
+        "jsarg": None,
         "nsarg": {"a": "default a", "b": "default b"},
     }
 

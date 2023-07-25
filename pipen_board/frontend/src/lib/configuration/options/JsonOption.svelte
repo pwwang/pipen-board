@@ -2,7 +2,10 @@
 // @ts-nocheck
 
     import { onMount } from "svelte";
+    import * as itoml from "@iarna/toml";
     import TextArea from "carbon-components-svelte/src/TextArea/TextArea.svelte";
+    import RadioButton from "carbon-components-svelte/src/RadioButton/RadioButton.svelte";
+    import RadioButtonGroup from "carbon-components-svelte/src/RadioButtonGroup/RadioButtonGroup.svelte";
     import OptionFrame from "./OptionFrame.svelte";
     import { validateData, autoHeight, insertTab, get_pgvalue } from "../../utils";
     import { storedGlobalChanged } from "../../store";
@@ -18,19 +21,27 @@
     export let pgargs = {};
     export let pgargkey = null;
     export let changed = false;
+    export let format;
 
-    let validator = ["json"];
+    format = format || "json";
+
     let invalid = false;
     let invalidText = "";
     let strValue = value;
     let origValue = value;
     let textarea = null;
+
+    const parse = (x) => format === "json" ? JSON.parse(x) : itoml.parse(x);
+    const stringify = (x) => x && (format === "json" ? JSON.stringify(x, null, 2) : itoml.stringify(x));
+
     if (value && typeof value === "object") {
-        strValue = JSON.stringify(value, null, 2);
+        strValue = stringify(value);
     }
 
-    if (required) {
-        validator = ["required", ...validator]
+    $: pgvalue = stringify(get_pgvalue(pgargs, pgargkey === true ? key : pgargkey));
+    $: if (pgvalue !== undefined && !changed) {
+        strValue = pgvalue;
+        value = parse(strValue);
     }
 
     const validateValue = (v, onmount = false) => {
@@ -44,6 +55,7 @@
             removeError(`${activeNavItem} / ${key}`);
             return;
         }
+        const validator = required ? ["required", format] : [format];
         const error = validateData(v, validator);
         invalid = error !== null;
         invalidText = error;
@@ -53,18 +65,17 @@
             value = v;
         } else {
             removeError(`${activeNavItem} / ${key}`);
-            if (!onmount) {
-                value = JSON.parse(v);
-            }
+            if (!onmount) { value = parse(v); }
         }
         autoHeight(textarea);
     };
 
-    $: pgvalue = JSON.stringify(get_pgvalue(pgargs, pgargkey === true ? key : pgargkey));
-    $: if (pgvalue !== undefined && !changed) {
-        strValue = pgvalue;
-        value = JSON.parse(strValue);
-    }
+    const useFormat = (e) => {
+        if (invalid) { return; }
+        if (e.detail === format) { return; }
+        format = e.detail;
+        strValue = stringify(value);
+    };
 
     onMount(() => {
         if (!readonly) {
@@ -77,8 +88,16 @@
     <div
         slot="label"
         style='--pgarg: "This option is linked to Group Argument: {pgargkey === true ? key : pgargkey}"'
-        class='{readonly ? "readonly-label" : ""} {pgargkey ? "linked-pgarg-label" : ""}'>{key}</div>
-    <div slot="field">
+        class='{readonly ? "readonly-label" : ""} {pgargkey ? "linked-pgarg-label" : ""}'>
+        {key}
+        <div class="json-format-selector">
+            <RadioButtonGroup selected={format} orientation="vertical" on:change={useFormat}>
+                <RadioButton labelText="JSON" value="json" />
+                <RadioButton labelText="TOML" value="toml" />
+            </RadioButtonGroup>
+        </div>
+    </div>
+    <div slot="field" style="align-self: flex-start;">
         <TextArea
             on:focus
             on:blur
@@ -90,9 +109,16 @@
             {placeholder}
             labelText={key}
             hideLabel
-            rows={1}
+            rows={3}
             bind:value={strValue}
             bind:ref={textarea}
         />
     </div>
 </OptionFrame>
+
+<style>
+    :global(.json-format-selector) {
+        transform: scale(.75);
+        margin-top: .2rem;
+    }
+</style>

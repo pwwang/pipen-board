@@ -146,6 +146,7 @@
     pgargkey={data.pgarg}
     bind:changed={data.changed}
     bind:value={data.value}
+    bind:format={data.format}
     />
 {:else if data.type === 'auto'}
 <AutoOption

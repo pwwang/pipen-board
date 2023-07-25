@@ -1,5 +1,6 @@
 import { marked } from 'marked';
 import { tick } from 'svelte';
+import * as itoml from "@iarna/toml";
 import { SECTION_PIPELINE_OPTS, SECTION_ADDITIONAL_OPTS, SECTION_PROCESSES, SECTION_PROCGROUPS } from './constants';
 
 
@@ -118,6 +119,13 @@ function validateData(data, validators) {
                 JSON.parse(data);
             } catch (e) {
                 return "This field must be a valid JSON";
+            }
+        }
+        if (validator === "toml") {
+            try {
+                itoml.parse(data);
+            } catch (e) {
+                return "This field must be a valid TOML";
             }
         }
     }

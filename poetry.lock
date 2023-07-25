@@ -806,13 +806,13 @@ pipen = ">=0.10,<0.11"
 
 [[package]]
 name = "pipen-args"
-version = "0.10.3"
+version = "0.10.4"
 description = "Command-line argument parser for pipen."
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "pipen_args-0.10.3-py3-none-any.whl", hash = "sha256:7977cde068997bfc1cfb5391d5e112b12a42c0750665388eda187e562e8fcc03"},
-    {file = "pipen_args-0.10.3.tar.gz", hash = "sha256:503b47df0f3f5902083215e23b80a47471306ca723285d027822d1f17ebb99db"},
+    {file = "pipen_args-0.10.4-py3-none-any.whl", hash = "sha256:e0b2fad52233923b08293a8fd77ed62375e4ecff3759deae27f5ad8115f73712"},
+    {file = "pipen_args-0.10.4.tar.gz", hash = "sha256:927969ccd055f67a32ecd7ea37354c6ca304e077802d2eb23c98211d0556ad2e"},
 ]
 
 [package.dependencies]
@@ -820,13 +820,13 @@ pipen-annotate = ">=0.9.0,<0.10.0"
 
 [[package]]
 name = "pipen-log2file"
-version = "0.3.2"
+version = "0.3.3"
 description = "Add verbosal information in logs for pipen."
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "pipen_log2file-0.3.2-py3-none-any.whl", hash = "sha256:2a96e2155ee5d247d009a474c39902f16ecdc9a19ec2e6e5d62e6cd22c731bac"},
-    {file = "pipen_log2file-0.3.2.tar.gz", hash = "sha256:3f1a6cdff82fd09fa32a428362ef08b06fc96f0f5a824d1a7b1c10af1f996472"},
+    {file = "pipen_log2file-0.3.3-py3-none-any.whl", hash = "sha256:684f735741168b8522c83a2a67ce845fc91ca132dc634834f3fa3b9511416246"},
+    {file = "pipen_log2file-0.3.3.tar.gz", hash = "sha256:895d72e4bef1c8902c529a7a669f45f9ccbc605f515d659513138edeb3f994ac"},
 ]
 
 [package.dependencies]
