@@ -71,8 +71,8 @@
     };
 
     const useFormat = (e) => {
-        if (invalid) { return; }
-        if (e.detail === format) { return; }
+        if (invalid) { console.log(e); return false; }
+        if (e.detail === format) { return false; }
         format = e.detail;
         strValue = stringify(value);
     };
@@ -91,7 +91,7 @@
         class='{readonly ? "readonly-label" : ""} {pgargkey ? "linked-pgarg-label" : ""}'>
         {key}
         <div class="json-format-selector">
-            <RadioButtonGroup selected={format} orientation="vertical" on:change={useFormat}>
+            <RadioButtonGroup disabled={invalid} selected={format} orientation="vertical" on:change={useFormat}>
                 <RadioButton labelText="JSON" value="json" />
                 <RadioButton labelText="TOML" value="toml" />
             </RadioButtonGroup>
