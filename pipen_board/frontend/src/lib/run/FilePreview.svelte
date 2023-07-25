@@ -9,7 +9,7 @@
     import Reset from "carbon-icons-svelte/lib/Reset.svelte";
     import DocumentPreliminary from "carbon-icons-svelte/lib/DocumentPreliminary.svelte";
     import { fetchAPI } from "../utils";
-    // {type, content}
+    // {type, path, content}
     export let proc;
     export let job;
     export let info;
@@ -121,6 +121,8 @@
         {:else if info.type === "text"}
             {#if info.content === "" || info.content === null}
                 <pre class="file-text {wordwrap ? 'text-wrap' : ''}">(empty)<hr /></pre>
+            {:else if !info.path.split("/").at(-1).startsWith("job.")}
+                <pre class="file-text {wordwrap ? 'text-wrap' : ''}">{info.content}<hr /></pre>
             {:else}
                 <pre class="file-text {wordwrap ? 'text-wrap' : ''}">{@html hljs.highlightAuto(info.content).value}<hr /></pre>
             {/if}
