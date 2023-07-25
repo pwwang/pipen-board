@@ -23,7 +23,9 @@
     data = { changed: false, ...data };
 
     const focusTail = "                    "
+    let windowBlurred = false;
     let oldDescription = description || "";
+    let timeout = null;
 
     const onMouseEnter = () => {
         if (!description || !description.endsWith(focusTail)) {
@@ -38,19 +40,31 @@
     };
 
     const onFocus = () => {
+        if (timeout) {
+            clearTimeout(timeout);
+        }
         description = data.desc + focusTail;
         descFocused.set(false);
     };
 
     const onBlur = () => {
-        if (!$descFocused) {
-            description = oldDescription;
-        } else if (description.endsWith(focusTail)) {
-            description = description.substring(0, description.length - focusTail.length);
+        // use timeout to prevent the pinned description from being cleared
+        // if window is going to be blurred
+        if (timeout) {
+            clearTimeout(timeout);
         }
+        timeout = setTimeout(() => {
+            if (!$descFocused) {
+                description = oldDescription;
+            } else if (description.endsWith(focusTail)) {
+                description = description.substring(0, description.length - focusTail.length);
+            }
+        }, 100);
     };
 
 </script>
+
+<svelte:window on:blur={() => { if (timeout) clearTimeout(timeout) }} />
 
 {#if moreLikeOption(key)}
 <MoreLikeOption
