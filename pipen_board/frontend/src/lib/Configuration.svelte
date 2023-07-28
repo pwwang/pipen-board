@@ -42,6 +42,16 @@
     let saving = false;
     let dragStartX = null;
     let initWidth = null;
+    // When mouse leave the description area, shall we blur the description?
+    // so that it can be replaced by the description of the active input
+    let allowDescBlur = true;
+
+    descFocused.subscribe(v => {
+        if (!v) {
+            allowDescBlur = true;
+        }
+    });
+
 
     let toastNotify = { kind: undefined, subtitle: undefined, timeout: 3000 };
 
@@ -378,7 +388,9 @@
     <aside
         class="right"
         on:mouseenter={e => descFocused.set(true)}
-        on:mouseleave={e => descFocused.set(false)}
+        on:mouseleave={e => allowDescBlur && descFocused.set(false)}
+        on:click={e => { allowDescBlur = false; }}
+        on:keypress={e => { allowDescBlur = false; }}
         >
         <Description description={activeDescription} />
     </aside>

@@ -24,46 +24,46 @@
 
     const focusTail = "                    "
     let oldDescription = description || "";
-    let timeout = null;
 
     const onMouseEnter = () => {
         if (!description || !description.endsWith(focusTail)) {
+            // Switch the description to target one only when
+            // no input is focused
             description = data.desc;
         }
     };
 
     const onMouseLeave = () => {
         if (!description || !description.endsWith(focusTail)) {
+            // Switch back to the old description
+            // when no input is focused
             description = oldDescription;
         }
     };
 
     const onFocus = () => {
-        if (timeout) {
-            clearTimeout(timeout);
-        }
+        // set the description to the focused one
+        // and append the focusTail (to mark that the description is the one
+        // from the focused input)
         description = data.desc + focusTail;
+        // description should not be focused as other input element (target)
+        // is focused
         descFocused.set(false);
     };
 
     const onBlur = () => {
-        // use timeout to prevent the pinned description from being cleared
-        // if window is going to be blurred
-        if (timeout) {
-            clearTimeout(timeout);
+        if (!$descFocused) {
+            // Switch back to the old description
+            // when description is not focused
+            description = oldDescription;
+        } else if (description.endsWith(focusTail)) {
+            // Remove the focusTail
+            // So that the description can be replaced when hover over
+            // other inputs
+            description = description.substring(0, description.length - focusTail.length);
         }
-        timeout = setTimeout(() => {
-            if (!$descFocused) {
-                description = oldDescription;
-            } else if (description.endsWith(focusTail)) {
-                description = description.substring(0, description.length - focusTail.length);
-            }
-        }, 100);
     };
-
 </script>
-
-<svelte:window on:blur={() => { if (timeout) clearTimeout(timeout) }} />
 
 {#if moreLikeOption(key)}
 <MoreLikeOption
