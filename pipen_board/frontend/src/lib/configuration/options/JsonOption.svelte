@@ -33,7 +33,19 @@
     let textarea = null;
 
     const parse = (x) => format === "json" ? JSON.parse(x) : itoml.parse(x);
-    const stringify = (x) => x && (format === "json" ? JSON.stringify(x, null, 2) : itoml.stringify(x));
+    const stringify = (x) => {
+        if (!x) { return x; }
+        if (format === "json") {
+            return JSON.stringify(x, null, 2);
+        }
+        try {
+            return itoml.stringify(x);
+        } catch (error) {
+            invalid = true;
+            invalidText = error;
+            return JSON.stringify(x, null, 2);
+        }
+    }
 
     if (value && typeof value === "object") {
         strValue = stringify(value);
