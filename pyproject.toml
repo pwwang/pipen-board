@@ -20,6 +20,9 @@ psutil = "^5.9.5"
 pipen-report = { version = "^0.12.2", optional = true }
 python-slugify = "^8.0.1"
 
+[tool.poetry.extras]
+report = ["pipen-report"]
+
 [tool.poetry.plugins.pipen]
 board = "pipen_board:pipen_board_plugin"
 
