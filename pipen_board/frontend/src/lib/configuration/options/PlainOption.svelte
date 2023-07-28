@@ -11,6 +11,7 @@
     export let required = false;
     export let activeNavItem;
     export let readonly = false;
+    export let defValue;
     export let setError;
     export let removeError;
     export let pgargs = {};
@@ -43,6 +44,7 @@
         if (invalid) {
             setError(`${activeNavItem} / ${key}`, invalidText);
         } else {
+            if (v === "") { value = defValue; }
             removeError(`${activeNavItem} / ${key}`);
         }
     };

@@ -12,6 +12,7 @@
     export let placeholder;
     export let required = false;
     export let readonly = false;
+    export let defValue;
     export let activeNavItem;
     export let setError;
     export let removeError;
@@ -65,7 +66,7 @@
         } else {
             removeError(`${activeNavItem} / ${key}`);
             if (!onmount) {
-                value = applyAtomicType(v, "auto");
+                value = v === "" ? defValue : applyAtomicType(v, "auto");
             }
         }
         autoHeight(textarea);

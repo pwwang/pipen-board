@@ -23,7 +23,6 @@
     data = { changed: false, ...data };
 
     const focusTail = "                    "
-    let windowBlurred = false;
     let oldDescription = description || "";
     let timeout = null;
 
@@ -97,6 +96,7 @@
     on:blur={onBlur}
     required={data.required}
     placeholder={data.placeholder}
+    defValue={data.default}
     readonly={readonly || data.readonly}
     {activeNavItem}
     {setError}
@@ -152,6 +152,7 @@
     required={data.required}
     placeholder={data.placeholder}
     readonly={readonly || data.readonly}
+    defValue={data.default}
     {key}
     {activeNavItem}
     {setError}
@@ -171,6 +172,7 @@
     required={data.required}
     readonly={readonly || data.readonly}
     placeholder={data.placeholder}
+    defValue={data.default}
     {key}
     {activeNavItem}
     {setError}
@@ -207,6 +209,7 @@
     optionType={data.type}
     required={data.required}
     readonly={readonly || data.readonly}
+    defValue={data.default}
     {activeNavItem}
     {key}
     {setError}
