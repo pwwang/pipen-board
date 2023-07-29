@@ -60,7 +60,14 @@ class PipenBoardPlugin:
             return
 
         sel = selectors.DefaultSelector()
-        sel.register(sys.stdin, selectors.EVENT_READ)
+        try:
+            # nohup fails
+            sel.register(sys.stdin, selectors.EVENT_READ)
+        except PermissionError:
+            self.ws = None
+            logger.debug("No permission to access selectors, skip.")
+            return
+
         if not sel.select(timeout=1):
             self.ws = None
             logger.debug("No data in stdin, skip.")
