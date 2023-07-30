@@ -2,7 +2,6 @@ import { marked } from 'marked';
 import { tick } from 'svelte';
 import * as itoml from "@iarna/toml";
 import { SECTION_PIPELINE_OPTS, SECTION_ADDITIONAL_OPTS, SECTION_PROCESSES, SECTION_PROCGROUPS } from './constants';
-import { options } from 'marked';
 
 
 function moreLikeOption(option) {
