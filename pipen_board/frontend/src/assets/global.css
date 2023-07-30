@@ -443,4 +443,12 @@ aside.left *, aside.run-nav * {
     }
 }
 
+/* move icons of buttons to the left */
+button.bx--btn > svg {
+    left: 1rem;
+}
 
+button.bx--btn--sm:has(svg) {
+    padding-left: 2.75rem;
+    padding-right: 1.75rem;
+}
