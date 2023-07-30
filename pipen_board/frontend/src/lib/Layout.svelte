@@ -12,7 +12,7 @@
     import ContinueFilled from "carbon-icons-svelte/lib/ContinueFilled.svelte";
     import SkipBack from "carbon-icons-svelte/lib/SkipBack.svelte";
     import CheckmarkOutline from "carbon-icons-svelte/lib/CheckmarkOutline.svelte";
-    import { storedGlobalChanged } from "./store";
+    import { storedGlobalChanged, presetConfig } from "./store";
 
     import { IS_DEV, getStatusPercentage, fetchAPI } from "./utils";
     import Header from "./Header.svelte";
@@ -53,12 +53,13 @@
             data = await fetchAPI("/api/pipeline", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ configfile }),
+                body: JSON.stringify({ configfile, preset: $presetConfig }),
             });
         } catch (e) {
             error = `<strong>Failed to fetch or parse data:</strong> <br /><br /><pre>${e}</pre>`;
         } finally {
             loadingData = false;
+            presetConfig.set(undefined);
         }
         if (!error) {
             if (IS_DEV) {

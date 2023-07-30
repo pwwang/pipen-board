@@ -27,6 +27,7 @@ from pipen_annotate import annotate
 from .defaults import (
     PIPEN_BOARD_DIR,
     SECTION_PIPELINE_OPTIONS,
+    SECTION_ADDITIONAL_OPTIONS,
     SECTION_PROCESSES,
     SECTION_PROCGROUPS,
     SECTION_DIAGRAM,
@@ -661,6 +662,59 @@ class DataManager:
             for proc in config_data[SECTION_PROCGROUPS][pg][SECTION_PROCESSES]:
                 process_proc(proc, out[SECTION_PROCGROUPS][pg])
 
+    def _update_config_by_preset(self, preset: Mapping[str, Any] | None):
+        if not preset:
+            return
+
+        def update_value(key, value, preset_val, force_ns=False):
+            if not preset_val or key not in preset_val:
+                return
+
+            vtype = value.get("type")
+
+            if vtype == "ns" or vtype == "namespace" or force_ns:
+                for k, v in value["value"].items():
+                    update_value(k, v, preset_val[key])
+                for k, v in preset_val[key].items():
+                    if k not in value["value"]:
+                        value["value"][k] = {"value" : v}
+            else:
+                value["value"] = preset_val[key]
+                if value.get("pgarg"):
+                    value["changed"] = True
+
+        # fill up the default value of self._config_data with preset
+        if SECTION_PIPELINE_OPTIONS in self._config_data:
+            for key, val in self._config_data[SECTION_PIPELINE_OPTIONS].items():
+                update_value(key, val, preset, force_ns=key.endswith("_opts"))
+
+        if SECTION_ADDITIONAL_OPTIONS in self._config_data:
+            for key, val in self._config_data[SECTION_ADDITIONAL_OPTIONS].items():
+                update_value(key, val, preset)
+
+        if SECTION_PROCESSES in self._config_data:
+            for proc, procconfig in self._config_data[SECTION_PROCESSES].items():
+                for key, val in procconfig["value"].items():
+                    update_value(
+                        key, val, preset.get(proc), force_ns=key == "envs"
+                    )
+
+        if SECTION_PROCGROUPS in self._config_data:
+            for pg, pgconfig in self._config_data[SECTION_PROCGROUPS].items():
+                if "ARGUMENTS" in pgconfig:
+                    for key, val in pgconfig["ARGUMENTS"].items():
+                        update_value(key, val, preset.get(pg))
+                if "PROCESSES" in pgconfig:
+                    for proc, procconfig in pgconfig["PROCESSES"].items():
+                        for key, val in procconfig["value"].items():
+                            update_value(
+                                key,
+                                val,
+                                preset.get(proc),
+                                force_ns=key == "envs"
+                            )
+
+
     def clear_run_data(self, keep_log: bool = False):
         """Clear the data"""
         self._proc_running_order = 0
@@ -671,10 +725,16 @@ class DataManager:
             self._run_data = deepcopy(DEFAULT_RUN_DATA)
             self._run_data[SECTION_LOG] = log
 
-    def get_data(self, args: Namespace, configfile: str | None):
+    def get_data(
+        self,
+        args: Namespace,
+        configfile: str | None,
+        preset: Mapping[str, Any] | None,
+    ):
         """Get the data"""
         if not self.running:
             self._get_prev_run(args, configfile=configfile)
+            self._update_config_by_preset(preset)
             return {
                 "runStarted": False,
                 "config": self._config_data,
@@ -682,6 +742,7 @@ class DataManager:
             }
 
         self._get_config_data(args, configfile=configfile)
+        self._update_config_by_preset(preset)
         return {
             "runStarted": True,
             "config": self._config_data,

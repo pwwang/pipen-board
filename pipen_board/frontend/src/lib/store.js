@@ -37,3 +37,6 @@ export const updateConfigfile = (configfile) => {
 storedConfigfile.subscribe((configfile) => {
     localStorage.setItem("configfile", configfile);
 });
+
+// Preset configs when creating a new configuration
+export const presetConfig = writable(undefined);

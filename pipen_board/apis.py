@@ -110,8 +110,10 @@ async def version():
 
 async def pipeline_data():
     logger.info("[bold][yellow]API[/yellow][/bold] Getting pipeline data")
-    configfile = (await request.get_json()).get("configfile")
-    return data_manager.get_data(request.cli_args, configfile)
+    req = await request.get_json()
+    configfile = req.get("configfile")
+    preset = req.get("preset")
+    return data_manager.get_data(request.cli_args, configfile, preset)
 
 
 async def reports(report_path):

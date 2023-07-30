@@ -2,6 +2,7 @@ import { marked } from 'marked';
 import { tick } from 'svelte';
 import * as itoml from "@iarna/toml";
 import { SECTION_PIPELINE_OPTS, SECTION_ADDITIONAL_OPTS, SECTION_PROCESSES, SECTION_PROCGROUPS } from './constants';
+import { options } from 'marked';
 
 
 function moreLikeOption(option) {
@@ -222,7 +223,14 @@ function finalizeConfig(schema) {
                 option.endsWith("_opts") || option === "envs"
             );
             // remove options that are equal to the pipeline options
-            if (_equal(proc_conf[option], config[option])) { delete proc_conf[option]; }
+            if (_equal(proc_conf[option], config[option])) {
+                delete proc_conf[option];
+            } else if (option.endsWith("_opts")) {
+                for (const [key, val] of Object.entries(proc_conf[option] || {})) {
+                    if (_equal(val, config[option][key])) { delete proc_conf[option][key]; }
+                }
+                if (Object.keys(proc_conf[option]).length === 0) { delete proc_conf[option]; }
+            }
         }
         if (Object.keys(proc_conf).length > 0) {
             if (flatten) {
@@ -250,7 +258,14 @@ function finalizeConfig(schema) {
                     groupinfo.ARGUMENTS
                 );
                 // remove options that are equal to the pipeline options
-                if (_equal(proc_conf[option], config[option])) { delete proc_conf[option]; }
+                if (_equal(proc_conf[option], config[option])) {
+                    delete proc_conf[option];
+                } else if (option.endsWith("_opts")) {
+                    for (const [key, val] of Object.entries(proc_conf[option] || {})) {
+                        if (_equal(val, config[option][key])) { delete proc_conf[option][key]; }
+                    }
+                    if (Object.keys(proc_conf[option]).length === 0) { delete proc_conf[option]; }
+                }
             }
             if (Object.keys(proc_conf).length > 0) config[proc] = proc_conf;
         }

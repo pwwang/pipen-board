@@ -276,8 +276,8 @@ div.linked-pgarg-label::after,
 div.textinput-wrapper.linked-pgarg label.bx--label--inline::after {
     content: var(--pgarg);
     position: absolute;
-    top: 50%;
-    left: 120%;
+    top: -100%;
+    left: -120%;
     transform: translateY(-50%);
     padding: 0.25rem 0.5rem;
     background-color: #464646;

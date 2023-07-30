@@ -1,16 +1,20 @@
 <script>
     // Used by ../App.svelte
+    import * as itoml from "@iarna/toml";
     import DataTable from "carbon-components-svelte/src/DataTable/DataTable.svelte";
     import Button from "carbon-components-svelte/src/Button/Button.svelte";
+    import Modal from "carbon-components-svelte/src/Modal/Modal.svelte";
     import TextInput from "carbon-components-svelte/src/TextInput/TextInput.svelte";
+    import TextArea from "carbon-components-svelte/src/TextArea/TextArea.svelte";
     import ToastNotification from "carbon-components-svelte/src/Notification/ToastNotification.svelte";
     import RowDelete from "carbon-icons-svelte/lib/RowDelete.svelte";
     import SaveModel from "carbon-icons-svelte/lib/SaveModel.svelte";
     import DocumentDownload from "carbon-icons-svelte/lib/DocumentDownload.svelte";
     import GroupObjectsNew from "carbon-icons-svelte/lib/GroupObjectsNew.svelte";
     import Download from "carbon-icons-svelte/lib/Download.svelte";
+    import LetterTt from "carbon-icons-svelte/lib/LetterTt.svelte";
     import Header from "./Header.svelte";
-    import { updateConfigfile, updateErrors, storedGlobalChanged } from "./store";
+    import { updateConfigfile, updateErrors, storedGlobalChanged, presetConfig } from "./store";
     import { fetchAPI } from "./utils";
 
     // example.py:ExamplePipeline
@@ -24,6 +28,8 @@
     let deleting;
     let uploading;
     let pipelineName = pipeline.split(":").at(-1);
+    let showLoadFromTOMLModal = false;
+    let tomlToLoadFrom = null;
 
     const headers = [
         { key: "name", value: "Name" },
@@ -202,6 +208,34 @@
         }
     };
 
+    const loadFromTOML = () => {
+        let parsed;
+        try {
+            parsed = itoml.parse(tomlToLoadFrom);
+        } catch (err) {
+            error = "Failed to parse the TOML:\n\n" + err;
+            return
+        }
+
+        if (!parsed.name) {
+            parsed.name = pipelineName;
+        }
+
+        if (histories.find(h => h.is_current && h.name === parsed.name)) {
+            error = `The name "${parsed.name}" is already used under current working directory.`;
+            return;
+        }
+
+        showLoadFromTOMLModal = false;
+        // Set globalChanged to false
+        storedGlobalChanged.set(false);
+        // Clear up the errors
+        updateErrors({});
+        updateConfigfile(undefined);
+        presetConfig.set(parsed);
+        configfile = `new:${parsed.name}`;
+    };
+
 </script>
 
 {#if error}
@@ -216,6 +250,20 @@
     <div slot="subtitle">{@html error}</div>
     </ToastNotification>
 {/if}
+
+<Modal
+    bind:open={showLoadFromTOMLModal}
+    modalHeading="Load From Generated TOML"
+    preventCloseOnClickOutside
+    primaryButtonText="Load"
+    secondaryButtonText="Cancer"
+    size="lg"
+    shouldSubmitOnEnter={false}
+    on:click:button--primary={loadFromTOML}
+    on:click:button--secondary={() => {showLoadFromTOMLModal = false;}}
+>
+    <TextArea rows={15} bind:value={tomlToLoadFrom} />
+</Modal>
 
 <div class="history-wrapper">
     <Header {pipelineName} />
@@ -248,8 +296,14 @@
                 configfile = `new:${new_name}`;
             }}
             size="small">
-            Create a New Instance
+            New Instance
         </Button> /
+        <Button
+            kind="secondary"
+            size="small"
+            icon={LetterTt}
+            iconDescription="Load From Generated TOML"
+            on:click={() => {showLoadFromTOMLModal = true}}>From Generated TOML</Button> /
         <Button
             kind="secondary"
             icon={DocumentDownload}
@@ -257,10 +311,10 @@
             on:click={openSchemaFile}
             disabled={uploading}
             size="small">
-            Load From a Schema File ...
+            From Schema File ...
         </Button> /
         <TextInput on:keyup={loadFromURL} placeholder="Load Schema File from a URL (Enter to confirm)" light hideLabel  /> /
-        <span>or load from a saved configuration:</span>
+        <span>Or load saved configuration:</span>
         <input type="file" id="schema_file" on:change={loadSchemaFile} style="display: none;" />
     </div>
 
@@ -374,9 +428,13 @@
         div.new-inst {
             padding-left: 5%;
             padding-right: 5%;
+            flex-wrap: wrap;
         }
     }
     @media (max-width: 1000px) {
+        div.new-inst {
+            flex-wrap: wrap;
+        }
         div.pipen-history :global(table tr th:nth-child(2)) {
             display: none;
         }
