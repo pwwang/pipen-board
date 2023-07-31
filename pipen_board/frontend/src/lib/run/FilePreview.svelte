@@ -90,7 +90,6 @@
 <div class="filepreview-wrapper">
     <div class="filepreview-actions">
         <Button size="small" kind="tertiary" icon={Copy} on:click={() => copy(info.path)} iconDescription="Copy File Path" />
-        <Button size="small" kind="tertiary" icon={Copy} on:click={() => copy(info.path)} iconDescription="Copy File Path" />
         {#if info.type === "text" }
             <Button size="small" kind="tertiary" icon={CopyFile} on:click={() => copy(info.content)} iconDescription="Copy Content" />
         {:else if info.type === "bigtext"}
