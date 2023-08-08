@@ -1,9 +1,11 @@
-desc = "An example pipeline showing how pipen-board works."
-error_strategy = "ignore"
-loglevel = "info"
 name = "SingleProcPipeline"
-plugin_opts = { }
-scheduler_opts = { }
 
-[in]
-var = [ "segsegrserg" ]
+[plugin_opts]
+diagram_theme = "fancy"
+report_no_collapse_pgs = false
+
+[P1.envs]
+number = "1"
+
+[P4.envs]
+abc = "abc"
