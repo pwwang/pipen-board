@@ -24,6 +24,14 @@
         }
         value = [[newkey, newvalue]];
     }
+
+    const addItem = () => {
+        changed = true;
+        storedGlobalChanged.set(true);
+        value = [...value, [newkey, newvalue]];
+        newkey = null;
+        newvalue = null;
+    }
 </script>
 
 {#each value as v, i (i)}
@@ -43,6 +51,7 @@
         <TextInput
             on:focus
             on:blur
+            on:keyup={(e) => {if (e.key == "Enter") addItem()}}
             size="sm"
             bind:value={value[i][1]}
         />
@@ -54,7 +63,7 @@
             size="small"
             kind="tertiary"
             iconDescription="Add a new key-value pair"
-            on:click={() => {changed = true; storedGlobalChanged.set(true); value = [...value, [newkey, newvalue]]; newkey = null; newvalue = null} }
+            on:click={addItem}
         />
         {:else}
         <Button
