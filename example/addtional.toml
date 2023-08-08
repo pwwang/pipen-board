@@ -1,7 +1,7 @@
-[PIPELINE_OPTIONS.plugin_opts.value.report_no_collapse_pgs]
-desc = "Proc groups that are not collapsed in report index page. "
-type = "auto"
-value = false
+# [PIPELINE_OPTIONS.plugin_opts.value.report_no_collapse_pgs]
+# desc = "Proc groups that are not collapsed in report index page. "
+# type = "auto"
+# value = false
 
 [ADDITIONAL_OPTIONS.bool_opt]
 desc = "A boolean option"

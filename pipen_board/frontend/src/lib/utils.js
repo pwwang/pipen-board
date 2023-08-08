@@ -228,7 +228,7 @@ function finalizeConfig(schema) {
                 for (const [key, val] of Object.entries(proc_conf[option] || {})) {
                     if (_equal(val, config[option][key])) { delete proc_conf[option][key]; }
                 }
-                if (Object.keys(proc_conf[option]).length === 0) { delete proc_conf[option]; }
+                if (proc_conf[option] && Object.keys(proc_conf[option]).length === 0) { delete proc_conf[option]; }
             }
         }
         if (Object.keys(proc_conf).length > 0) {
@@ -263,7 +263,7 @@ function finalizeConfig(schema) {
                     for (const [key, val] of Object.entries(proc_conf[option] || {})) {
                         if (_equal(val, config[option][key])) { delete proc_conf[option][key]; }
                     }
-                    if (Object.keys(proc_conf[option]).length === 0) { delete proc_conf[option]; }
+                    if (proc_conf[option] && Object.keys(proc_conf[option]).length === 0) { delete proc_conf[option]; }
                 }
             }
             if (Object.keys(proc_conf).length > 0) config[proc] = proc_conf;
