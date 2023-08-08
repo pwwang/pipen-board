@@ -142,7 +142,7 @@
         if (toastNotify.kind !== "error") {
             if (d.ok) {
                 toastNotify = { kind: "success", subtitle: "Run stopped successfully.", timeout: 5000 };
-                finished = true;
+                finished = "error";
                 statusPercent = [statusPercent[0], statusPercent[1] + statusPercent[2], 0, statusPercent[3]];
                 // change the status of the processes and jobs in data
                 changeStatus("failed", "running");

@@ -12,6 +12,7 @@
     import ContinueFilled from "carbon-icons-svelte/lib/ContinueFilled.svelte";
     import SkipBack from "carbon-icons-svelte/lib/SkipBack.svelte";
     import CheckmarkOutline from "carbon-icons-svelte/lib/CheckmarkOutline.svelte";
+    import Warning from "carbon-icons-svelte/lib/Warning.svelte";
     import { storedGlobalChanged, presetConfig } from "./store";
 
     import { IS_DEV, getStatusPercentage, fetchAPI } from "./utils";
@@ -120,7 +121,9 @@
                 class="run-tab {runStarted && (statusPercent[2] > 0 || !finished) ? 'running' : ''}"
                 style="--n_succ: {statusPercent[0]}%; --n_fail: {statusPercent[1]}%; --n_run: {statusPercent[2]}%; --n_init: {statusPercent[3]}%"
             >
-                {#if runStarted && finished}
+                {#if runStarted && finished === "error"}
+                <Warning style="stroke: #ff001d" /><span class="runtab-title">Finished</span>
+                {:else if runStarted && finished}
                 <CheckmarkOutline /><span class="runtab-title">Finished</span>
                 {:else if runStarted && !finished}
                 <ContinueFilled /><span class="runtab-title">Running</span>

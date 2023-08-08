@@ -946,9 +946,12 @@ class DataManager:
             # In case it's too long to data between hooks
             await self.send_run_data(ws_clients.get("web"))
 
-        await p.wait()
-        # In case the pipeline fails to start
-        self._run_data["FINISHED"] = True
+        if await p.wait() != 0:
+            # In case the pipeline fails to start
+            self._run_data["FINISHED"] = "error"
+        else:
+            self._run_data["FINISHED"] = True
+
         self.running = False
         await self.send_run_data(ws_clients.get("web"), force=True)
 
@@ -1006,7 +1009,7 @@ class DataManager:
                 pass
 
         self.running = False
-        self._run_data["FINISHED"] = True
+        self._run_data["FINISHED"] = "error"
         return {"ok": True, "msg": "Pipeline killed"}
 
 
