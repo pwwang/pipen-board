@@ -133,42 +133,42 @@
         a.remove();
     };
 
-    const openSchemaFile = () => {
-        const input = document.getElementById("schema_file");
-        // @ts-ignore
-        input.value = "";
-        input.click();
-    };
+    // const openSchemaFile = () => {
+    //     const input = document.getElementById("schema_file");
+    //     // @ts-ignore
+    //     input.value = "";
+    //     input.click();
+    // };
 
-    const loadSchemaFile = async (e) => {
-        uploading = true;
-        const target = e.target;
-        if (target.files.length === 0) {
-            uploading = false;
-            return;
-        }
-        // Upload the file and come back with the new history item with
-        // the name in the file and current working directory
-        const formData = new FormData();
-        formData.append("schema_file", target.files[0]);
-        let resp;
-        try {
-            resp = await fetchAPI("/api/history/upload", {
-                method: "POST",
-                body: formData,
-            });
-            if (resp.error) {
-                throw new Error(resp.error);
-            }
-        } catch (e) {
-            error = `<strong>Failed to upload the schema file:</strong> <br /><br /><pre>${e}</pre>`;
-        } finally {
-            uploading = false;
-        }
-        if (!error) {
-            histories = [...histories, resp];
-        }
-    };
+    // const loadSchemaFile = async (e) => {
+    //     uploading = true;
+    //     const target = e.target;
+    //     if (target.files.length === 0) {
+    //         uploading = false;
+    //         return;
+    //     }
+    //     // Upload the file and come back with the new history item with
+    //     // the name in the file and current working directory
+    //     const formData = new FormData();
+    //     formData.append("schema_file", target.files[0]);
+    //     let resp;
+    //     try {
+    //         resp = await fetchAPI("/api/history/upload", {
+    //             method: "POST",
+    //             body: formData,
+    //         });
+    //         if (resp.error) {
+    //             throw new Error(resp.error);
+    //         }
+    //     } catch (e) {
+    //         error = `<strong>Failed to upload the schema file:</strong> <br /><br /><pre>${e}</pre>`;
+    //     } finally {
+    //         uploading = false;
+    //     }
+    //     if (!error) {
+    //         histories = [...histories, resp];
+    //     }
+    // };
 
     const loadFromURL = async (event) => {
         // if key is Enter, try upload
@@ -189,9 +189,7 @@
         try {
             resp = await fetchAPI("/api/history/fromurl", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ url }),
             });
             if (resp.error) {
@@ -202,16 +200,18 @@
         } finally {
             uploading = false;
         }
+
         if (!error) {
-            histories = [...histories, resp];
-            event.target.value = "";
+            // histories = [...histories, resp];
+            // event.target.value = "";
+            loadFromTOML(resp.content);
         }
     };
 
-    const loadFromTOML = () => {
+    const loadFromTOML = (t) => {
         let parsed;
         try {
-            parsed = itoml.parse(tomlToLoadFrom);
+            parsed = itoml.parse(t || tomlToLoadFrom);
         } catch (err) {
             error = "Failed to parse the TOML:\n\n" + err;
             return
@@ -304,18 +304,8 @@
             icon={LetterTt}
             iconDescription="Load From Generated TOML"
             on:click={() => {showLoadFromTOMLModal = true}}>From Generated TOML</Button> /
-        <Button
-            kind="secondary"
-            icon={DocumentDownload}
-            iconDescription="Load From a Schema File"
-            on:click={openSchemaFile}
-            disabled={uploading}
-            size="small">
-            From Schema File ...
-        </Button> /
-        <TextInput on:keyup={loadFromURL} placeholder="Load Schema File from a URL (Enter to confirm)" light hideLabel  /> /
+        <TextInput on:keyup={loadFromURL} placeholder="Load TOML File from a URL (Enter to confirm)" light hideLabel  /> /
         <span>Or load saved configuration:</span>
-        <input type="file" id="schema_file" on:change={loadSchemaFile} style="display: none;" />
     </div>
 
     <div class="pipen-history">

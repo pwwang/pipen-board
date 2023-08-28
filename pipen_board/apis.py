@@ -221,68 +221,49 @@ async def history_download():
     )
 
 
-async def history_upload():
-    # get form data
-    form = await request.files
-    # load as json
-    jdata = json.load(form["schema_file"])
-    name = jdata[SECTION_PIPELINE_OPTIONS]["name"]["value"]
-    logger.info(
-        "[bold][yellow]API[/yellow][/bold] Receiving schema file with name: %s",
-        name,
-    )
-    workdir = Path(request.cli_args.workdir).resolve().as_posix()
-    enc = base64.b64encode(workdir.encode()).decode().rstrip("=")
-    schema_file = PIPEN_BOARD_DIR.joinpath(
-        f"{slugify(request.cli_args.pipeline)}.{name}.{enc}.json"
-    )
-    if schema_file.is_file():
-        return {"ok": False, "error": "File already exists."}
+# async def history_upload():
+#     # get form data
+#     form = await request.files
+#     # load as json
+#     jdata = json.load(form["schema_file"])
+#     name = jdata[SECTION_PIPELINE_OPTIONS]["name"]["value"]
+#     logger.info(
+#         "[bold][yellow]API[/yellow][/bold] Receiving schema file with name: "
+#         f"{name}"
+#     )
+#     workdir = Path(request.cli_args.workdir).resolve().as_posix()
+#     enc = base64.b64encode(workdir.encode()).decode().rstrip("=")
+#     schema_file = PIPEN_BOARD_DIR.joinpath(
+#         f"{slugify(request.cli_args.pipeline)}.{name}.{enc}.json"
+#     )
+#     if schema_file.is_file():
+#         return {"ok": False, "error": "File already exists."}
 
-    schema_file.write_text(json.dumps(jdata, indent=4))
-    return {
-        "name": name,
-        "mtime": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "ctime": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "workdir": workdir,
-        "is_current": True,
-        "configfile": schema_file.name,
-    }
+#     schema_file.write_text(json.dumps(jdata, indent=4))
+#     return {
+#         "name": name,
+#         "mtime": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+#         "ctime": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+#         "workdir": workdir,
+#         "is_current": True,
+#         "configfile": schema_file.name,
+#     }
 
 
 async def history_fromurl():
     # get form data
     url = (await request.get_json())["url"]
     logger.info(
-        "[bold][yellow]API[/yellow][/bold] Receiving schema file from url: %s",
+        "[bold][yellow]API[/yellow][/bold] Receiving TOML file from url: %s",
         url,
     )
     try:
         import urllib.request
         with urllib.request.urlopen(url) as response:
-            jdata = json.loads(response.read().decode())
+            return {"ok": True, "content": response.read().decode()}
 
-        name = jdata[SECTION_PIPELINE_OPTIONS]["name"]["value"]
-        workdir = Path(request.cli_args.workdir).resolve().as_posix()
-        enc = base64.b64encode(workdir.encode()).decode().rstrip("=")
-        schema_file = PIPEN_BOARD_DIR.joinpath(
-            f"{slugify(request.cli_args.pipeline)}.{name}.{enc}.json"
-        )
-        if schema_file.is_file():
-            return {"ok": False, "error": "File already exists."}
-
-        schema_file.write_text(json.dumps(jdata, indent=4))
     except Exception as exc:
         return {"ok": False, "error": str(exc)}
-
-    return {
-        "name": name,
-        "mtime": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "ctime": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "workdir": workdir,
-        "is_current": True,
-        "configfile": schema_file.name,
-    }
 
 
 async def config_save():
@@ -518,7 +499,7 @@ POSTS = {
     "/api/history/del": history_del,
     "/api/history/saveas": history_saveas,
     "/api/history/download": history_download,
-    "/api/history/upload": history_upload,
+    # "/api/history/upload": history_upload,
     "/api/history/fromurl": history_fromurl,
     "/api/config/save": config_save,
     "/api/job/get_tree": job_get_tree,
