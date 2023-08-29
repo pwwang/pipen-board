@@ -204,11 +204,11 @@
         if (!error) {
             // histories = [...histories, resp];
             // event.target.value = "";
-            loadFromTOML(resp.content);
+            loadFromTOML(null, resp.content);
         }
     };
 
-    const loadFromTOML = (t) => {
+    const loadFromTOML = (e, t) => {
         let parsed;
         try {
             parsed = itoml.parse(t || tomlToLoadFrom);
