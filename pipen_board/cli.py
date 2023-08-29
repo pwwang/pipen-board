@@ -77,6 +77,14 @@ class PipenCliBoardPlugin(CLIPlugin):
             default=".pipen",
         )
         subparser.add_argument(
+            "-s",
+            "--schema-dir",
+            dest="schema_dir",
+            help="The directory to store the configuration schemas.",
+            default="~/.pipen-board",
+            type="path",
+        )
+        subparser.add_argument(
             "pipeline",
             help=(
                 "The pipeline and the CLI arguments to run the pipeline. "
@@ -94,7 +102,7 @@ class PipenCliBoardPlugin(CLIPlugin):
         # the second part is the args for the pipeline
         args = sys.argv[1:]
         idx = args.index("--") if "--" in args else len(args)
-        args, rest = args[:idx], args[idx + 1 :]
+        args, rest = args[:idx], args[idx + 1:]
         parsed = self.parser.parse_args(args=args)
         parsed.pipeline_args = rest
         return parsed
@@ -107,9 +115,9 @@ class PipenCliBoardPlugin(CLIPlugin):
             logger.setLevel(args.loglevel.upper())
 
         print(" * ")
-        print(" *        __   __  __         __  __      __  __")
-        print(" *       |__)||__)|_ |\ | __ |__)/  \ /\ |__)|  \\")
-        print(" *       |   ||   |__| \|    |__)\__//--\| \ |__/")
+        print(" *        __   __  __.  .     __  __   +  __  __")
+        print(" *       |__)||__)|_ |\\ | __ |__)/  \\ /\\ |__)|  \\")
+        print(" *       |   ||   |__| \\|    |__)\\__//--\\| \\ |__/")
         print(" * ")
         print(" *                   version: %s" % __version__)
         print(" * ")

@@ -11,12 +11,7 @@ from quart import abort, request, redirect, send_file
 from slugify import slugify
 
 from .version import __version__
-from .defaults import (
-    JOB_STATUS,
-    PIPEN_BOARD_DIR,
-    SECTION_PIPELINE_OPTIONS,
-    logger,
-)
+from .defaults import JOB_STATUS, SECTION_PIPELINE_OPTIONS, logger
 from .data_manager import data_manager
 
 
@@ -74,7 +69,9 @@ async def history():
     out["histories"] = []
     curr_workdir = Path(args.workdir).resolve()
 
-    for histfile in PIPEN_BOARD_DIR.glob(f"{slugify(args.pipeline)}.*.*.json"):
+    for histfile in args.schema_dir.expanduser().glob(
+        f"{slugify(args.pipeline)}.*.*.json"
+    ):
         name = histfile.stem.split(".")[-2]
         workdir = base64.b64decode(
             histfile.stem.split(".")[-1] + "=="
@@ -152,12 +149,13 @@ async def report_building_log():
 
 
 async def history_del():
+    args = request.cli_args
     configfile = (await request.get_json())["configfile"]
     logger.info(
         "[bold][yellow]API[/yellow][/bold] Deleting history: %s",
         configfile,
     )
-    PIPEN_BOARD_DIR.joinpath(configfile).unlink()
+    args.schema_dir.expanduser().joinpath(configfile).unlink()
     return {"ok": True}
 
 
@@ -166,6 +164,9 @@ async def history_saveas():
     args = request.cli_args
     configfile = req["configfile"]
     newname = req["new_name"]
+    schema_dir = args.schema_dir.expanduser()
+    if not schema_dir.is_dir():
+        schema_dir.mkdir(parents=True, exist_ok=True)
 
     logger.info(
         "[bold][yellow]API[/yellow][/bold] Save history: %s with new name: %s",
@@ -173,7 +174,7 @@ async def history_saveas():
         newname,
     )
     try:
-        jdata = json.loads(PIPEN_BOARD_DIR.joinpath(configfile).read_text())
+        jdata = json.loads(schema_dir.joinpath(configfile).read_text())
         jdata[SECTION_PIPELINE_OPTIONS]["name"]["value"] = newname
 
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -186,7 +187,7 @@ async def history_saveas():
             "workdir": workdir,
         }
         enc = base64.b64encode(workdir.encode()).decode().rstrip("=")
-        newconfigfile = PIPEN_BOARD_DIR.joinpath(
+        newconfigfile = schema_dir.joinpath(
             f"{slugify(args.pipeline)}.{newname}.{enc}.json"
         )
 
@@ -215,10 +216,8 @@ async def history_download():
         "[bold][yellow]API[/yellow][/bold] Downloading schema: %s",
         configfile,
     )
-    return await send_file(
-        PIPEN_BOARD_DIR.joinpath(configfile),
-        as_attachment=True,
-    )
+    schema_dir = request.cli_args.schema_dir.expanduser()
+    return await send_file(schema_dir.joinpath(configfile), as_attachment=True)
 
 
 # async def history_upload():
@@ -272,6 +271,9 @@ async def config_save():
     configfile = data.get("configfile")
     configdata = data["data"]
     jdata = json.loads(configdata)
+    schema_dir = args.schema_dir.expanduser()
+    if not schema_dir.is_dir():
+        schema_dir.mkdir(parents=True, exist_ok=True)
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     name = jdata[SECTION_PIPELINE_OPTIONS]["name"]["value"]
@@ -280,7 +282,7 @@ async def config_save():
     enc = base64.b64encode(workdir.encode()).decode().rstrip("=")
     if not configfile:
         # base64 encode the workdir path
-        configfile = PIPEN_BOARD_DIR.joinpath(
+        configfile = schema_dir.joinpath(
             f"{slugify(args.pipeline)}.{name}.{enc}.json"
         )
         for val in jdata.get("RUNNING_OPTIONS", {}).values():
@@ -311,7 +313,7 @@ async def config_save():
                 ]["placeholder"] = f"{name}.config.toml"
 
         configdata = json.dumps(jdata, indent=4)
-        configfile = PIPEN_BOARD_DIR.joinpath(
+        configfile = schema_dir.joinpath(
             f"{slugify(args.pipeline)}.{name}.{enc}.json"
         )
         if configfile.exists():
@@ -326,7 +328,7 @@ async def config_save():
             f"{configfile}"
         )
     else:
-        configfile = PIPEN_BOARD_DIR.joinpath(configfile)
+        configfile = schema_dir.joinpath(configfile)
         logger.info(
             f"[bold][yellow]API[/yellow][/bold] Saving config to: {configfile}"
         )

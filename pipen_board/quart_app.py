@@ -119,7 +119,7 @@ def get_app(args: Namespace):
     @app.route("/api/pipeline/rerun", methods=["POST"])
     async def rerun():
         logger.info(
-            f"[bold][yellow]API[/yellow][/bold] Re-Running pipeline: %s",
+            "[bold][yellow]API[/yellow][/bold] Re-Running pipeline: %s",
             data_manager._command,
         )
 

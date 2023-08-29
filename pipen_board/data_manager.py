@@ -25,7 +25,6 @@ from pipen.utils import get_marked
 from pipen_annotate import annotate
 
 from .defaults import (
-    PIPEN_BOARD_DIR,
     SECTION_PIPELINE_OPTIONS,
     SECTION_ADDITIONAL_OPTIONS,
     SECTION_PROCESSES,
@@ -373,7 +372,9 @@ async def _get_config_data(
     try:
         old_argv = sys.argv
         sys.argv = ["@pipen-board"] + args.pipeline_args
-        logger.info("[bold][yellow]DBG[/yellow][/bold] Fetching pipeline data ...")
+        logger.info(
+            "[bold][yellow]DBG[/yellow][/bold] Fetching pipeline data ..."
+        )
         try:
             pipeline = parse_pipeline(args.pipeline)
             # Initialize the pipeline so that the arguments definied by
@@ -405,7 +406,8 @@ async def _get_config_data(
             "type": "str",
             "value": pipeline.desc,
             "desc": (
-                "The description of the pipeline, " "shows in the log and report."
+                "The description of the pipeline, "
+                "shows in the log and report."
             ),
         }
         data[SECTION_PIPELINE_OPTIONS]["outdir"] = {
@@ -460,7 +462,10 @@ async def _get_config_data(
                     # for arg, arginfo in pg_args.items():
                     #     arginfo["value"] = pg.DEFAULTS.get(arg)
                     pg_sec[pg.name]["ARGUMENTS"] = pg_args
-                pg_sec[pg.name][SECTION_PROCESSES][proc.name] = _proc_to_argspec(
+
+                pg_sec[pg.name][SECTION_PROCESSES][
+                    proc.name
+                ] = _proc_to_argspec(
                     proc,
                     proc in pipeline.starts,
                     get_marked(proc, "board_config_hidden", False),
@@ -499,7 +504,7 @@ async def _get_config_data(
             )
             _update_dict(data, addi_data)
 
-    except Exception as e:
+    except Exception:
         import traceback
         return {"error": traceback.format_exc()}
 
@@ -532,7 +537,7 @@ class DataManager:
             configfile: The name to the config file
         """
         if configfile and not configfile.startswith("new:") and not args.dev:
-            with PIPEN_BOARD_DIR.joinpath(configfile).open() as f:
+            with args.schema_dir.expanduser().joinpath(configfile).open() as f:
                 self._config_data = json.load(f)
                 return
 
@@ -543,7 +548,7 @@ class DataManager:
             name = configfile[4:]
         else:
             self._config_data = json.loads(
-                PIPEN_BOARD_DIR.joinpath(configfile).read_text()
+                args.schema_dir.expanduser().joinpath(configfile).read_text()
             )
             name = self._config_data[SECTION_PIPELINE_OPTIONS]["name"]["value"]
 
@@ -677,7 +682,7 @@ class DataManager:
                     update_value(k, v, preset_val[key])
                 for k, v in preset_val[key].items():
                     if k not in value["value"]:
-                        value["value"][k] = {"value" : v}
+                        value["value"][k] = {"value": v}
             else:
                 value["value"] = preset_val[key]
                 if value.get("pgarg"):
@@ -689,11 +694,15 @@ class DataManager:
                 update_value(key, val, preset, force_ns=key.endswith("_opts"))
 
         if SECTION_ADDITIONAL_OPTIONS in self._config_data:
-            for key, val in self._config_data[SECTION_ADDITIONAL_OPTIONS].items():
+            for key, val in self._config_data[
+                SECTION_ADDITIONAL_OPTIONS
+            ].items():
                 update_value(key, val, preset)
 
         if SECTION_PROCESSES in self._config_data:
-            for proc, procconfig in self._config_data[SECTION_PROCESSES].items():
+            for proc, procconfig in self._config_data[
+                SECTION_PROCESSES
+            ].items():
                 for key, val in procconfig["value"].items():
                     update_value(
                         key, val, preset.get(proc), force_ns=key == "envs"
@@ -713,7 +722,6 @@ class DataManager:
                                 preset.get(proc),
                                 force_ns=key == "envs"
                             )
-
 
     def clear_run_data(self, keep_log: bool = False):
         """Clear the data"""

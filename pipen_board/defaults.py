@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-from pathlib import Path
 from typing import Awaitable, Callable, Coroutine
 
 from rich.logging import RichHandler
@@ -70,10 +69,6 @@ class Quart(_Quart):
 
         return serve(self, config, shutdown_trigger=shutdown_trigger)
 
-
-# Cached/saved pipeline data
-PIPEN_BOARD_DIR = Path("~/.pipen-board").expanduser()
-PIPEN_BOARD_DIR.mkdir(parents=True, exist_ok=True)
 
 SECTION_PIPELINE_OPTIONS = "PIPELINE_OPTIONS"
 SECTION_ADDITIONAL_OPTIONS = "ADDITIONAL_OPTIONS"
