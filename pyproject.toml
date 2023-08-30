@@ -15,7 +15,7 @@ python = "^3.8"
 quart = "^0.18"
 pipen-args = "^0.10.0"
 websocket-client = "^1.5"
-pipen-log2file = "^0.3.0"
+pipen-log2file = "^0.3.4"
 psutil = "^5.9.5"
 pipen-report = { version = "^0.12.6", optional = true }
 pipen-diagram = { version = "^0.7", optional = true }

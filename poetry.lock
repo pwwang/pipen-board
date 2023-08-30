@@ -845,13 +845,13 @@ pipen = ">=0.10,<0.11"
 
 [[package]]
 name = "pipen-log2file"
-version = "0.3.3"
+version = "0.3.4"
 description = "Add verbosal information in logs for pipen."
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "pipen_log2file-0.3.3-py3-none-any.whl", hash = "sha256:684f735741168b8522c83a2a67ce845fc91ca132dc634834f3fa3b9511416246"},
-    {file = "pipen_log2file-0.3.3.tar.gz", hash = "sha256:895d72e4bef1c8902c529a7a669f45f9ccbc605f515d659513138edeb3f994ac"},
+    {file = "pipen_log2file-0.3.4-py3-none-any.whl", hash = "sha256:05eabfcf4f0ca6c99019017455bac851a6433a0f8d2af0872ed282e5ab81f4fb"},
+    {file = "pipen_log2file-0.3.4.tar.gz", hash = "sha256:93fb76f94e28b1b57f95f04593af637ac4332b5a8a237ce7cf01d80a250bfc0e"},
 ]
 
 [package.dependencies]
@@ -1526,4 +1526,4 @@ report = ["pipen-report"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "1ff380f00bb05f96b15fc51d8786568277a923de5c66124b7319ce624bac411d"
+content-hash = "2ff5f16c1a564026c278cca0ea64cf124e06f1b1bb2f88481b55e03ececb4ae8"
