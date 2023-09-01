@@ -201,7 +201,7 @@
 </div>
 {/if}
 <div class="run-container">
-    <aside class="run-nav">
+    <aside class="run-nav {runStarted > 0 ? '' : 'prev'}">
 
         {#if data[SECTION_LOG] !== null}
             <NavItem text="Log" noerror bind:activeNavItem />
@@ -351,6 +351,9 @@
         padding: 2rem 0;
         background-color: #f4f4f4;
         overflow: auto;
+    }
+    aside.run-nav:not(.prev) {
+        padding: 2rem 0 4rem 0;
     }
     main {
         grid-area: main;
