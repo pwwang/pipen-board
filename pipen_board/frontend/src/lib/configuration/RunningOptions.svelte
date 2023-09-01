@@ -7,7 +7,6 @@
     import Button from "carbon-components-svelte/src/Button/Button.svelte";
     import TextArea from "carbon-components-svelte/src/TextArea/TextArea.svelte";
     import ToastNotification from "carbon-components-svelte/src/Notification/ToastNotification.svelte";
-    import Checkbox from "carbon-components-svelte/src/Checkbox/Checkbox.svelte";
     import TooltipDefinition from "carbon-components-svelte/src/TooltipDefinition/TooltipDefinition.svelte";
     import Modal from "carbon-components-svelte/src/Modal/Modal.svelte";
     import ChevronUp from "carbon-icons-svelte/lib/ChevronUp.svelte";
@@ -178,7 +177,6 @@
             bind:value={generatedCommand}
             on:input={e => autoHeight(e.target)} />
         <div class="running-action-wrapper">
-            <Button size="small" kind="secondary" icon={Copy} on:click={()=>{ copy(generatedCommand); }} iconDescription="Copy the command" />
             {#if data.allow_run}
             <TooltipDefinition
                 direction="bottom"
@@ -186,15 +184,29 @@
                 tooltipText="Save the configurations to {tomlfile} and run the generated command.">
                 <Button
                     size="small"
+                    kind="primary"
+                    icon={ContinueFilled}
+                    disabled={submitting || generatedCommand === ""}
+                    iconDescription="Run the Command"
+                    on:click={() => {overwriteConfig = false; runCommandConfirm()}}>
+                    Run
+                </Button>
+            </TooltipDefinition>
+            <TooltipDefinition
+                direction="bottom"
+                align="center"
+                tooltipText="Save the configurations to {tomlfile} (overwrite if exists) and run the generated command.">
+                <Button
+                    size="small"
                     kind="tertiary"
                     icon={ContinueFilled}
                     disabled={submitting || generatedCommand === ""}
                     iconDescription="Run the Command"
-                    on:click={runCommandConfirm}>
-                    Run the Command
+                    on:click={() => {overwriteConfig = true; runCommandConfirm()}}>
+                    Overwrite and Run
                 </Button>
             </TooltipDefinition>
-            <Checkbox bind:checked={overwriteConfig} labelText="Overwrite {tomlfile}" />
+            <Button size="small" kind="secondary" icon={Copy} on:click={()=>{ copy(generatedCommand); }} iconDescription="Copy the command" />
             {/if}
         </div>
 
