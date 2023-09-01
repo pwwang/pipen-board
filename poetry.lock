@@ -844,6 +844,20 @@ graphviz = ">=0.20,<0.21"
 pipen = ">=0.10,<0.11"
 
 [[package]]
+name = "pipen-filters"
+version = "0.8.0"
+description = "Add a set of useful filters for pipen templates"
+optional = true
+python-versions = ">=3.8,<4.0"
+files = [
+    {file = "pipen_filters-0.8.0-py3-none-any.whl", hash = "sha256:84c9590d7b4a5c0abaa6457339aed9936531577528007f431955f73294e68b21"},
+    {file = "pipen_filters-0.8.0.tar.gz", hash = "sha256:671a707e1d4beaea199ba0f3acf1cca988315b8e1b1679fe20f563aa337b170e"},
+]
+
+[package.dependencies]
+pipen = ">=0.10,<0.11"
+
+[[package]]
 name = "pipen-log2file"
 version = "0.3.4"
 description = "Add verbosal information in logs for pipen."
@@ -1521,9 +1535,10 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 
 [extras]
 diagram = ["pipen-diagram"]
+filters = ["pipen-filters"]
 report = ["pipen-report"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "2ff5f16c1a564026c278cca0ea64cf124e06f1b1bb2f88481b55e03ececb4ae8"
+content-hash = "e651704058cce085aec699aa431576553707f3e9a5b15ad94ecf3b7f2906b94e"

@@ -1,7 +1,7 @@
 WORKSPACE="/workspace"
 
 # Install python dependencies
-poetry update && poetry install -E report -E diagram
+poetry update && poetry install -E report -E diagram -E filters
 
 # Install frontend dependencies for pipen-report
 pipen report update
