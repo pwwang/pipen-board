@@ -522,7 +522,6 @@ class DataManager:
         self._config_data = None
         self._run_data = None
         self._timer = None
-        self._proc_running_order = 0
         self._command = None
 
     def _get_config_data(
@@ -725,7 +724,6 @@ class DataManager:
 
     def clear_run_data(self, keep_log: bool = False):
         """Clear the data"""
-        self._proc_running_order = 0
         if not keep_log:
             self._run_data = deepcopy(DEFAULT_RUN_DATA)
         else:
@@ -776,7 +774,6 @@ class DataManager:
         self._timer = time.time()
 
     async def on_start(self, data, ws):
-        self._proc_running_order = 0
         # { SECTION_PROCESSES: [p1, p2], SECTION_PROCGROUPS: {pg1: [p3, p4]} }
         if isinstance(data, str):
             data = json.loads(data)
@@ -787,9 +784,9 @@ class DataManager:
             self._run_data[SECTION_DIAGRAM] = data[SECTION_DIAGRAM]
 
         if SECTION_PROCESSES in data:
-            for proc in data[SECTION_PROCESSES]:
+            for i, proc in enumerate(data[SECTION_PROCESSES]):
                 self._run_data[SECTION_PROCESSES][proc] = {
-                    "order": 0,
+                    "order": i,
                     "status": "init",
                     "jobs": [],
                 }
@@ -797,8 +794,9 @@ class DataManager:
         if SECTION_PROCGROUPS in data:
             for pg in data[SECTION_PROCGROUPS]:
                 self._run_data[SECTION_PROCGROUPS][pg] = {}
-                for proc in data[SECTION_PROCGROUPS][pg]:
+                for i, proc in enumerate(data[SECTION_PROCGROUPS][pg]):
                     self._run_data[SECTION_PROCGROUPS][pg][proc] = {
+                        "order": i,
                         "status": "init",
                         "jobs": [],
                     }
@@ -821,7 +819,6 @@ class DataManager:
         self.running = False
         self._run_data["FINISHED"] = True
         await self.send_run_data(ws, force=True)
-        self._proc_running_order = 0
 
     async def on_proc_start(self, data, ws):
         if isinstance(data, str):
@@ -836,15 +833,9 @@ class DataManager:
         )
 
         if not group:
-            self._run_data[SECTION_PROCESSES][proc][
-                "order"
-            ] = self._proc_running_order
             self._run_data[SECTION_PROCESSES][proc]["status"] = "running"
             self._run_data[SECTION_PROCESSES][proc]["jobs"] = ["init"] * njobs
         else:
-            self._run_data[SECTION_PROCGROUPS][group][proc][
-                "order"
-            ] = self._proc_running_order
             self._run_data[SECTION_PROCGROUPS][group][proc][
                 "status"
             ] = "running"
@@ -852,7 +843,6 @@ class DataManager:
                 "init"
             ] * njobs
 
-        self._proc_running_order += 1
         await self.send_run_data(ws, force=True)
 
     async def on_proc_done(self, data, ws):
