@@ -11,6 +11,7 @@
     import Modal from "carbon-components-svelte/src/Modal/Modal.svelte";
     import ChevronUp from "carbon-icons-svelte/lib/ChevronUp.svelte";
     import ChevronDown from "carbon-icons-svelte/lib/ChevronDown.svelte";
+    import PlayFilledAlt from "carbon-icons-svelte/lib/PlayFilledAlt.svelte";
     import ContinueFilled from "carbon-icons-svelte/lib/ContinueFilled.svelte";
     import Option from "./options/Option.svelte";
     import { hasHidden, getKeysHidden, getKeysUnhidden, autoHeight, finalizeConfig, fetchAPI } from "../utils";
@@ -185,7 +186,7 @@
                 <Button
                     size="small"
                     kind="primary"
-                    icon={ContinueFilled}
+                    icon={PlayFilledAlt}
                     disabled={submitting || generatedCommand === ""}
                     iconDescription="Run the Command"
                     on:click={() => {overwriteConfig = false; runCommandConfirm()}}>
