@@ -18,8 +18,8 @@ export default defineConfig({
   plugins: [
     svelte({
       onwarn: (warning, handler) => {
-        if (warning.code === "a11y-interactive-supports-focus") return
-        handler(warning)
+        if (warning.code === "a11y-interactive-supports-focus") return;
+        handler(warning);
       }
     }),
     nodePolyfills(),

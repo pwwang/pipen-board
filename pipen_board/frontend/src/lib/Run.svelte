@@ -309,8 +309,12 @@
                 >
                     <p>Select an item from the navigation menu on the left to view its details.</p>
                     <p style="flex-basis: 100%;">&nbsp;</p>
-                    <p>Note that the information may be incomplete for the previous run if it was failed, since the information was gather from the working directory instead of the pipeline (<code>Pipen</code>) object.</p>
-                    <p>There may be also extra processes or process groups that are not in the pipeline by current configuration, but were run in the previous run with a different configuration.</p>
+                    <p><strong>Note:</strong></p>
+                    <ul class="notif-ul">
+                    <li>The information may be incomplete for the previous run if it failed, since the information was gather from the working directory instead of the pipeline (<code>Pipen</code>) object.</li>
+                    <li>There may be also extra processes or process groups that are not in the pipeline by current configuration, but were run in the previous run with a different configuration.</li>
+                    <li>The processes listed in the left sidebar is in alphabetic order.</li>
+                    </ul>
                 </InlineNotification>
             </div>
         {/if}
@@ -397,5 +401,14 @@
     div.reports-wrapper-layout > :global(div.run-log > div.run-log__code) {
         height: 100%;
         overflow: auto;
+    }
+    ul.notif-ul {
+        list-style-position: outside;
+        list-style-type: circle;
+        margin-left: 1.2rem;
+    }
+    ul.notif-ul > li {
+        line-height: 1rem;
+        margin: 0.4rem 0;
     }
 </style>
