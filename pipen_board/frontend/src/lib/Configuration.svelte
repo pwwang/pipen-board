@@ -1,8 +1,11 @@
 <script>
     // Used by Layout.svelte
+    import { onMount } from "svelte";
+
     import * as itoml from "@iarna/toml";
     import Button from "carbon-components-svelte/src/Button/Button.svelte";
     import Link from "carbon-components-svelte/src/Link/Link.svelte";
+    import Loading from "carbon-components-svelte/src/Loading/Loading.svelte";
     import Modal from "carbon-components-svelte/src/Modal/Modal.svelte";
     import CodeSnippet from "carbon-components-svelte/src/CodeSnippet/CodeSnippet.svelte";
     import ToastNotification from "carbon-components-svelte/src/Notification/ToastNotification.svelte";
@@ -45,13 +48,13 @@
     // When mouse leave the description area, shall we blur the description?
     // so that it can be replaced by the description of the active input
     let allowDescBlur = true;
+    let isNewConfig = false;
 
     descFocused.subscribe(v => {
         if (!v) {
             allowDescBlur = true;
         }
     });
-
 
     let toastNotify = { kind: undefined, subtitle: undefined, timeout: 3000 };
 
@@ -100,8 +103,8 @@
         toml = itoml.stringify(finalizeConfig(data));
     };
 
-    const saveConfig = async function (saveas = false) {
-        if (!$storedGlobalChanged && !saveas) {
+    const saveConfig = async function (saveas = false, anyway = false) {
+        if (!anyway && !$storedGlobalChanged && !saveas) {
             return;
         }
         if (Object.keys($storedErrors).length > 0) {
@@ -150,6 +153,7 @@
                 throw new Error(saved.error);
             }
         } catch (error) {
+            isNewConfig = false;
             toastNotify.kind = "error";
             toastNotify.subtitle = `Failed to save: ${error}`;
         } finally {
@@ -207,11 +211,25 @@
         parts.splice(-2, 1, shortened);
         return parts.join(".");
     };
+
+    onMount(async () => {
+        if (configfile && configfile.startsWith("new:")) {
+            isNewConfig = true;
+            await saveConfig(false, true);
+        }
+    })
 </script>
 
 <svelte:window
     on:mouseup={handleDragEnd}
     on:mousemove={handleDrag} />
+
+{#if isNewConfig}
+<Loading
+    class="pipen-cli-config-loading"
+    style="--content: 'Saving new configuration ...\A'"
+    description="Saving new configuration ..." />
+{/if}
 
 <Modal passiveModal bind:open={tomlShow} modalHeading="TOML Configuration" preventCloseOnClickOutside>
     <div class="snippet-wrapper">
