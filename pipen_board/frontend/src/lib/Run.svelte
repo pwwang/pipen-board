@@ -201,10 +201,9 @@
 </div>
 {/if}
 <div class="run-container">
-    <aside class="run-nav {runStarted > 0 ? '' : 'prev'}">
-
+    <aside class="run-nav {finished === 'error' ? 'errored' : ''} {runStarted > 0 ? '' : 'prev'}">
         {#if data[SECTION_LOG] !== null}
-            <NavItem text="Log" noerror bind:activeNavItem />
+            <NavItem text="Log" noerror class="log" bind:activeNavItem />
         {/if}
         {#if data[SECTION_DIAGRAM]}
             <NavItem text="Diagram" noerror bind:activeNavItem />
