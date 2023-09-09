@@ -355,7 +355,7 @@ button.run-status-init > span::after {
     margin-left: -.2rem;
 }
 
-button.run-status-running > span::after {
+aside:not(.errored) button.run-status-running > span::after {
     content: "⏳";
     padding-left: 5px;
     font-size: .8rem;
@@ -363,6 +363,15 @@ button.run-status-running > span::after {
     display: inline-block;
     animation: running-dot 1s cubic-bezier(0, 1.59, 1, -0.37) infinite;
     transform-origin: 60% 60%;
+}
+
+aside.errored button.run-status-running > span::after,
+aside.errored button.log > span::after {
+    content: "❗";
+    padding-left: 5px;
+    font-size: .8rem;
+    margin-left: -.2rem;
+    display: inline-block;
 }
 
 div.run-log .bx--snippet--multi {
@@ -385,7 +394,7 @@ div.pipen-tabs li.run-tab {
     );
 }
 
-div.pipen-tabs li.run-tab.running::after {
+div.pipen-tabs li:not(.errored).run-tab.running::after {
     content: "";
     display: inline-block;
     width: 12px;

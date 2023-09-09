@@ -118,7 +118,7 @@
         <Tabs style="border-bottom: 2px solid #e0e0e0" bind:selected={selectedTab}>
             <Tab><Settings />Configuration</Tab>
             <Tab
-                class="run-tab {runStarted && (statusPercent[2] > 0 || !finished) ? 'running' : ''}"
+                class="{finished === 'error' ? 'errored' : ''} run-tab {runStarted && (statusPercent[2] > 0 || !finished) ? 'running' : ''}"
                 style="--n_succ: {statusPercent[0]}%; --n_fail: {statusPercent[1]}%; --n_run: {statusPercent[2]}%; --n_init: {statusPercent[3]}%"
             >
                 {#if runStarted && finished === "error"}
