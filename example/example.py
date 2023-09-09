@@ -34,7 +34,6 @@ class P1(Proc):
     output = "outfile:file:{{in.invar}}.out"
     envs = {"number": None, "gene_qc": {"min_cells": 3}}
     script = "echo {{in.invar}} P1 > {{out.outfile}}"
-    plugin_opts = {"report": "{{x.y}}"}
 
 
 class MyGroup(ProcGroup):
