@@ -2,6 +2,8 @@
 
 Visualize configuration and running of [pipen][1] pipelines on the web.
 
+![pipen-board](https://pwwang.github.io/immunopipe/pipen-board.gif)
+
 ## Installation
 
 ```bash
