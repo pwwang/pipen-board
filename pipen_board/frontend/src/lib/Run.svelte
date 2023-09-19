@@ -165,14 +165,17 @@
         }
     }
 
+    $: faviconKey = runStarted > 0 && !finished;
+
 </script>
 
 <svelte:head>
-    {#if runStarted > 0 && !finished}
-        <link rel="icon" type="image/png" href="./assets/favicon-running.png" />
-    {:else}
-        <link rel="icon" type="image/png" href="./assets/favicon.png" />
-    {/if}
+    {#key faviconKey}
+        <link 
+            rel="icon" 
+            type="image/png" 
+            href="./assets/favicon{faviconKey ? '-running' : ''}.png" />
+    {/key}
 </svelte:head>
 
 {#if !data && fetching}
