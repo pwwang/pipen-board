@@ -355,7 +355,8 @@ button.run-status-init > span::after {
     margin-left: -.2rem;
 }
 
-aside:not(.errored) button.run-status-running > span::after {
+aside:not(.errored) button.run-status-running > span::after,
+aside.running:not(.errored) button.log > span::after {
     content: "⏳";
     padding-left: 5px;
     font-size: .8rem;

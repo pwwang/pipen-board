@@ -171,9 +171,9 @@
 
 <svelte:head>
     {#key faviconKey}
-        <link 
-            rel="icon" 
-            type="image/png" 
+        <link
+            rel="icon"
+            type="image/png"
             href="./assets/favicon{faviconKey ? '-running' : ''}.png" />
     {/key}
 </svelte:head>
@@ -204,7 +204,7 @@
 </div>
 {/if}
 <div class="run-container">
-    <aside class="run-nav {finished === 'error' ? 'errored' : ''} {runStarted > 0 ? '' : 'prev'}">
+    <aside class="run-nav {faviconKey ? 'running' : ''} {finished === 'error' ? 'errored' : ''} {runStarted > 0 ? '' : 'prev'}">
         {#if data[SECTION_LOG] !== null}
             <NavItem text="Log" noerror class="log" bind:activeNavItem />
         {/if}
