@@ -39,6 +39,11 @@ desc = "An auto option"
 value = {}
 type = "auto"
 
+[ADDITIONAL_OPTIONS.json_opt]
+desc = "An json option"
+value = {}
+type = "json"
+
 [ADDITIONAL_OPTIONS.ns_opt]
 desc = "A namespace option"
 type = "namespace"

@@ -7,6 +7,7 @@ from rich.logging import RichHandler
 from hypercorn.config import Config as HyperConfig
 from hypercorn.asyncio import serve
 from quart import Quart as _Quart
+from quart.json.provider import DefaultJSONProvider
 
 NAME = "board"
 
@@ -44,8 +45,14 @@ logger.addFilter(PluginNameLogFilter())
 logging.getLogger("asyncio").setLevel(logging.WARNING)
 
 
+class UnsortedJSONProvider(DefaultJSONProvider):
+    sort_keys = False
+
+
 # Subclass Quart to allow using logger
 class Quart(_Quart):
+    json_provider_class = UnsortedJSONProvider
+
     def run_task(
         self,
         host: str = "127.0.0.1",
