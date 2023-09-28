@@ -11,11 +11,12 @@
     import SaveModel from "carbon-icons-svelte/lib/SaveModel.svelte";
     import DocumentDownload from "carbon-icons-svelte/lib/DocumentDownload.svelte";
     import GroupObjectsNew from "carbon-icons-svelte/lib/GroupObjectsNew.svelte";
-    import Download from "carbon-icons-svelte/lib/Download.svelte";
+    // import Download from "carbon-icons-svelte/lib/Download.svelte";
     import LetterTt from "carbon-icons-svelte/lib/LetterTt.svelte";
+    import IbmSecureInfrastructureOnVpcForRegulatedIndustries from "carbon-icons-svelte/lib/IbmSecureInfrastructureOnVpcForRegulatedIndustries.svelte";
     import Header from "./Header.svelte";
     import { updateConfigfile, updateErrors, storedGlobalChanged, presetConfig } from "./store";
-    import { fetchAPI } from "./utils";
+    import { fetchAPI, finalizeConfig } from "./utils";
 
     // example.py:ExamplePipeline
     export let pipeline;
@@ -50,8 +51,8 @@
         }
     });
 
-    const history_del = async (i, configfile) => {
-        if (confirm("Are you sure to delete this history?\n\n" + configfile) === false) {
+    const history_del = async (i, configfile, confirming = true) => {
+        if (confirming && confirm("Are you sure to delete this history?\n\n" + configfile) === false) {
             deleting = undefined;
             return;
         }
@@ -59,9 +60,7 @@
         try {
             await fetchAPI("/api/history/del", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ configfile }),
             });
         } catch (e) {
@@ -111,63 +110,26 @@
         }
     };
 
-    const history_download = async (i, configfile) => {
-        let resp;
-        try {
-            resp = await fetchAPI("/api/history/download", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ configfile }),
-            }, "blob");
-        } catch (e) {
-            error = `<strong>Failed to download the schema file:</strong> <br /><br /><pre>${e}</pre>`;
-        } finally {
-            deleting = undefined;
-        }
-        const blob = new Blob([resp], { type: "text/json" });
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = histories[i].name + ".schema.json";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-    };
-
-    // const openSchemaFile = () => {
-    //     const input = document.getElementById("schema_file");
-    //     // @ts-ignore
-    //     input.value = "";
-    //     input.click();
-    // };
-
-    // const loadSchemaFile = async (e) => {
-    //     uploading = true;
-    //     const target = e.target;
-    //     if (target.files.length === 0) {
-    //         uploading = false;
-    //         return;
-    //     }
-    //     // Upload the file and come back with the new history item with
-    //     // the name in the file and current working directory
-    //     const formData = new FormData();
-    //     formData.append("schema_file", target.files[0]);
+    // const history_download = async (i, configfile) => {
     //     let resp;
     //     try {
-    //         resp = await fetchAPI("/api/history/upload", {
+    //         resp = await fetchAPI("/api/history/download", {
     //             method: "POST",
-    //             body: formData,
-    //         });
-    //         if (resp.error) {
-    //             throw new Error(resp.error);
-    //         }
+    //             headers: { "Content-Type": "application/json" },
+    //             body: JSON.stringify({ configfile }),
+    //         }, "blob");
     //     } catch (e) {
-    //         error = `<strong>Failed to upload the schema file:</strong> <br /><br /><pre>${e}</pre>`;
+    //         error = `<strong>Failed to download the schema file:</strong> <br /><br /><pre>${e}</pre>`;
     //     } finally {
-    //         uploading = false;
+    //         deleting = undefined;
     //     }
-    //     if (!error) {
-    //         histories = [...histories, resp];
-    //     }
+    //     const blob = new Blob([resp], { type: "text/json" });
+    //     const a = document.createElement("a");
+    //     a.href = URL.createObjectURL(blob);
+    //     a.download = histories[i].name + ".schema.json";
+    //     document.body.appendChild(a);
+    //     a.click();
+    //     a.remove();
     // };
 
     const loadFromURL = async (event) => {
@@ -210,11 +172,15 @@
 
     const loadFromTOML = (e, t) => {
         let parsed;
-        try {
-            parsed = itoml.parse(t || tomlToLoadFrom);
-        } catch (err) {
-            error = "Failed to parse the TOML:\n\n" + err;
-            return
+        if (t && typeof t === "object") {
+            parsed = t;
+        } else {
+            try {
+                parsed = itoml.parse(t || tomlToLoadFrom);
+            } catch (err) {
+                error = "Failed to parse the TOML:\n\n" + err;
+                return
+            }
         }
 
         if (!parsed.name) {
@@ -234,6 +200,47 @@
         updateConfigfile(undefined);
         presetConfig.set(parsed);
         configfile = `new:${parsed.name}`;
+    };
+
+    const history_reload = async (i, configfile) => {
+        if (deleting) { return; }
+
+        deleting = true;
+        let resp;
+        try {
+            resp = await fetchAPI("/api/history/get", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ configfile })
+            });
+            if (!resp.ok) {
+                throw new Error("Invalid response");
+            }
+        } catch (e) {
+            error = `<strong>Failed to fetch configuration file:</strong> <br /><br /><pre>${e}</pre>`;
+        }
+        if (error) {
+            deleting = undefined;
+            return;
+        }
+
+        let origConfig;
+        let tomlConfig;
+        try {
+            origConfig = JSON.parse(resp.data);
+            tomlConfig = finalizeConfig(origConfig);
+        } catch (e) {
+            error = `<strong>Failed to parse original schema:</strong> <br /><br /><pre>${e}</pre>`;
+        }
+        if (error) {
+            deleting = undefined;
+            return;
+        }
+
+        await history_del(i, configfile, false);
+        if (error) { return; }
+
+        loadFromTOML(null, tomlConfig);
     };
 
 </script>
@@ -337,34 +344,32 @@
                     <Button
                         size="small"
                         kind="tertiary"
-                        icon={SaveModel}
-                        iconDescription="Save the configuration as a new one"
-                        disabled={deleting === cell.value[0]}
-                        on:click={() => {
-                            deleting = cell.value[0];
-                            history_saveas(...cell.value);
-                        }}
-                        >Save As</Button>
+                        icon={IbmSecureInfrastructureOnVpcForRegulatedIndustries}
+                        iconDescription="Reload the schema from the pipeline"
+                        title="Reload the schema from the pipeline. Useful when pipeline is changed or upgraded."
+                        disabled={deleting === cell.value[0] || !histories[cell.value[0]].is_current}
+                        on:click={async () => { await history_reload(...cell.value); }}
+                        >ReLoad</Button>
                     <Button
                         size="small"
                         kind="tertiary"
-                        icon={Download}
-                        iconDescription="Download the schema file"
+                        icon={SaveModel}
+                        iconDescription="Save the configuration as a new one"
                         disabled={deleting === cell.value[0]}
-                        on:click={() => {
+                        on:click={async () => {
                             deleting = cell.value[0];
-                            history_download(...cell.value);
+                            await history_saveas(...cell.value);
                         }}
-                        >Download</Button>
+                        >Save As</Button>
                     <Button
                         size="small"
                         kind="danger-tertiary"
                         icon={RowDelete}
                         iconDescription="Delete the history"
                         disabled={deleting === cell.value[0]}
-                        on:click={() => {
+                        on:click={async () => {
                             deleting = cell.value[0];
-                            history_del(...cell.value);
+                            await history_del(...cell.value);
                         }}
                         >Delete</Button>
                 {:else}

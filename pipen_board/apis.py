@@ -148,6 +148,17 @@ async def report_building_log():
     return {"ok": True, "content": pattern.sub("", report_file.read_text())}
 
 
+async def history_get():
+    args = request.cli_args
+    configfile = (await request.get_json())["configfile"]
+    logger.info(
+        "[bold][yellow]API[/yellow][/bold] Fetching history: %s",
+        configfile,
+    )
+    configfile = args.schema_dir.expanduser().joinpath(configfile)
+    return {"ok": True, "data": configfile.read_text()}
+
+
 async def history_del():
     args = request.cli_args
     configfile = (await request.get_json())["configfile"]
@@ -498,6 +509,7 @@ GETS = {
 
 POSTS = {
     "/api/pipeline": pipeline_data,
+    "/api/history/get": history_get,
     "/api/history/del": history_del,
     "/api/history/saveas": history_saveas,
     "/api/history/download": history_download,

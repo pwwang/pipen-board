@@ -18,7 +18,7 @@
     "@cfworker/json-schema": "^1.12.5",
     "@iarna/toml": "^2.2.5",
     "carbon-components-svelte": "^0.75.1",
-    "carbon-icons-svelte": "^11.4.0",
+    "carbon-icons-svelte": "^12.3.0",
     "clipboard-copy": "^4.0.1",
     "highlight.js": "^11.8.0",
     "marked": "^5.0.5"

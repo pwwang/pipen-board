@@ -13,11 +13,11 @@ generate-setup-file = true
 [tool.poetry.dependencies]
 python = "^3.8"
 quart = "^0.18"
-pipen-args = "^0.10.0"
-websocket-client = "^1.5"
+pipen-args = "^0.10.4"
+websocket-client = "^1.6"
 pipen-log2file = "^0.3.4"
 psutil = "^5.9.5"
-pipen-report = { version = "^0.12.6", optional = true }
+pipen-report = { version = "^0.12.8", optional = true }
 pipen-diagram = { version = "^0.7", optional = true }
 pipen-filters = { version = "^0.8", optional = true }
 python-slugify = "^8.0.1"

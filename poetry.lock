@@ -1541,4 +1541,4 @@ report = ["pipen-report"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "e651704058cce085aec699aa431576553707f3e9a5b15ad94ecf3b7f2906b94e"
+content-hash = "4a6649941409e2815c3dd61b8e446710efdacefe886167958eef1d589750ce0e"
