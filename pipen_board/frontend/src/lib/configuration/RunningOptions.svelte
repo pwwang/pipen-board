@@ -207,8 +207,8 @@
                     Overwrite and Run
                 </Button>
             </TooltipDefinition>
-            <Button size="small" kind="secondary" icon={Copy} on:click={()=>{ copy(generatedCommand); }} iconDescription="Copy the command" />
             {/if}
+            <Button size="small" kind="secondary" icon={Copy} on:click={()=>{ copy(generatedCommand); }} iconDescription="Copy the command" />
         </div>
 
     </AccordionItem>
