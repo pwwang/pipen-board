@@ -75,8 +75,8 @@
             invalid = true;
             return;
         }
-        await saveConfig();
         openConfirm = true;
+        await saveConfig();
     };
 
     const runCommand = async () => {
