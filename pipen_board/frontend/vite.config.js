@@ -19,6 +19,8 @@ export default defineConfig({
     svelte({
       onwarn: (warning, handler) => {
         if (warning.code === "a11y-interactive-supports-focus") return;
+        if (warning.code === "a11y-no-noninteractive-element-interactions") return;
+        if (warning.code === "a11y-no-static-element-interactions") return;
         handler(warning);
       }
     }),

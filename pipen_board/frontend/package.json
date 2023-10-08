@@ -10,17 +10,17 @@
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.4.1",
-    "svelte": "^3.59.1",
-    "vite": "^4.3.9",
-    "vite-plugin-node-polyfills": "^0.8.2"
+    "svelte": "^4.2.1",
+    "vite": "^4.4.11",
+    "vite-plugin-node-polyfills": "^0.15.0"
   },
   "dependencies": {
     "@cfworker/json-schema": "^1.12.5",
     "@iarna/toml": "^2.2.5",
-    "carbon-components-svelte": "^0.75.1",
+    "carbon-components-svelte": "^0.80.0",
     "carbon-icons-svelte": "^12.3.0",
     "clipboard-copy": "^4.0.1",
     "highlight.js": "^11.8.0",
-    "marked": "^5.0.5"
+    "marked": "^9.1.0"
   }
 }
