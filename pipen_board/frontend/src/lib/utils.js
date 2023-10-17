@@ -264,7 +264,9 @@ function finalizeConfig(schema) {
                     delete proc_conf[option];
                 } else if (option.endsWith("_opts")) {
                     for (const [key, val] of Object.entries(proc_conf[option] || {})) {
-                        if (_equal(val, config[option][key])) { delete proc_conf[option][key]; }
+                        if (config[option] && _equal(val, config[option][key])) {
+                            delete proc_conf[option][key];
+                        }
                     }
                     if (proc_conf[option] && Object.keys(proc_conf[option]).length === 0) { delete proc_conf[option]; }
                 }
