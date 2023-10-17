@@ -67,6 +67,9 @@ function applyAtomicType(data, type, raiseError = true) {
             if (["None", "NONE", "none", "null", "NULL"].includes(data)) {
                 return null;
             }
+            if ("" === data) {
+                return "";
+            }
             try {
                 return applyAtomicType(data, "int");
             } catch (e1) {
