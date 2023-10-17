@@ -42,6 +42,7 @@ class MyGroup(ProcGroup):
     Args:
         arg (text): The arg
         jsarg (type=json): The json arg
+        autoarg (type=auto): The json arg
         nsarg: The nsarg
             - a: The a
             - b: The b
@@ -50,6 +51,7 @@ class MyGroup(ProcGroup):
     DEFAULTS = {
         "arg": "default arg",
         "jsarg": None,
+        "autoarg": None,
         "nsarg": {"a": "default a", "b": "default b"},
     }
 
@@ -62,12 +64,17 @@ class MyGroup(ProcGroup):
             Envs:
                 arg (text;pgarg): The arg linked from the group
                 p2arg2 (pgarg=nsarg.a): The nsarg.a linked from the group
+                autoarg (pgarg): The auto arg
             """
             requires = P1
             input = "infile:file"
             forks = 2
             output = "outfile:file:{{in.infile | split: '/' | last | split: '.' | first}}.out"
-            envs = {"arg": self.opts.arg, "p2arg2": self.opts.nsarg["a"]}
+            envs = {
+                "arg": self.opts.arg,
+                "p2arg2": self.opts.nsarg["a"],
+                "autoarg": self.opts.autoarg,
+            }
             lang = "bash"
             cache = False
             script = """

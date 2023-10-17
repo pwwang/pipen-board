@@ -51,7 +51,7 @@
         strValue = stringify(value);
     }
 
-    $: pgvalue = stringify(get_pgvalue(pgargs, pgargkey === true ? key : pgargkey));
+    const pgvalue = stringify(get_pgvalue(pgargs, pgargkey === true ? key : pgargkey));
     $: if (pgvalue !== undefined && !changed) {
         strValue = pgvalue;
         value = parse(strValue);

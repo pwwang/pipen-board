@@ -46,7 +46,7 @@
 
     // Change the value and pass it to the parent component
     $: value = choices[selectedId];
-    $: pgvalue = get_pgvalue(pgargs, pgargkey === true ? key : pgargkey);
+    const pgvalue = get_pgvalue(pgargs, pgargkey === true ? key : pgargkey);
     $: if (pgvalue !== undefined && !changed) {
         selectedId = choices.indexOf(pgvalue);
     }

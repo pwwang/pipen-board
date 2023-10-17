@@ -15,7 +15,7 @@
         value = ["true", "yes", "on", "1"].includes(value.toLowerCase());
     }
 
-    $: pgvalue = get_pgvalue(pgargs, pgargkey === true ? key : pgargkey);
+    const pgvalue = get_pgvalue(pgargs, pgargkey === true ? key : pgargkey);
     $: if (pgvalue !== undefined && !changed) {
         value = pgvalue;
     }

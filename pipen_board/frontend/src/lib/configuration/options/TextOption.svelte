@@ -53,7 +53,7 @@
         autoHeight(textarea);
     };
 
-    $: pgvalue = get_pgvalue(pgargs, pgargkey === true ? key : pgargkey);
+    const pgvalue = get_pgvalue(pgargs, pgargkey === true ? key : pgargkey);
     $: if (pgvalue !== undefined && !changed) {
         value = pgvalue;
     }

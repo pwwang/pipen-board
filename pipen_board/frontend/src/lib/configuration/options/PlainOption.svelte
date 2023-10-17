@@ -53,7 +53,7 @@
         value = applyAtomicType(strValue, optionType, false);
     }
 
-    $: pgvalue = get_pgvalue(pgargs, pgargkey === true ? key : pgargkey);
+    const pgvalue = get_pgvalue(pgargs, pgargkey === true ? key : pgargkey);
     $: if (pgvalue !== undefined && !changed) {
         strValue = pgvalue;
     }

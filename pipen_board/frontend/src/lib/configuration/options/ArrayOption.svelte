@@ -73,7 +73,7 @@
         validateValues(strValues);
     };
 
-    $: pgvalue = JSON.stringify(get_pgvalue(pgargs, pgargkey === true ? key : pgargkey));
+    const pgvalue = JSON.stringify(get_pgvalue(pgargs, pgargkey === true ? key : pgargkey));
     $: if (pgvalue !== undefined && !changed) {
         strValues = JSON.parse(pgvalue);
         value = strValues.map((v) => applyAtomicType(v, itype));

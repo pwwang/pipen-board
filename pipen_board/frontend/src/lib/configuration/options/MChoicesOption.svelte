@@ -48,7 +48,7 @@
         }
     };
 
-    $: pgvalue = JSON.stringify(get_pgvalue(pgargs, pgargkey === true ? key : pgargkey));
+    const pgvalue = JSON.stringify(get_pgvalue(pgargs, pgargkey === true ? key : pgargkey));
     $: if (pgvalue !== undefined && !changed) {
         const pgv = JSON.parse(pgvalue);
         selectedIds = pgv.map((v) => choices.indexOf(v));
