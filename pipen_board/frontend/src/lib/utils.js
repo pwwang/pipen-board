@@ -135,10 +135,10 @@ function validateData(data, validators) {
     return null;
 }
 
-function _equal(val1, val2) {
+function _equal(val1, val2, allowNullEmptyStr = false) {
     if (val1 === val2) { return true; }
-    if (val1 === undefined || val1 === null) { return false; }
-    if (val2 === undefined || val2 === null) { return false; }
+    if (val1 === undefined || val1 === null) { return allowNullEmptyStr && val2 === ""; }
+    if (val2 === undefined || val2 === null) { return allowNullEmptyStr && val1 === ""; }
     if (typeof val1 !== typeof val2) { return false; }
     if (typeof val1 === "object") {
         if (Array.isArray(val1) !== Array.isArray(val2)) { return false; }
@@ -190,7 +190,7 @@ function updateConfig(config, option, value, ns=false, pgargs=null) {
     }
     if (pgargs && value.pgarg) {
         const pgvalue = get_pgvalue(pgargs, value.pgarg === true ? option : value.pgarg);
-        if (pgvalue === value.value || (typeof pgvalue === typeof value.value && JSON.stringify(pgvalue) === JSON.stringify(value.value))) {
+        if (_equal(pgvalue, value.value, true)) {
             return config;
         }
     }
