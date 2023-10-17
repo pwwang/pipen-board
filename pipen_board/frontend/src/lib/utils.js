@@ -187,7 +187,7 @@ function updateConfig(config, option, value, ns=false, pgargs=null) {
     }
     if (pgargs && value.pgarg) {
         const pgvalue = get_pgvalue(pgargs, value.pgarg === true ? option : value.pgarg);
-        if (pgvalue == value.value) {
+        if (pgvalue === value.value || (typeof pgvalue === typeof value.value && JSON.stringify(pgvalue) === JSON.stringify(value.value))) {
             return config;
         }
     }

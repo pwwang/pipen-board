@@ -51,7 +51,7 @@ class MyGroup(ProcGroup):
     DEFAULTS = {
         "arg": "default arg",
         "jsarg": None,
-        "autoarg": None,
+        "autoarg": "",
         "nsarg": {"a": "default a", "b": "default b"},
     }
 
@@ -64,7 +64,7 @@ class MyGroup(ProcGroup):
             Envs:
                 arg (text;pgarg): The arg linked from the group
                 p2arg2 (pgarg=nsarg.a): The nsarg.a linked from the group
-                autoarg (pgarg): The auto arg
+                autoarg (pgarg;type=auto): The auto arg
             """
             requires = P1
             input = "infile:file"
