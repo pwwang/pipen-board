@@ -118,6 +118,7 @@ function validateData(data, validators) {
             }
         }
         if (validator === "json" || validator === "dict") {
+            if (data === "") return null;
             try {
                 JSON.parse(data);
             } catch (e) {
