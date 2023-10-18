@@ -31,6 +31,7 @@
     let strValue = value;
     let origValue = value;
     let textarea = null;
+    let isJsonArray = false;
 
     const parse = (x) => format === "json" ? JSON.parse(x) : itoml.parse(x);
     const stringify = (x) => {
@@ -79,6 +80,7 @@
         } else {
             removeError(`${activeNavItem} / ${key}`);
             if (!onmount) { value = v === "" ? defValue : parse(v); }
+            isJsonArray = format === "json" && Array.isArray(value);
         }
         autoHeight(textarea);
     };
@@ -104,7 +106,7 @@
         class='{readonly ? "readonly-label" : ""} {pgargkey ? "linked-pgarg-label" : ""}'>
         {key}
         <div class="json-format-selector">
-            <RadioButtonGroup disabled={invalid} selected={format} orientation="vertical" on:change={useFormat}>
+            <RadioButtonGroup disabled={invalid || isJsonArray} selected={format} orientation="vertical" on:change={useFormat}>
                 <RadioButton labelText="JSON" value="json" />
                 <RadioButton labelText="TOML" value="toml" />
             </RadioButtonGroup>
