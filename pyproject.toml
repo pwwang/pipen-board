@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pipen-board"
-version = "0.12.5"
+version = "0.13.0"
 description = "Visualization configuration and running of pipen pipelines on the web"
 authors = ["pwwang <pwwang@pwwang.com>"]
 license = "MIT"
