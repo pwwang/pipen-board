@@ -21,7 +21,7 @@ from simpleconf import Config
 from slugify import slugify
 from liquid import Liquid
 from pipen import Pipen, Proc, ProcGroup
-from pipen.utils import get_marked
+from pipen.utils import get_marked, load_pipeline
 from pipen_annotate import annotate
 
 from .defaults import (
@@ -57,48 +57,6 @@ DEFAULT_RUN_DATA = {
 
 # proc status: init, running, succeeded, failed
 # job status: init, queued, submitted, running, killed, succeeded, failed
-
-
-def parse_pipeline(pipeline: str) -> Pipen:
-    """Parse the pipeline"""
-    modpath, sep, name = pipeline.rpartition(":")
-    if sep != ":":
-        raise ValueError(
-            f"Invalid pipeline: {pipeline}.\n"
-            "It must be in the format '<module[.submodule]>:pipeline' or \n"
-            "'/path/to/pipeline.py:pipeline'"
-        )
-
-    path = Path(modpath)
-    if path.is_file():
-        spec = importlib.util.spec_from_file_location(path.stem, modpath)
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-    else:
-        module = importlib.import_module(modpath)
-
-    try:
-        pipeline = getattr(module, name)
-    except AttributeError:
-        raise ValueError(f"Invalid pipeline: {pipeline}") from None
-
-    if isinstance(pipeline, type) and issubclass(pipeline, Proc):
-        pipeline = Pipen(name=f"{pipeline.name}Pipeline").set_starts(pipeline)
-
-    if isinstance(pipeline, type) and issubclass(pipeline, Pipen):
-        # Avoid "pipeline" to be used as pipeline name
-        [pipeline] = [pipeline()]
-
-    if isinstance(pipeline, type) and issubclass(pipeline, ProcGroup):
-        pipeline = pipeline().as_pipen()
-
-    if not isinstance(pipeline, Pipen):
-        raise ValueError(
-            f"Invalid pipeline: {pipeline}\n"
-            "It must be a `pipen.Pipen` instance"
-        )
-
-    return pipeline
 
 
 def _anno_to_argspec(anno: Mapping[str, Any] | None) -> Mapping[str, Any]:
@@ -369,25 +327,8 @@ async def _get_config_data(
     name: str | None,
 ) -> Mapping[str, Any]:
     """Get the pipeline data"""
+    pipeline = await load_pipeline(args.pipeline, argv1p=args.pipeline_args)
     try:
-        old_argv = sys.argv
-        sys.argv = ["@pipen-board"] + args.pipeline_args
-        logger.info(
-            "[bold][yellow]DBG[/yellow][/bold] Fetching pipeline data ..."
-        )
-        try:
-            pipeline = parse_pipeline(args.pipeline)
-            # Initialize the pipeline so that the arguments definied by
-            # other plugins (i.e. pipen-args) to take in place.
-            pipeline.workdir = Path(pipeline.config.workdir).joinpath(
-                name or pipeline.name
-            )
-            await pipeline._init()
-            pipeline.workdir.mkdir(parents=True, exist_ok=True)
-            pipeline.build_proc_relationships()
-        finally:
-            sys.argv = old_argv
-
         data = {}
         data[SECTION_PIPELINE_OPTIONS] = PIPELINE_OPTIONS.copy()
         data[SECTION_PIPELINE_OPTIONS]["name"] = {
