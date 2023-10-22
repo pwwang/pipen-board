@@ -539,8 +539,17 @@ class DataManager:
 
         # Get the log
         logfile = pipeline_dir.joinpath("run-latest.log")
+        logsdir = pipeline_dir.joinpath(".logs")
         if logfile.exists() and logfile.is_file():
             out[SECTION_LOG] = logfile.read_text()
+        elif logsdir.is_dir():
+            # a wrong symlink, use the latest one from .logs
+            logfiles = sorted(logsdir.glob("*.log"))
+            if not logfiles:
+                # no previous run, return defaults
+                self._run_data = DEFAULT_RUN_DATA
+                return
+            out[SECTION_LOG] = logfiles[-1].read_text()
         else:
             # no previous run, return defaults
             self._run_data = DEFAULT_RUN_DATA
