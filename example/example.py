@@ -118,6 +118,23 @@ mg = MyGroup()
 class P4(Proc):
     """The P4 process
 
+    Examples:
+        Here is an example of how to use P4
+
+        >>> from example import P4
+        >>> P4().run()
+
+        A markdown code block:
+        ```python
+        from example import P4
+        P4().run()
+        ```
+        footnode
+
+    References:
+    - [P4](https://google.com)
+    - [P4](https://google.com)
+
     Envs:
         abc (required): The `abc` env
             >>> code code code

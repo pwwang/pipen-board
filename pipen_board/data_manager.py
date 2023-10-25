@@ -6,6 +6,7 @@ import json
 import os
 import re
 import signal
+import textwrap
 import time
 from copy import deepcopy
 from multiprocessing import Process, Pipe
@@ -187,10 +188,17 @@ def _proc_to_argspec(
         anno = annotate(proc)
 
     summary = anno.get("Summary", {"short": "", "long": ""})
+    proc_desc = f'# {summary["short"]}\n\n{summary["long"]}'
+    for key, val in anno.items():
+        if key in ("Summary", "Args", "Input", "Output", "Envs", "Requires"):
+            continue
+        val = textwrap.dedent(val.to_markdown())
+        proc_desc += f"\n\n## {key}\n\n{val}"
+
     argspec = {
         "is_start": is_start,
         "order": order,
-        "desc": f'# {summary["short"]}\n\n{summary["long"]}',
+        "desc": proc_desc,
         "value": {},
     }
     if hidden:
