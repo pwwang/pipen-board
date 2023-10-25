@@ -1,5 +1,5 @@
 <script>
-    import { onMount } from "svelte";
+    import { onMount, createEventDispatcher } from "svelte";
     import Tag from "carbon-components-svelte/src/Tag/Tag.svelte";
     import TextInput from "carbon-components-svelte/src/TextInput/TextInput.svelte";
     import Button from "carbon-components-svelte/src/Button/Button.svelte";
@@ -28,6 +28,8 @@
 
     let iValidator = [itype];
     let validator = required ? ["required"] : [];
+
+    const dispatch = createEventDispatcher();
 
     const validateValues = (values) => {
         value = strValues.map((v) => applyAtomicType(v, itype));
@@ -73,6 +75,11 @@
         validateValues(strValues);
     };
 
+    const onBlur = (e) => {
+        addTag();
+        dispatch("blur", e);
+    };
+
     const pgvalue = JSON.stringify(get_pgvalue(pgargs, pgargkey === true ? key : pgargkey));
     $: if (pgvalue !== undefined && !changed) {
         strValues = JSON.parse(pgvalue);
@@ -102,7 +109,7 @@
                 on:keyup={e => { if (e.key === "Enter" && !readonly) addTag() }}
                 on:input={e => { changed = true; storedGlobalChanged.set(true); validateValue(e.detail); }}
                 on:focus
-                on:blur
+                on:blur={onBlur}
                 bind:value={currValue}
             />
             {#if !readonly}
