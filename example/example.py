@@ -119,6 +119,12 @@ class P4(Proc):
     """The P4 process
 
     Examples:
+        A table
+        | a | b | c |
+        |---|---|---|
+        | 1 | 2 | 3 |
+        | 4 | 5 | 6 |
+
         Here is an example of how to use P4
 
         >>> from example import P4
