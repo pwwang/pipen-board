@@ -27,7 +27,7 @@ class PluginNameLogFilter(logging.Filter):
     def filter(self, record):
         if isinstance(record.args, dict) and "s" in record.args:
             if not isinstance(record.args["s"], int):
-                return True
+                return False
             if record.args["s"] in (200, 304):
                 record.levelno = logging.DEBUG
                 record.levelname = "DEBUG"
