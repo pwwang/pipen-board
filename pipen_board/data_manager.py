@@ -501,11 +501,14 @@ class DataManager:
             # Use multiprocessing to get a clean environment
             # to load the pipeline to avoid conflicts
             def target(conn):
-                conn.send(
-                    json.dumps(
+                try:
+                    msg = json.dumps(
                         asyncio.run(_get_config_data(args, name))
                     ).encode()
-                )
+                except Exception as exc:
+                    msg = json.dumps({"error": str(exc)}).encode()
+
+                conn.send(msg)
                 conn.close()
 
             parent_conn, child_conn = Pipe()
