@@ -203,7 +203,7 @@ class PipenBoardPlugin:
         )
 
     @plugin.impl
-    async def on_job_running(self, proc: Proc, job: Job):
+    async def on_job_started(self, proc: Proc, job: Job):
         group = get_marked(proc, "procgroup")
         if group:
             group = group.name
