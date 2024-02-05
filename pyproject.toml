@@ -11,16 +11,16 @@ exclude = ["pipen_board/frontend/[!build]*", "pipen_board/frontend/index.html"]
 generate-setup-file = true
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 quart = "^0.19"
-pipen-args = "^0.13"
+pipen-args = "^0.14"
 websocket-client = "^1.7"
-pipen-log2file = "^0.6"
+pipen-log2file = "^0.7"
 psutil = "^5.9"
-pipen-report = { version = "^0.17.1", optional = true }
-pipen-diagram = { version = "^0.10", optional = true }
-pipen-filters = { version = "^0.11", optional = true }
-python-slugify = "^8.0.1"
+pipen-report = { version = "^0.18", optional = true }
+pipen-diagram = { version = "^0.11", optional = true }
+pipen-filters = { version = "^0.12", optional = true }
+python-slugify = "^8.0"
 
 [tool.poetry.extras]
 report = ["pipen-report"]
@@ -39,5 +39,5 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.black]
 line-length = 88
-target-version = ['py38', 'py39', 'py310', 'py311']
+target-version = ['py39', 'py310', 'py311']
 include = '\.pyi?$'
