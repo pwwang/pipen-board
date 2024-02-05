@@ -19,39 +19,37 @@ Usage: pipen board [options] <pipeline> -- [pipeline options]
 Configure and run pipen pipelines from the web
 
 Required Arguments:
-  pipeline              The pipeline and the CLI arguments to run the pipeline.
-                        For the pipeline either
-                        `/path/to/pipeline.py:<pipeline>` or
-                        `<module.submodule>:<pipeline>` `<pipeline>` must be an
-                        instance of `Pipen` and running the pipeline should be
-                        called under `__name__ == '__main__'.
+  pipeline              The pipeline and the CLI arguments to run the pipeline. For the
+                        pipeline either `/path/to/pipeline.py:<pipeline>` or
+                        `<module.submodule>:<pipeline>` `<pipeline>` must be an instance of
+                        `Pipen` and running the pipeline should be called under `__name__ ==
+                        '__main__'.
 
-Options:
+Optional Arguments:
   -h, --help            show help message and exit
   -p PORT, --port PORT  Port to serve the UI wizard [default: 18521]
   -a FILE, --additional FILE
-                        Additional arguments for the pipeline, in YAML, INI,
-                        JSON or TOML format. Can have sections
-                        `ADDITIONAL_OPTIONS` and `RUNNING_OPTIONS`. It can also
-                        have other sections and items to override the
-                        configurations generated from the pipeline. If the
-                        pipeline is provided as a python script, such as
-                        `/path/to/pipeline.py:<pipeline>`, and `<pipeline>`
-                        runs under `__name__ == '__main__'`, the additional
-                        file can also be specified as `auto` to generate a
-                        `RUNNING OPTIONS/Local` section to run the pipeline
-                        locally.
+                        Additional arguments for the pipeline, in YAML, INI, JSON or TOML
+                        format. Can have sections `ADDITIONAL_OPTIONS` and `RUNNING_OPTIONS`.
+                        It can also have other sections and items to override the
+                        configurations generated from the pipeline. If the pipeline is
+                        provided as a python script, such as
+                        `/path/to/pipeline.py:<pipeline>`, and `<pipeline>` runs under
+                        `__name__ == '__main__'`, the additional file can also be specified
+                        as `auto` to generate a `RUNNING OPTIONS/Local` section to run the
+                        pipeline locally.
   --loglevel {auto,debug,info,warning,error,critical}
-                        The logging level. If `auto`, it will be set to `debug`
-                        if `--dev` is set, otherwise `info`. [default: auto]
-  --dev                 Run the pipeline in development/debug mode. This will
-                        reload the server when changes are made to this package
-                        and reload the pipeline when page reloads for new
-                        configurations. Page cache is also disabled in this
-                        mode.
+                        The logging level. If `auto`, it will be set to `debug` if `--dev` is
+                        set, otherwise `info`. [default: auto]
+  --dev                 Run the pipeline in development/debug mode. This will reload the
+                        server when changes are made to this package and reload the pipeline
+                        when page reloads for new configurations. Page cache is also disabled
+                        in this mode.
   -w WORKDIR, --workdir WORKDIR
-                        The working directory of the pipeline. [default:
-                        .pipen]
+                        The working directory of the pipeline. [default: .pipen]
+  -s SCHEMA_DIR, --schema-dir SCHEMA_DIR
+                        The directory to store the configuration schemas. [default: ~/.pipen-
+                        board]
 ```
 
 ## Describing arguments in docstring
