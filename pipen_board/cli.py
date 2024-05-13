@@ -81,7 +81,7 @@ class PipenCliBoardPlugin(CLIPlugin):
             "--schema-dir",
             dest="schema_dir",
             help="The directory to store the configuration schemas.",
-            default="~/.pipen-board",
+            default="./.pipen-board",
             type="path",
         )
         subparser.add_argument(
