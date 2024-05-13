@@ -311,7 +311,7 @@
             icon={LetterTt}
             iconDescription="Load From Generated TOML"
             on:click={() => {showLoadFromTOMLModal = true}}>From Generated TOML</Button> /
-        <TextInput on:keyup={loadFromURL} placeholder="Load TOML File from a URL (Enter to confirm)" light hideLabel  /> /
+        <TextInput on:keyup={loadFromURL} placeholder="Load TOML File from a path/URL (Enter to confirm)" light hideLabel  /> /
         <span>Or load saved configuration:</span>
     </div>
 

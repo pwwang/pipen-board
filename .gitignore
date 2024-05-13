@@ -158,6 +158,7 @@ docs/api/
 # End of https://www.gitignore.io/api/python
 
 .pipen/
+.pipen-board/
 *_results
 *-output
 

@@ -263,17 +263,27 @@ async def history_download():
 async def history_fromurl():
     # get form data
     url = (await request.get_json())["url"]
-    logger.info(
-        "[bold][yellow]API[/yellow][/bold] Receiving TOML file from url: %s",
-        url,
-    )
-    try:
-        import urllib.request
-        with urllib.request.urlopen(url) as response:
-            return {"ok": True, "content": response.read().decode()}
-
-    except Exception as exc:
-        return {"ok": False, "error": str(exc)}
+    # is url a local path?
+    if "://" not in url:
+        logger.info(
+            "[bold][yellow]API[/yellow][/bold] Receiving TOML file from path: %s",
+            url,
+        )
+        try:
+            return {"ok": True, "content": Path(url).read_text()}
+        except Exception as exc:
+            return {"ok": False, "error": str(exc)}
+    else:
+        logger.info(
+            "[bold][yellow]API[/yellow][/bold] Receiving TOML file from URL: %s",
+            url,
+        )
+        try:
+            import urllib.request
+            with urllib.request.urlopen(url) as response:
+                return {"ok": True, "content": response.read().decode()}
+        except Exception as exc:
+            return {"ok": False, "error": str(exc)}
 
 
 async def config_save():
