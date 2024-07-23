@@ -167,8 +167,8 @@ class PipenBoardPlugin:
         )
 
     @plugin.impl
-    async def on_job_queued(self, proc: Proc, job: Job):
-        group = get_marked(proc, "procgroup")
+    async def on_job_queued(self, job: Job):
+        group = get_marked(job.proc, "procgroup")
         if group:
             group = group.name
 
@@ -176,7 +176,7 @@ class PipenBoardPlugin:
             {
                 "type": "on_job_queued",
                 "data": {
-                    "proc": proc.name,
+                    "proc": job.proc.name,
                     "procgroup": group,
                     "job": job.index,
                 },
@@ -185,8 +185,8 @@ class PipenBoardPlugin:
         )
 
     @plugin.impl
-    async def on_job_submitted(self, proc: Proc, job: Job):
-        group = get_marked(proc, "procgroup")
+    async def on_job_submitted(self, job: Job):
+        group = get_marked(job.proc, "procgroup")
         if group:
             group = group.name
 
@@ -194,7 +194,7 @@ class PipenBoardPlugin:
             {
                 "type": "on_job_submitted",
                 "data": {
-                    "proc": proc.name,
+                    "proc": job.proc.name,
                     "procgroup": group,
                     "job": job.index,
                 },
@@ -203,8 +203,8 @@ class PipenBoardPlugin:
         )
 
     @plugin.impl
-    async def on_job_started(self, proc: Proc, job: Job):
-        group = get_marked(proc, "procgroup")
+    async def on_job_started(self, job: Job):
+        group = get_marked(job.proc, "procgroup")
         if group:
             group = group.name
 
@@ -212,7 +212,7 @@ class PipenBoardPlugin:
             {
                 "type": "on_job_running",
                 "data": {
-                    "proc": proc.name,
+                    "proc": job.proc.name,
                     "procgroup": group,
                     "job": job.index,
                 },
@@ -221,8 +221,8 @@ class PipenBoardPlugin:
         )
 
     @plugin.impl
-    async def on_job_killed(self, proc: Proc, job: Job):
-        group = get_marked(proc, "procgroup")
+    async def on_job_killed(self, job: Job):
+        group = get_marked(job.proc, "procgroup")
         if group:
             group = group.name
 
@@ -230,7 +230,7 @@ class PipenBoardPlugin:
             {
                 "type": "on_job_killed",
                 "data": {
-                    "proc": proc.name,
+                    "proc": job.proc.name,
                     "procgroup": group,
                     "job": job.index,
                 },
@@ -239,8 +239,8 @@ class PipenBoardPlugin:
         )
 
     @plugin.impl
-    async def on_job_succeeded(self, proc: Proc, job: Job):
-        group = get_marked(proc, "procgroup")
+    async def on_job_succeeded(self, job: Job):
+        group = get_marked(job.proc, "procgroup")
         if group:
             group = group.name
 
@@ -248,7 +248,7 @@ class PipenBoardPlugin:
             {
                 "type": "on_job_succeeded",
                 "data": {
-                    "proc": proc.name,
+                    "proc": job.proc.name,
                     "procgroup": group,
                     "job": job.index,
                 },
@@ -257,8 +257,8 @@ class PipenBoardPlugin:
         )
 
     @plugin.impl
-    async def on_job_failed(self, proc: Proc, job: Job):
-        group = get_marked(proc, "procgroup")
+    async def on_job_failed(self, job: Job):
+        group = get_marked(job.proc, "procgroup")
         if group:
             group = group.name
 
@@ -266,7 +266,7 @@ class PipenBoardPlugin:
             {
                 "type": "on_job_failed",
                 "data": {
-                    "proc": proc.name,
+                    "proc": job.proc.name,
                     "procgroup": group,
                     "job": job.index,
                 },
@@ -275,8 +275,8 @@ class PipenBoardPlugin:
         )
 
     @plugin.impl
-    async def on_job_cached(self, proc: Proc, job: Job):
-        group = get_marked(proc, "procgroup")
+    async def on_job_cached(self, job: Job):
+        group = get_marked(job.proc, "procgroup")
         if group:
             group = group.name
 
@@ -284,7 +284,7 @@ class PipenBoardPlugin:
             {
                 "type": "on_job_cached",
                 "data": {
-                    "proc": proc.name,
+                    "proc": job.proc.name,
                     "procgroup": group,
                     "job": job.index,
                 },

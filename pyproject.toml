@@ -13,13 +13,13 @@ generate-setup-file = true
 [tool.poetry.dependencies]
 python = "^3.9"
 quart = "^0.19"
-pipen-args = "^0.14"
-websocket-client = "^1.7"
-pipen-log2file = "^0.7"
+pipen-args = "^0.15"
+websocket-client = "^1.8"
+pipen-log2file = "^0.8"
 psutil = "^5.9"
-pipen-report = { version = "^0.19", optional = true }
-pipen-diagram = { version = "^0.11", optional = true }
-pipen-filters = { version = "^0.12", optional = true }
+pipen-report = { version = "^0.20", optional = true }
+pipen-diagram = { version = "^0.12", optional = true }
+pipen-filters = { version = "^0.14", optional = true }
 python-slugify = "^8.0"
 
 [tool.poetry.extras]
@@ -39,5 +39,5 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.black]
 line-length = 88
-target-version = ['py39', 'py310', 'py311']
+target-version = ['py39', 'py310', 'py311', 'py312']
 include = '\.pyi?$'
