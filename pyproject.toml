@@ -17,7 +17,7 @@ pipen-args = "^0.16"
 websocket-client = "^1.8"
 pipen-log2file = "^0.8"
 psutil = "^5.9"
-pipen-report = { version = "^0.20", optional = true }
+pipen-report = { version = "^0.21", optional = true }
 pipen-diagram = { version = "^0.12", optional = true }
 pipen-filters = { version = "^0.14", optional = true }
 python-slugify = "^8.0"
