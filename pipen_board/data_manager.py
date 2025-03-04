@@ -1,4 +1,5 @@
 """Provides the running data and functions to mutate it"""
+
 from __future__ import annotations
 
 import asyncio
@@ -15,11 +16,12 @@ from tempfile import gettempdir
 from typing import TYPE_CHECKING, Any, Mapping, Type
 from urllib.parse import urlparse
 
+from yunpath import AnyPath, CloudPath
 from simpleconf import Config
 from slugify import slugify
 from liquid import Liquid
 from pipen import Proc
-from pipen.utils import get_marked, load_pipeline
+from pipen.utils import get_marked, load_pipeline, update_dict
 from pipen_annotate import annotate
 
 from .defaults import (
@@ -303,12 +305,22 @@ def _load_additional(additional: str, **kwargs) -> Mapping[str, Any]:
 
     if kwargs:
         # kwargs passed, treat the file as a template
-        additional = Path(additional)
+        additional = AnyPath(additional)
         tpl = Liquid(additional.read_text(), mode="wild", from_file=False)
         additional = cache_dir.joinpath(
             f"{slugify(str(additional.resolve()))}.rendered{additional.suffix}"
         )
         additional.write_text(tpl.render(**kwargs))
+
+    else:
+        additional = AnyPath(additional)
+        if isinstance(additional, CloudPath):
+            dig = sha256(str(additional).encode()).hexdigest()
+            local_add = cache_dir.joinpath(
+                f"{additional.stem}.{dig}{additional.suffix}"
+            )
+            additional.download_to(local_add)
+            additional = local_add
 
     out = Config.load(additional)
     if "ADDITIONAL_OPTIONS" in out:
@@ -318,15 +330,13 @@ def _load_additional(additional: str, **kwargs) -> Mapping[str, Any]:
     return out
 
 
-def _update_dict(d1: Mapping[str, Any], d2: Mapping[str, Any]) -> None:
-    """Update d1 with d2 recursively"""
-    for key, val in d2.items():
-        if key in d1 and isinstance(val, dict) and isinstance(d1[key], dict):
-            _update_dict(d1[key], val)
-        else:
-            d1[key] = val
-
-
+# def _update_dict(d1: Mapping[str, Any], d2: Mapping[str, Any]) -> None:
+#     """Update d1 with d2 recursively"""
+#     for key, val in d2.items():
+#         if key in d1 and isinstance(val, dict) and isinstance(d1[key], dict):
+#             _update_dict(d1[key], val)
+#         else:
+#             d1[key] = val
 async def _get_config_data(
     args: Namespace,
     name: str | None,
@@ -352,8 +362,7 @@ async def _get_config_data(
             "type": "str",
             "value": pipeline.desc,
             "desc": (
-                "The description of the pipeline, "
-                "shows in the log and report."
+                "The description of the pipeline, " "shows in the log and report."
             ),
         }
         data[SECTION_PIPELINE_OPTIONS]["outdir"] = {
@@ -371,9 +380,7 @@ async def _get_config_data(
             "args_flatten" not in pipeline.config.plugin_opts
             and len(pipeline.procs) == 1
         ):
-            data[SECTION_PIPELINE_OPTIONS]["plugin_opts"]["value"][
-                "args_flatten"
-            ] = {
+            data[SECTION_PIPELINE_OPTIONS]["plugin_opts"]["value"]["args_flatten"] = {
                 "desc": (
                     "Flatten the arguments of the pipeline. "
                     "For example, [envs] will ba treated as [<Process>.envs]. "
@@ -409,9 +416,7 @@ async def _get_config_data(
                     #     arginfo["value"] = pg.DEFAULTS.get(arg)
                     pg_sec[pg.name]["ARGUMENTS"] = pg_args
 
-                pg_sec[pg.name][SECTION_PROCESSES][
-                    proc.name
-                ] = _proc_to_argspec(
+                pg_sec[pg.name][SECTION_PROCESSES][proc.name] = _proc_to_argspec(
                     proc,
                     proc in pipeline.starts,
                     get_marked(proc, "board_config_hidden", False),
@@ -432,13 +437,10 @@ async def _get_config_data(
                 "[bold][yellow]DBG[/yellow][/bold] "
                 "Loading additional configuration items ..."
             )
-            if (
-                args.additional == "auto"
-                and args.pipeline.rpartition(":")[0].endswith(".py")
+            if args.additional == "auto" and args.pipeline.rpartition(":")[0].endswith(
+                ".py"
             ):
-                additional = str(
-                    Path(__file__).parent.joinpath("additional_auto.toml")
-                )
+                additional = str(Path(__file__).parent.joinpath("additional_auto.toml"))
             else:
                 additional = args.additional
 
@@ -448,10 +450,11 @@ async def _get_config_data(
                 pipeline=args.pipeline,
                 pipeline_args=args.pipeline_args,
             )
-            _update_dict(data, addi_data)
+            update_dict(data, addi_data)
 
     except Exception:
         import traceback
+
         return {"error": traceback.format_exc()}
 
     return data
@@ -482,7 +485,7 @@ class DataManager:
             configfile: The name to the config file
         """
         if configfile and not configfile.startswith("new:") and not args.dev:
-            with args.schema_dir.expanduser().joinpath(configfile).open() as f:
+            with args.schema_dir.joinpath(configfile).open() as f:
                 self._config_data = json.load(f)
                 return
 
@@ -493,7 +496,7 @@ class DataManager:
             name = configfile[4:]
         else:
             self._config_data = json.loads(
-                args.schema_dir.expanduser().joinpath(configfile).read_text()
+                args.schema_dir.joinpath(configfile).read_text()
             )
             name = self._config_data[SECTION_PIPELINE_OPTIONS]["name"]["value"]
 
@@ -502,9 +505,7 @@ class DataManager:
             # to load the pipeline to avoid conflicts
             def target(conn):
                 try:
-                    msg = json.dumps(
-                        asyncio.run(_get_config_data(args, name))
-                    ).encode()
+                    msg = json.dumps(asyncio.run(_get_config_data(args, name))).encode()
                 except Exception as exc:
                     msg = json.dumps({"error": str(exc)}).encode()
 
@@ -523,11 +524,11 @@ class DataManager:
                     logger.error(line)
 
                 from quart import abort
+
                 abort(500)
 
         self._config_data[SECTION_PIPELINE_OPTIONS]["name"]["value"] = (
-            name
-            or self._config_data[SECTION_PIPELINE_OPTIONS]["name"]["default"]
+            name or self._config_data[SECTION_PIPELINE_OPTIONS]["name"]["default"]
         )
 
     def _get_prev_run(self, args: Namespace, configfile: str | None):
@@ -542,7 +543,7 @@ class DataManager:
         out = self._run_data = {SECTION_LOG: None, "FINISHED": True}
         self._get_config_data(args, configfile=configfile)
         name = self._config_data[SECTION_PIPELINE_OPTIONS]["name"]["value"]
-        pipeline_dir = Path(args.workdir).joinpath(name)
+        pipeline_dir = args.workdir.joinpath(name)
         if not pipeline_dir.is_dir():
             # no previous run, return defaults
             self._run_data = DEFAULT_RUN_DATA
@@ -572,13 +573,13 @@ class DataManager:
             {"value": None},
         )["value"]
         if not outdir:
-            outdir = Path(args.workdir).parent.joinpath(f"{name}-output")
+            outdir = args.workdir.parent.joinpath(f"{name}-output")
         else:
-            outdir = Path(outdir)
+            outdir = AnyPath(outdir)
 
         report_procs_dir = outdir.joinpath("REPORTS", "procs")
         if report_procs_dir.is_dir() and [
-            p for p in report_procs_dir.glob("*") if p.is_dir()
+            p for p in report_procs_dir.iterdir() if p.is_dir()
         ]:
             out[SECTION_REPORTS] = str(outdir)
 
@@ -597,7 +598,7 @@ class DataManager:
                 return
 
             for jobdir in sorted(
-                [j for j in procdir.glob("*") if j.name.isdigit()],
+                [j for j in procdir.iterdir() if j.name.isdigit()],
                 key=lambda x: int(x.name),
             ):
                 rcfile = jobdir / "job.rc"
@@ -606,9 +607,7 @@ class DataManager:
                 except Exception:
                     container[proc]["jobs"].append("failed")
                 else:
-                    container[proc]["jobs"].append(
-                        "succeeded" if rc == 0 else "failed"
-                    )
+                    container[proc]["jobs"].append("succeeded" if rc == 0 else "failed")
             if not container[proc]["jobs"]:
                 container[proc]["status"] = "init"
             elif "failed" in container[proc]["jobs"]:
@@ -651,19 +650,13 @@ class DataManager:
                 update_value(key, val, preset, force_ns=key.endswith("_opts"))
 
         if SECTION_ADDITIONAL_OPTIONS in self._config_data:
-            for key, val in self._config_data[
-                SECTION_ADDITIONAL_OPTIONS
-            ].items():
+            for key, val in self._config_data[SECTION_ADDITIONAL_OPTIONS].items():
                 update_value(key, val, preset)
 
         if SECTION_PROCESSES in self._config_data:
-            for proc, procconfig in self._config_data[
-                SECTION_PROCESSES
-            ].items():
+            for proc, procconfig in self._config_data[SECTION_PROCESSES].items():
                 for key, val in procconfig["value"].items():
-                    update_value(
-                        key, val, preset.get(proc), force_ns=key == "envs"
-                    )
+                    update_value(key, val, preset.get(proc), force_ns=key == "envs")
 
         if SECTION_PROCGROUPS in self._config_data:
             for pg, pgconfig in self._config_data[SECTION_PROCGROUPS].items():
@@ -674,10 +667,7 @@ class DataManager:
                     for proc, procconfig in pgconfig["PROCESSES"].items():
                         for key, val in procconfig["value"].items():
                             update_value(
-                                key,
-                                val,
-                                preset.get(proc),
-                                force_ns=key == "envs"
+                                key, val, preset.get(proc), force_ns=key == "envs"
                             )
 
     def clear_run_data(self, keep_log: bool = False):
@@ -768,7 +758,7 @@ class DataManager:
 
         logger.info(
             "WS/PIPELINE Received: Pipeline completed (succeeded=%s)",
-            data['succeeded'],
+            data["succeeded"],
         )
 
         if SECTION_REPORTS in data:
@@ -794,12 +784,8 @@ class DataManager:
             self._run_data[SECTION_PROCESSES][proc]["status"] = "running"
             self._run_data[SECTION_PROCESSES][proc]["jobs"] = ["init"] * njobs
         else:
-            self._run_data[SECTION_PROCGROUPS][group][proc][
-                "status"
-            ] = "running"
-            self._run_data[SECTION_PROCGROUPS][group][proc]["jobs"] = [
-                "init"
-            ] * njobs
+            self._run_data[SECTION_PROCGROUPS][group][proc]["status"] = "running"
+            self._run_data[SECTION_PROCGROUPS][group][proc]["jobs"] = ["init"] * njobs
 
         await self.send_run_data(ws, force=True)
 
@@ -845,9 +831,7 @@ class DataManager:
         if not group:
             self._run_data[SECTION_PROCESSES][proc]["jobs"][job] = status
         else:
-            self._run_data[SECTION_PROCGROUPS][group][proc]["jobs"][
-                job
-            ] = status
+            self._run_data[SECTION_PROCGROUPS][group][proc]["jobs"][job] = status
         await self.send_run_data(ws)
 
     async def on_job_queued(self, data, ws):

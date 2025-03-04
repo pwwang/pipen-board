@@ -69,7 +69,7 @@ class MyGroup(ProcGroup):
             requires = P1
             input = "infile:file"
             forks = 2
-            output = "outfile:file:{{in.infile | split: '/' | last | split: '.' | first}}.out"
+            output = "outfile:file:{{in.infile.name | split: '.' | first}}.out"
             envs = {
                 "arg": self.opts.arg,
                 "p2arg2": self.opts.nsarg["a"],
@@ -90,8 +90,8 @@ class MyGroup(ProcGroup):
         class P3(Proc):
             requires = self.p2
             input = "infile:file"
-            input_data = lambda ch: list(ch.outfile)[:1]
-            output = "outfile:file:{{in.infile | split: '/' | last | split: '.' | first}}.out"
+            input_data = lambda ch: list(ch.outfile)[:1]  # noqa
+            output = "outfile:file:{{in.infile.name | split: '.' | first}}.out"
             script = """
                 cat {{in.infile}} > {{out.outfile}}
                 echo P3 >> {{out.outfile}}
@@ -153,10 +153,10 @@ class P4(Proc):
             - b: Use method b
             - c: Use method c
             - <more>: More methods
-    """
+    """  # noqa
     requires = mg.p2
     input = "infile:file"
-    output = "outfile:file:{{in.infile | split: '/' | last | split: '.' | first}}.out"
+    output = "outfile:file:{{in.infile.name | split: '.' | first}}.out"
     envs = {"abc": None, "method": {"a": 1}}
     script = "cat {{in.infile}} > {{out.outfile}}; echo P4 >> {{out.outfile}};"
     plugin_opts = {"report": "<h1>P4</h1><p>{{envs.abc}}</p>"}

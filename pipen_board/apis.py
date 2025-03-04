@@ -7,6 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from yunpath import AnyPath, CloudPath
 from quart import abort, request, redirect, send_file
 from slugify import slugify
 
@@ -20,10 +21,12 @@ if TYPE_CHECKING:
 
 
 # Helper functions
-def _get_children(parent: Path, idx: int = 0) -> Tuple[Mapping[str, Any], int]:
+def _get_children(
+    parent: Path | CloudPath, idx: int = 0
+) -> Tuple[Mapping[str, Any], int]:
     """Get the children of a parent path"""
     out = []
-    for child in parent.glob("*"):
+    for child in parent.iterdir():
         idx += 1
         item = {"id": idx, "text": child.name, "full": str(child)}
         if child.is_dir():
@@ -32,7 +35,7 @@ def _get_children(parent: Path, idx: int = 0) -> Tuple[Mapping[str, Any], int]:
     return out, idx
 
 
-def _get_file_content(path: Path, how: str) -> str:
+def _get_file_content(path: Path | CloudPath, how: str) -> str:
     how, n = how.split(" ", 1)
     n = int(n)
     lines = path.read_text().splitlines()
@@ -43,10 +46,11 @@ def _get_file_content(path: Path, how: str) -> str:
     return "\n".join(lines[-n:])
 
 
-def _is_text_file(file_path: str | Path) -> bool:
+def _is_text_file(file_path: str | Path | CloudPath) -> bool:
     """Check if the file is a text file"""
+    file_path = AnyPath(file_path)
     try:
-        with open(file_path) as file:
+        with file_path.open() as file:
             file.read(1)
     except UnicodeDecodeError:
         return False
@@ -69,13 +73,9 @@ async def history():
     out["histories"] = []
     curr_workdir = Path(args.workdir).resolve()
 
-    for histfile in args.schema_dir.expanduser().glob(
-        f"{slugify(args.pipeline)}.*.*.json"
-    ):
+    for histfile in args.schema_dir.glob(f"{slugify(args.pipeline)}.*.*.json"):
         name = histfile.stem.split(".")[-2]
-        workdir = base64.b64decode(
-            histfile.stem.split(".")[-1] + "=="
-        ).decode()
+        workdir = base64.b64decode(histfile.stem.split(".")[-1] + "==").decode()
         out["histories"].append(
             {
                 "name": name,
@@ -155,7 +155,7 @@ async def history_get():
         "[bold][yellow]API[/yellow][/bold] Fetching history: %s",
         configfile,
     )
-    configfile = args.schema_dir.expanduser().joinpath(configfile)
+    configfile = args.schema_dir.joinpath(configfile)
     return {"ok": True, "data": configfile.read_text()}
 
 
@@ -166,7 +166,7 @@ async def history_del():
         "[bold][yellow]API[/yellow][/bold] Deleting history: %s",
         configfile,
     )
-    args.schema_dir.expanduser().joinpath(configfile).unlink()
+    args.schema_dir.joinpath(configfile).unlink()
     return {"ok": True}
 
 
@@ -175,7 +175,7 @@ async def history_saveas():
     args = request.cli_args
     configfile = req["configfile"]
     newname = req["new_name"]
-    schema_dir = args.schema_dir.expanduser()
+    schema_dir = args.schema_dir
     if not schema_dir.is_dir():
         schema_dir.mkdir(parents=True, exist_ok=True)
 
@@ -208,9 +208,9 @@ async def history_saveas():
         for val in jdata.get("RUNNING_OPTIONS", {}).values():
             configfile_opt = val.get("configfile", "configfile")
             if not val["value"][configfile_opt].get("changed"):
-                val["value"][configfile_opt]["value"] = val["value"][
-                    configfile_opt
-                ]["placeholder"] = f"{newname}.config.toml"
+                val["value"][configfile_opt]["value"] = val["value"][configfile_opt][
+                    "placeholder"
+                ] = f"{newname}.config.toml"
 
         newconfigfile.write_text(json.dumps(jdata, indent=4))
         out["configfile"] = newconfigfile.name
@@ -227,7 +227,7 @@ async def history_download():
         "[bold][yellow]API[/yellow][/bold] Downloading schema: %s",
         configfile,
     )
-    schema_dir = request.cli_args.schema_dir.expanduser()
+    schema_dir = request.cli_args.schema_dir
     return await send_file(schema_dir.joinpath(configfile), as_attachment=True)
 
 
@@ -280,6 +280,7 @@ async def history_fromurl():
         )
         try:
             import urllib.request
+
             with urllib.request.urlopen(url) as response:
                 return {"ok": True, "content": response.read().decode()}
         except Exception as exc:
@@ -292,7 +293,7 @@ async def config_save():
     configfile = data.get("configfile")
     configdata = data["data"]
     jdata = json.loads(configdata)
-    schema_dir = args.schema_dir.expanduser()
+    schema_dir = args.schema_dir
     if not schema_dir.is_dir():
         schema_dir.mkdir(parents=True, exist_ok=True)
 
@@ -303,15 +304,13 @@ async def config_save():
     enc = base64.b64encode(workdir.encode()).decode().rstrip("=")
     if not configfile:
         # base64 encode the workdir path
-        configfile = schema_dir.joinpath(
-            f"{slugify(args.pipeline)}.{name}.{enc}.json"
-        )
+        configfile = schema_dir.joinpath(f"{slugify(args.pipeline)}.{name}.{enc}.json")
         for val in jdata.get("RUNNING_OPTIONS", {}).values():
             configfile_opt = val.get("configfile", "configfile")
             if not val["value"][configfile_opt].get("changed"):
-                val["value"][configfile_opt]["value"] = val["value"][
-                    configfile_opt
-                ]["placeholder"] = f"{name}.config.toml"
+                val["value"][configfile_opt]["value"] = val["value"][configfile_opt][
+                    "placeholder"
+                ] = f"{name}.config.toml"
 
         out["ctime"] = now
         out["is_current"] = True
@@ -321,22 +320,17 @@ async def config_save():
             f"{configfile}"
         )
     elif configfile.startswith("new:"):
-        name = (
-            configfile[4:]
-            or jdata[SECTION_PIPELINE_OPTIONS]["name"]["default"]
-        )
+        name = configfile[4:] or jdata[SECTION_PIPELINE_OPTIONS]["name"]["default"]
         jdata[SECTION_PIPELINE_OPTIONS]["name"]["value"] = name
         for val in jdata.get("RUNNING_OPTIONS", {}).values():
             configfile_opt = val.get("configfile", "configfile")
             if not val["value"][configfile_opt].get("changed"):
-                val["value"][configfile_opt]["value"] = val["value"][
-                    configfile_opt
-                ]["placeholder"] = f"{name}.config.toml"
+                val["value"][configfile_opt]["value"] = val["value"][configfile_opt][
+                    "placeholder"
+                ] = f"{name}.config.toml"
 
         configdata = json.dumps(jdata, indent=4)
-        configfile = schema_dir.joinpath(
-            f"{slugify(args.pipeline)}.{name}.{enc}.json"
-        )
+        configfile = schema_dir.joinpath(f"{slugify(args.pipeline)}.{name}.{enc}.json")
         if configfile.exists():
             return {"ok": False, "error": "File already exists."}
 
@@ -350,9 +344,7 @@ async def config_save():
         )
     else:
         configfile = schema_dir.joinpath(configfile)
-        logger.info(
-            f"[bold][yellow]API[/yellow][/bold] Saving config to: {configfile}"
-        )
+        logger.info(f"[bold][yellow]API[/yellow][/bold] Saving config to: {configfile}")
 
     out["configfile"] = configfile.name
     configfile.write_text(configdata)
@@ -366,11 +358,7 @@ async def job_get_tree():
         "[bold][yellow]API[/yellow][/bold] Fetching tree for: "
         f"{data['proc']}/{data['job']}"
     )
-    jobdir = Path(args.workdir).joinpath(
-        data["name"],
-        data["proc"],
-        str(data["job"]),
-    )
+    jobdir = args.workdir.joinpath(data["name"], data["proc"], str(data["job"]))
     if not jobdir.is_dir():
         return []
 
@@ -383,7 +371,7 @@ async def job_get_file():
     """Get file details"""
     data = await request.get_json()
     how = data.get("how", "full")
-    path = Path(data["path"])
+    path = AnyPath(data["path"])
     if how != "full":
         logger.info(
             "[bold][yellow]API[/yellow][/bold] Fetching file for "
@@ -440,7 +428,7 @@ async def job_get_file():
 
 async def job_get_file_metadata():
     data = await request.get_json()
-    path = Path(data["path"])
+    path = AnyPath(data["path"])
     logger.info(
         "[bold][yellow]API[/yellow][/bold] Fetching file metadata for "
         f"{data['proc']}/{data['job']}: {path}"
@@ -482,11 +470,7 @@ async def ws_pipeline(data, clients):
 
     # logger.info(f"WS/PIPELINE Received: {logdata}")
     type = data.get("type")
-    if (
-        type
-        and type.startswith("on_")
-        and callable(getattr(data_manager, type, None))
-    ):
+    if type and type.startswith("on_") and callable(getattr(data_manager, type, None)):
         await getattr(data_manager, type)(data["data"], clients.get("web"))
 
 

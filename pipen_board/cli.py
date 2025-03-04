@@ -3,7 +3,9 @@ from __future__ import annotations
 
 import sys
 from typing import TYPE_CHECKING
+from pathlib import Path
 
+from yunpath import AnyPath
 from pipen.cli import CLIPlugin
 
 from .version import __version__
@@ -82,7 +84,6 @@ class PipenCliBoardPlugin(CLIPlugin):
             dest="schema_dir",
             help="The directory to store the configuration schemas.",
             default="./.pipen-board",
-            type="path",
         )
         subparser.add_argument(
             "pipeline",
@@ -105,6 +106,12 @@ class PipenCliBoardPlugin(CLIPlugin):
         args, rest = args[:idx], args[idx + 1:]
         parsed = self.parser.parse_args(args=args)
         parsed.pipeline_args = rest
+        parsed.schema_dir = AnyPath(parsed.schema_dir)
+        if isinstance(parsed.schema_dir, Path):
+            parsed.schema_dir.expanduser()
+        parsed.workdir = AnyPath(parsed.workdir)
+        if isinstance(parsed.workdir, Path):
+            parsed.workdir.expanduser()
         return parsed
 
     def exec_command(self, args: Namespace) -> None:
