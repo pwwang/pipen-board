@@ -1190,13 +1190,13 @@ executing = ">=2.0,<3.0"
 
 [[package]]
 name = "pipen"
-version = "0.16.0a8"
+version = "0.16.0"
 description = "A pipeline framework for python"
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "pipen-0.16.0a8-py3-none-any.whl", hash = "sha256:cd5a255913de91bb32107ade8e2cecb56ae47db15cc672ec50efd78bec6b4cbe"},
-    {file = "pipen-0.16.0a8.tar.gz", hash = "sha256:63512fab632f56f24f98c56350dae46929137ec343c8676eed6b9987e9e5b436"},
+    {file = "pipen-0.16.0-py3-none-any.whl", hash = "sha256:0a824bf416469bea6957432647ef9e4342786dba01b2657aa183e22ceef9f607"},
+    {file = "pipen-0.16.0.tar.gz", hash = "sha256:5343fd3178ffe8716ab71426fbda9087bce202c0dade78003aa231875f0fa8c7"},
 ]
 
 [package.dependencies]
@@ -1211,95 +1211,95 @@ xqute = ">=0.8,<0.9"
 
 [[package]]
 name = "pipen-annotate"
-version = "0.15.0a1"
+version = "0.15.0"
 description = "Use docstring to annotate pipen processes"
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "pipen_annotate-0.15.0a1-py3-none-any.whl", hash = "sha256:9bef8ea5fd20ac7bfea01ddfe4d42f592cdd537a1cc88ffcbdbb90140267f56e"},
-    {file = "pipen_annotate-0.15.0a1.tar.gz", hash = "sha256:b372fddb9dafe7a98ee0b3a24ac731316ab9430cbaab82fc4410da50ba8d768c"},
+    {file = "pipen_annotate-0.15.0-py3-none-any.whl", hash = "sha256:a08fa3a91a8656a11d87e5fa8eb43af544e3cf987534929a643f919d3460f7ea"},
+    {file = "pipen_annotate-0.15.0.tar.gz", hash = "sha256:648d7162756251b1773af922747cd78b939ac93dffee53eac32f0a4f5733067c"},
 ]
 
 [package.dependencies]
-pipen = ">=0.16.0a1,<0.17.0"
+pipen = ">=0.16.0,<0.17.0"
 
 [[package]]
 name = "pipen-args"
-version = "0.17.0a1"
+version = "0.17.0"
 description = "Command-line argument parser for pipen."
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "pipen_args-0.17.0a1-py3-none-any.whl", hash = "sha256:20c9514d8dc2f3c6e0e4d915f6a7a60c14258aa43d963523344a4a4f1b201694"},
-    {file = "pipen_args-0.17.0a1.tar.gz", hash = "sha256:e9075748df342499912f226f5fa2984f59207cb5dd8b7740b41e4b584d57debd"},
+    {file = "pipen_args-0.17.0-py3-none-any.whl", hash = "sha256:2941363592ed8cd3d0cf98c61446665d7617da995070d474dcac24a9f2aa270e"},
+    {file = "pipen_args-0.17.0.tar.gz", hash = "sha256:740bff015b7ebde1421f47d84d78c6651e668fa951cdcd89373fb2b87325d33c"},
 ]
 
 [package.dependencies]
-pipen-annotate = ">=0.15.0a1,<0.16.0"
+pipen-annotate = ">=0.15,<0.16"
 
 [[package]]
 name = "pipen-diagram"
-version = "0.13.0a2"
+version = "0.13.0"
 description = "Draw pipeline diagrams for pipen."
 optional = true
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "pipen_diagram-0.13.0a2-py3-none-any.whl", hash = "sha256:3536e83f6639110114b693f056fe7038842175d3d6b38c7eece8b3b18fc4afed"},
-    {file = "pipen_diagram-0.13.0a2.tar.gz", hash = "sha256:73d66dde43eb0e8d9ec3ce7bc177563f6d080a7ec066ab06a41dc7a2c54efdab"},
+    {file = "pipen_diagram-0.13.0-py3-none-any.whl", hash = "sha256:0d8104619fa510bee8b526f8ea0a52d590c4e33613da4ebb123c555a13e0671d"},
+    {file = "pipen_diagram-0.13.0.tar.gz", hash = "sha256:88d5f27d77daf7707f37d0af3da87fa787800567a742bf6adc1988a622e50461"},
 ]
 
 [package.dependencies]
 graphviz = ">=0.20,<0.21"
-pipen = ">=0.16.0a1,<0.17.0"
+pipen = ">=0.16.0,<0.17.0"
 
 [[package]]
 name = "pipen-filters"
-version = "0.15.0a1"
+version = "0.15.0"
 description = "Add a set of useful filters for pipen templates"
 optional = true
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "pipen_filters-0.15.0a1-py3-none-any.whl", hash = "sha256:0447a9219789fce5bfd043752bd2c779105949f73d9d974ce23af9627c9d4d0a"},
-    {file = "pipen_filters-0.15.0a1.tar.gz", hash = "sha256:d763aae6acbe0dbb931713a380ccaffbb491f1bf8dfa79a7001303d32902b529"},
+    {file = "pipen_filters-0.15.0-py3-none-any.whl", hash = "sha256:2026d20132749e3aee8cd397c8fd81d4bf0e3237eb6a01a722c0c2e1d217edee"},
+    {file = "pipen_filters-0.15.0.tar.gz", hash = "sha256:1618ee3efbcca1d57f25a83e0a46a0c3bb9317fb2af448b88c1d66ce320a453e"},
 ]
 
 [package.dependencies]
-pipen = ">=0.16.0a4,<0.17.0"
+pipen = ">=0.16.0,<0.17.0"
 
 [[package]]
 name = "pipen-log2file"
-version = "0.9.0a2"
+version = "0.9.0"
 description = "Add verbosal information in logs for pipen."
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "pipen_log2file-0.9.0a2-py3-none-any.whl", hash = "sha256:7b699c9edac2206a842a8d9e9b219c852317781da5ed5ef34e3980af3c394a96"},
-    {file = "pipen_log2file-0.9.0a2.tar.gz", hash = "sha256:64f9ec4595f40cda6267624862bbbb81da13e91b948cdae5240499210e3c3947"},
+    {file = "pipen_log2file-0.9.0-py3-none-any.whl", hash = "sha256:fb3434bcfdc2d36eb757cb0c0013b42feb44830feacf92f9e7efeeb9669dc93a"},
+    {file = "pipen_log2file-0.9.0.tar.gz", hash = "sha256:38314afe58c1c59c6cd3523c70991c94638b794213847b45f020466b281cdbc7"},
 ]
 
 [package.dependencies]
-pipen = ">=0.16.0a1,<0.17.0"
+pipen = ">=0.16.0,<0.17.0"
 
 [[package]]
 name = "pipen-report"
-version = "0.22.0a1"
+version = "0.22.0"
 description = "Report generation system for pipen"
 optional = true
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "pipen_report-0.22.0a1-py3-none-any.whl", hash = "sha256:aa62b75a1e9e378d5fcbfd220f0228fe629e3fde17bb8a51df549a3509616f7a"},
-    {file = "pipen_report-0.22.0a1.tar.gz", hash = "sha256:788f329be5153fac54a079ecd6748977c16b392111259328d36190ec5ac6c561"},
+    {file = "pipen_report-0.22.0-py3-none-any.whl", hash = "sha256:6df9d549a1da434a89587fd75a372144bf136f62b793515e73b756df0b636d82"},
+    {file = "pipen_report-0.22.0.tar.gz", hash = "sha256:783f9d5ebec0208ca0a0e45048c5d00ebb080518810d657725c2eb0121ec6090"},
 ]
 
 [package.dependencies]
 copier = ">=9,<10"
 imagesize = ">=1.4,<2.0"
 Markdown = ">=3,<4"
-pipen = ">=0.16.0a8,<0.17.0"
+pipen = ">=0.16,<0.17"
 python-slugify = ">=8.0,<9.0"
 
 [package.extras]
-runinfo = ["pipen-runinfo (>=0.9.0a1,<0.10.0)"]
+runinfo = ["pipen-runinfo (>=0.9.0,<0.10.0)"]
 
 [[package]]
 name = "platformdirs"
@@ -2268,4 +2268,4 @@ report = ["pipen-report"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "5171688d171cc671119517ffc6203b93366c04ec2d6c1b5c9a22371b1cbd85ca"
+content-hash = "96aaf3d6bedd9e8c46eeb0cf72a9887fd6bc733f6e53fd964f78f7506e0237ba"
