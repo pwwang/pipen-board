@@ -259,6 +259,10 @@
                             <p>&nbsp;</p>
                             <p>You can either:</p>
                             <ul>
+                                {#if data[SECTION_REPORTS].includes('://')}
+                                <li>You may download the output and check them out by directly visiting the <code>index.html</code> file, </li>
+                                <li>Or serve the whole downloaded directory by running <code>pipen report serve -r [downloaded output directory]</code>.</li>
+                                {:else}
                                 <li>Check them out by directly visiting <code>{data[SECTION_REPORTS]}/REPORTS/index.html</code></li>
                                 <li>Run <code>pipen report serve -r {data[SECTION_REPORTS]}</code>, and go to <code>REPORTS</code> directory.</li>
                                 <li>Visit <a target="_blank" href="/reports/{data[SECTION_REPORTS].replaceAll('/', '|')}/REPORTS/index.html">the reports</a> served by this plugin</li>
@@ -266,6 +270,7 @@
                                     <a href={'javascript:void(0)'} on:click|preventDefault={loadReportBuildingLog}>building log</a>
                                     if necessary.
                                 </li>
+                                {/if}
                             </ul>
                             <p>&nbsp;</p>
                             <p>Note that if the run fails, the reports may be incomplete.</p>

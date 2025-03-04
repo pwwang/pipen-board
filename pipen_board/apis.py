@@ -71,9 +71,12 @@ async def history():
     out = {}
     out["pipeline"] = args.pipeline
     out["histories"] = []
-    curr_workdir = Path(args.workdir).resolve()
+    curr_workdir = args.workdir
 
     for histfile in args.schema_dir.glob(f"{slugify(args.pipeline)}.*.*.json"):
+        ctime = histfile.stat().st_ctime or 0
+        mtime = histfile.stat().st_mtime or 0
+
         name = histfile.stem.split(".")[-2]
         workdir = base64.b64decode(histfile.stem.split(".")[-1] + "==").decode()
         out["histories"].append(
@@ -81,16 +84,16 @@ async def history():
                 "name": name,
                 "configfile": histfile.name,
                 "workdir": workdir,
-                "is_current": Path(workdir).resolve() == curr_workdir,
+                "is_current": workdir == str(curr_workdir),
                 # 2023-01-01_00-00-00 to
                 # 2023-01-01 00:00:00
                 "ctime": (
-                    datetime.fromtimestamp(histfile.stat().st_ctime).strftime(
+                    datetime.fromtimestamp(ctime).strftime(
                         "%Y-%m-%d %H:%M:%S"
                     )
                 ),
                 "mtime": (
-                    datetime.fromtimestamp(histfile.stat().st_mtime).strftime(
+                    datetime.fromtimestamp(mtime).strftime(
                         "%Y-%m-%d %H:%M:%S"
                     )
                 ),
@@ -283,8 +286,12 @@ async def history_fromurl():
 
             with urllib.request.urlopen(url) as response:
                 return {"ok": True, "content": response.read().decode()}
-        except Exception as exc:
-            return {"ok": False, "error": str(exc)}
+        except Exception:
+            try:
+                path = AnyPath(url)
+                return {"ok": True, "content": path.read_text()}
+            except Exception as exc:
+                return {"ok": False, "error": str(exc)}
 
 
 async def config_save():
@@ -299,7 +306,7 @@ async def config_save():
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     name = jdata[SECTION_PIPELINE_OPTIONS]["name"]["value"]
-    workdir = Path(args.workdir).resolve().as_posix()
+    workdir = str(args.workdir)
     out = {"name": name, "mtime": now}
     enc = base64.b64encode(workdir.encode()).decode().rstrip("=")
     if not configfile:

@@ -369,7 +369,7 @@ async def _get_config_data(
             "desc": "The output directory of your pipeline",
             "placeholder": "./<name>-output",
             "type": "str",
-            "value": None,
+            "value": str(pipeline.outdir),
         }
         for key, val in data[SECTION_PIPELINE_OPTIONS].items():
             _get_default(val, key in ("plugin_opts", "scheduler_opts"))
@@ -450,11 +450,11 @@ async def _get_config_data(
                 pipeline=args.pipeline,
                 pipeline_args=args.pipeline_args,
             )
-            update_dict(data, addi_data)
+            data = update_dict(data, addi_data)
 
     except Exception:
-        import traceback
 
+        import traceback
         return {"error": traceback.format_exc()}
 
     return data
@@ -572,15 +572,14 @@ class DataManager:
             "outdir",
             {"value": None},
         )["value"]
+
         if not outdir:
             outdir = args.workdir.parent.joinpath(f"{name}-output")
         else:
             outdir = AnyPath(outdir)
 
-        report_procs_dir = outdir.joinpath("REPORTS", "procs")
-        if report_procs_dir.is_dir() and [
-            p for p in report_procs_dir.iterdir() if p.is_dir()
-        ]:
+        report_procs_dir = outdir.joinpath("REPORTS", "pages")
+        if report_procs_dir.is_dir() and [p for p in report_procs_dir.glob("*.js")]:
             out[SECTION_REPORTS] = str(outdir)
 
         diagram = outdir.joinpath("diagram.svg")
