@@ -70,7 +70,7 @@ class PipenBoardPlugin:
 
         if not sel.select(timeout=1):
             self.ws = None
-            logger.debug("No data in stdin, skip.")
+            logger.debug("Receiving data from stdin timeout (1s), skip.")
             return
 
         port = sys.stdin.readline().strip()
