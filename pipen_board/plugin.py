@@ -122,8 +122,8 @@ class PipenBoardPlugin:
             reports_dir = pipen.outdir.joinpath("REPORTS")
             if (
                 reports_dir.joinpath("index.html").is_file()
-                and reports_dir.joinpath("procs").is_dir()
-                and [p for p in reports_dir.joinpath("procs").iterdir()]
+                and reports_dir.joinpath("pages").is_dir()
+                and [p for p in reports_dir.joinpath("pages").iterdir()]
             ):
                 data[SECTION_REPORTS] = str(reports_dir.parent)
 
