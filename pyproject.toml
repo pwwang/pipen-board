@@ -13,7 +13,7 @@ generate-setup-file = true
 [tool.poetry.dependencies]
 python = "^3.9"
 quart = "^0.20"
-psutil = "^5.9"
+psutil = "^7"
 websocket-client = "^1.8"
 python-slugify = "^8.0"
 pipen-args = "^0.17"
