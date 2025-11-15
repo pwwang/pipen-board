@@ -96,7 +96,7 @@ class PipenCliBoardPlugin(CLIPlugin):
             ),
         )
 
-    def parse_args(self) -> Namespace:
+    def parse_args(self, known_parsed, unparsed_argv) -> Namespace:
         """Parse the arguments"""
         # split the args into two parts, separated by `--`
         # the first part is the args for pipen_cli_config
