@@ -31,7 +31,7 @@ filters = ["pipen-filters"]
 all = ["pipen-report", "pipen-diagram", "pipen-filters"]
 
 [tool.poetry.group.dev.dependencies]
-cloudsh = "^0.1"
+cloudsh = "^0.2"
 python-dotenv = "^1"
 google-cloud-storage = "^3"
 

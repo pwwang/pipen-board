@@ -304,14 +304,14 @@ s3 = ["boto3 (>=1.34.0)"]
 
 [[package]]
 name = "cloudsh"
-version = "0.1.5"
+version = "0.2.1"
 description = "A Python CLI wrapping common Linux commands for local/cloud files."
 optional = false
 python-versions = "<4.0,>=3.9"
 groups = ["dev"]
 files = [
-    {file = "cloudsh-0.1.5-py3-none-any.whl", hash = "sha256:4c094f958f19cc6f125e058100fe79fc8ad582bdef13d27a3348ff8bca4ca59d"},
-    {file = "cloudsh-0.1.5.tar.gz", hash = "sha256:c7c59fc0e67666b4b8ef4be54801bc5fb42a82f500a51675494f2e00d78e5403"},
+    {file = "cloudsh-0.2.1-py3-none-any.whl", hash = "sha256:1db16896e2821bff6e94a54220a3b95158fad92afd1b3e17b2c5318d9dc6476f"},
+    {file = "cloudsh-0.2.1.tar.gz", hash = "sha256:438cab42c78a65d051b87eadeedb7a0a944bb24ff5680420889f3a58196587f2"},
 ]
 
 [package.dependencies]
@@ -2710,4 +2710,4 @@ report = ["pipen-report"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.9"
-content-hash = "f5f7a8af548f1939fa90a371a41141626ecefd6a3a3e7ed6f452f333defa71d7"
+content-hash = "4cf0ffc1581cd530b3d8b7c808a942ccf395aa5f8d608eaf31e6f9cdce8617b8"
