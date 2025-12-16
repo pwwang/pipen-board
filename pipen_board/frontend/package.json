@@ -17,10 +17,10 @@
   "dependencies": {
     "@cfworker/json-schema": "^4.1.0",
     "@iarna/toml": "^2.2.5",
-    "carbon-components-svelte": "^0.89.0",
+    "carbon-components-svelte": "^0.96.0",
     "carbon-icons-svelte": "^13.5.0",
     "clipboard-copy": "^4.0.1",
     "highlight.js": "^11.8.0",
-    "marked": "^16.1.0"
+    "marked": "^17.0"
   }
 }
