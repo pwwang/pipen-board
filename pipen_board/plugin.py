@@ -142,7 +142,7 @@ class PipenBoardPlugin:
                 "data": {
                     "proc": proc.name,
                     "procgroup": group,
-                    "njobs": len(proc.jobs),
+                    "njobs": proc.size,
                 },
             },
             log=proc.log,
