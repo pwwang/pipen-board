@@ -16,13 +16,13 @@ quart = "^0.20"
 psutil = "^7"
 websocket-client = "^1.8"
 python-slugify = "^8.0"
-pipen-args = "^0.17"
-pipen-log2file = "^0.10"
+pipen-args = "^1.0"
+pipen-log2file = "^1.0"
 # markers = "python_version < \"3.11\"" can not be recognized by poetry
 taskgroup = { version = "^0.2", python = "<3.11" }
-pipen-report = { version = "^0.23", optional = true }
-pipen-diagram = { version = "^0.13", optional = true }
-pipen-filters = { version = "^0.15", optional = true }
+pipen-report = { version = "^1.0", optional = true }
+pipen-diagram = { version = "^1.0", optional = true }
+pipen-filters = { version = "^1.0", optional = true }
 
 [tool.poetry.extras]
 report = ["pipen-report"]
