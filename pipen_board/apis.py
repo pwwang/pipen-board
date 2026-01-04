@@ -7,7 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from yunpath import AnyPath, CloudPath
+from panpath import PanPath, CloudPath
 from quart import abort, request, redirect, send_file
 from slugify import slugify
 
@@ -21,24 +21,22 @@ if TYPE_CHECKING:
 
 
 # Helper functions
-def _get_children(
-    parent: Path | CloudPath, idx: int = 0
-) -> Tuple[Mapping[str, Any], int]:
+async def _get_children(parent: PanPath, idx: int = 0) -> Tuple[Mapping[str, Any], int]:
     """Get the children of a parent path"""
     out = []
-    for child in parent.iterdir():
+    async for child in parent.a_iterdir():
         idx += 1
         item = {"id": idx, "text": child.name, "full": str(child)}
-        if child.is_dir():
-            item["children"], idx = _get_children(child, idx)
+        if await child.a_is_dir():
+            item["children"], idx = await _get_children(child, idx)
         out.append(item)
     return out, idx
 
 
-def _get_file_content(path: Path | CloudPath, how: str) -> str:
+async def _get_file_content(path: PanPath, how: str) -> str:
     how, n = how.split(" ", 1)
     n = int(n)
-    lines = path.read_text().splitlines()
+    lines = (await path.a_read_text()).splitlines()
 
     if how == "Head":
         return "\n".join(lines[:n])
@@ -46,12 +44,12 @@ def _get_file_content(path: Path | CloudPath, how: str) -> str:
     return "\n".join(lines[-n:])
 
 
-def _is_text_file(file_path: str | Path | CloudPath) -> bool:
+async def _is_text_file(file_path: str | Path | CloudPath) -> bool:
     """Check if the file is a text file"""
-    file_path = AnyPath(file_path)
+    file_path = PanPath(file_path)
     try:
-        with file_path.open() as file:
-            file.read(1)
+        async with file_path.a_open() as file:
+            await file.read(1)
     except UnicodeDecodeError:
         return False
     return True
@@ -73,12 +71,19 @@ async def history():
     out["histories"] = []
     curr_workdir = args.workdir
 
-    for histfile in args.schema_dir.glob(f"{slugify(args.pipeline)}.*.*.json"):
-        ctime = histfile.stat().st_ctime or 0
-        mtime = histfile.stat().st_mtime or 0
+    async for histfile in PanPath(args.schema_dir).a_glob(
+        f"{slugify(args.pipeline)}.*.*.json"
+    ):
+        ctime = (await histfile.a_stat()).st_ctime or 0
+        mtime = (await histfile.a_stat()).st_mtime or 0
+        if isinstance(ctime, (int, float)):
+            ctime = datetime.fromtimestamp(ctime)
+        if isinstance(mtime, (int, float)):
+            mtime = datetime.fromtimestamp(mtime)
 
         name = histfile.stem.split(".")[-2]
         workdir = base64.b64decode(histfile.stem.split(".")[-1] + "==").decode()
+
         out["histories"].append(
             {
                 "name": name,
@@ -87,16 +92,8 @@ async def history():
                 "is_current": workdir == str(curr_workdir),
                 # 2023-01-01_00-00-00 to
                 # 2023-01-01 00:00:00
-                "ctime": (
-                    datetime.fromtimestamp(ctime).strftime(
-                        "%Y-%m-%d %H:%M:%S"
-                    )
-                ),
-                "mtime": (
-                    datetime.fromtimestamp(mtime).strftime(
-                        "%Y-%m-%d %H:%M:%S"
-                    )
-                ),
+                "ctime": ctime.strftime("%Y-%m-%d %H:%M:%S"),
+                "mtime": mtime.strftime("%Y-%m-%d %H:%M:%S"),
             }
         )
 
@@ -113,7 +110,7 @@ async def pipeline_data():
     req = await request.get_json()
     configfile = req.get("configfile")
     preset = req.get("preset")
-    return data_manager.get_data(request.cli_args, configfile, preset)
+    return await data_manager.get_data(request.cli_args, configfile, preset)
 
 
 async def reports(report_path):
@@ -121,11 +118,11 @@ async def reports(report_path):
     root, rest = report_path.split("/", 1)
     root = root.replace("|", "/")
 
-    report_path = Path(root) / rest
-    if report_path.is_dir():
+    report_path = PanPath(root) / rest
+    if await report_path.a_is_dir():
         report_path = report_path / "index.html"
 
-    if not report_path.is_file():
+    if not await report_path.a_is_file():
         return abort(404)
     # Serve the file
     return await send_file(report_path)
@@ -135,7 +132,7 @@ async def report_building_log():
     """Get the building log of a report"""
     args = request.cli_args
     name = request.args["name"]
-    report_file = Path(args.workdir).joinpath(
+    report_file = PanPath(args.workdir).joinpath(
         name,
         ".report-workdir",
         "pipen-report.log",
@@ -144,11 +141,11 @@ async def report_building_log():
         "[bold][yellow]API[/yellow][/bold] Getting building log: %s",
         report_file,
     )
-    if not report_file.is_file():
+    if not await report_file.a_is_file():
         return {"ok": False, "content": "No report building log file found."}
 
     pattern = re.compile(r"\x1B\[\d+(;\d+){0,2}m")
-    return {"ok": True, "content": pattern.sub("", report_file.read_text())}
+    return {"ok": True, "content": pattern.sub("", await report_file.a_read_text())}
 
 
 async def history_get():
@@ -158,8 +155,8 @@ async def history_get():
         "[bold][yellow]API[/yellow][/bold] Fetching history: %s",
         configfile,
     )
-    configfile = args.schema_dir.joinpath(configfile)
-    return {"ok": True, "data": configfile.read_text()}
+    configfile = PanPath(args.schema_dir).joinpath(configfile)
+    return {"ok": True, "data": await configfile.a_read_text()}
 
 
 async def history_del():
@@ -169,7 +166,7 @@ async def history_del():
         "[bold][yellow]API[/yellow][/bold] Deleting history: %s",
         configfile,
     )
-    args.schema_dir.joinpath(configfile).unlink()
+    await PanPath(args.schema_dir).joinpath(configfile).a_unlink()
     return {"ok": True}
 
 
@@ -178,9 +175,9 @@ async def history_saveas():
     args = request.cli_args
     configfile = req["configfile"]
     newname = req["new_name"]
-    schema_dir = args.schema_dir
-    if not schema_dir.is_dir():
-        schema_dir.mkdir(parents=True, exist_ok=True)
+    schema_dir = PanPath(args.schema_dir)
+    if not await schema_dir.a_is_dir():
+        await schema_dir.a_mkdir(parents=True, exist_ok=True)
 
     logger.info(
         "[bold][yellow]API[/yellow][/bold] Save history: %s with new name: %s",
@@ -188,7 +185,7 @@ async def history_saveas():
         newname,
     )
     try:
-        jdata = json.loads(schema_dir.joinpath(configfile).read_text())
+        jdata = json.loads(await schema_dir.joinpath(configfile).a_read_text())
         jdata[SECTION_PIPELINE_OPTIONS]["name"]["value"] = newname
 
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -205,7 +202,7 @@ async def history_saveas():
             f"{slugify(args.pipeline)}.{newname}.{enc}.json"
         )
 
-        if newconfigfile.is_file():
+        if await newconfigfile.a_is_file():
             return {"ok": False, "error": "File already exists."}
 
         for val in jdata.get("RUNNING_OPTIONS", {}).values():
@@ -215,7 +212,7 @@ async def history_saveas():
                     "placeholder"
                 ] = f"{newname}.config.toml"
 
-        newconfigfile.write_text(json.dumps(jdata, indent=4))
+        await newconfigfile.a_write_text(json.dumps(jdata, indent=4))
         out["configfile"] = newconfigfile.name
 
     except Exception as exc:
@@ -273,7 +270,7 @@ async def history_fromurl():
             url,
         )
         try:
-            return {"ok": True, "content": Path(url).read_text()}
+            return {"ok": True, "content": await PanPath(url).a_read_text()}
         except Exception as exc:
             return {"ok": False, "error": str(exc)}
     else:
@@ -288,8 +285,8 @@ async def history_fromurl():
                 return {"ok": True, "content": response.read().decode()}
         except Exception:
             try:
-                path = AnyPath(url)
-                return {"ok": True, "content": path.read_text()}
+                path = PanPath(url)
+                return {"ok": True, "content": await path.a_read_text()}
             except Exception as exc:
                 return {"ok": False, "error": str(exc)}
 
@@ -300,9 +297,9 @@ async def config_save():
     configfile = data.get("configfile")
     configdata = data["data"]
     jdata = json.loads(configdata)
-    schema_dir = args.schema_dir
-    if not schema_dir.is_dir():
-        schema_dir.mkdir(parents=True, exist_ok=True)
+    schema_dir = PanPath(args.schema_dir)
+    if not await schema_dir.a_is_dir():
+        await schema_dir.a_mkdir(parents=True, exist_ok=True)
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     name = jdata[SECTION_PIPELINE_OPTIONS]["name"]["value"]
@@ -338,7 +335,7 @@ async def config_save():
 
         configdata = json.dumps(jdata, indent=4)
         configfile = schema_dir.joinpath(f"{slugify(args.pipeline)}.{name}.{enc}.json")
-        if configfile.exists():
+        if await configfile.a_exists():
             return {"ok": False, "error": "File already exists."}
 
         out["name"] = name
@@ -354,7 +351,7 @@ async def config_save():
         logger.info(f"[bold][yellow]API[/yellow][/bold] Saving config to: {configfile}")
 
     out["configfile"] = configfile.name
-    configfile.write_text(configdata)
+    await configfile.a_write_text(configdata)
     return out
 
 
@@ -365,20 +362,22 @@ async def job_get_tree():
         "[bold][yellow]API[/yellow][/bold] Fetching tree for: "
         f"{data['proc']}/{data['job']}"
     )
-    jobdir = args.workdir.joinpath(data["name"], data["proc"], str(data["job"]))
-    if not jobdir.is_dir():
+    jobdir = PanPath(args.workdir).joinpath(
+        data["name"], data["proc"], str(data["job"])
+    )
+    if not await jobdir.a_is_dir():
         return []
 
     # compose a treeview data
     # see: https://carbon-components-svelte.onrender.com/components/TreeView
-    return _get_children(jobdir)[0]
+    return (await _get_children(jobdir))[0]
 
 
 async def job_get_file():
     """Get file details"""
     data = await request.get_json()
     how = data.get("how", "full")
-    path = AnyPath(data["path"])
+    path = PanPath(data["path"])
     if how != "full":
         logger.info(
             "[bold][yellow]API[/yellow][/bold] Fetching file for "
@@ -386,7 +385,7 @@ async def job_get_file():
         )
         return {
             "type": "bigtext-part",
-            "content": _get_file_content(path, how),
+            "content": await _get_file_content(path, how),
         }
 
     logger.info(
@@ -398,10 +397,10 @@ async def job_get_file():
         "job.signature.toml",
         "job.rc",
     ):
-        return {"type": "text", "content": path.read_text()}
+        return {"type": "text", "content": await path.a_read_text()}
 
     if path.name == "job.status":
-        st_code = path.read_text().strip()
+        st_code = (await path.a_read_text()).strip()
         status = JOB_STATUS.get(st_code, "UNKNOWN")
         return {"type": "text", "content": f"{st_code} ({status})"}
 
@@ -411,37 +410,37 @@ async def job_get_file():
             "type": "image",
             "content": (
                 f"data:image/{path.suffix[1:]};base64,"
-                f"{base64.b64encode(path.read_bytes()).decode()}"
+                f"{base64.b64encode(await path.a_read_bytes()).decode()}"
             ),
         }
 
-    if _is_text_file(path):
+    if await _is_text_file(path):
         # check the size of the file
-        size = path.stat().st_size
+        size = (await path.a_stat()).st_size
         if size > 1024 * 1024:  # 1MB
             # read first 100 lines
             lines = []
-            with path.open() as f:
-                for i, line in enumerate(f):
+            async with path.a_open() as f:
+                async for i, line in enumerate(f):
                     lines.append(line)
                     if i > 100:
                         break
             return {"type": "bigtext", "content": "".join(lines)}
 
-        return {"type": "text", "content": path.read_text()}
+        return {"type": "text", "content": await path.a_read_text()}
 
     return {"type": "binary"}
 
 
 async def job_get_file_metadata():
     data = await request.get_json()
-    path = AnyPath(data["path"])
+    path = PanPath(data["path"])
     logger.info(
         "[bold][yellow]API[/yellow][/bold] Fetching file metadata for "
         f"{data['proc']}/{data['job']}: {path}"
     )
 
-    size = size_human = path.stat().st_size
+    size = size_human = (await path.a_stat()).st_size
     base = 1024
     size_human = abs(float(size_human))
     for unit in ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB"]:
@@ -453,10 +452,10 @@ async def job_get_file_metadata():
         "name": path.name,
         "size": size,
         "size_human": f"{size_human:.2f} {unit}",
-        "ctime": datetime.fromtimestamp(path.stat().st_ctime).isoformat(
+        "ctime": datetime.fromtimestamp((await path.a_stat()).st_ctime).isoformat(
             sep=" ", timespec="seconds"
         ),
-        "mtime": datetime.fromtimestamp(path.stat().st_mtime).isoformat(
+        "mtime": datetime.fromtimestamp((await path.a_stat()).st_mtime).isoformat(
             sep=" ", timespec="seconds"
         ),
     }

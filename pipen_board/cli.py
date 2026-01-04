@@ -5,7 +5,7 @@ import sys
 from typing import TYPE_CHECKING
 from pathlib import Path
 
-from yunpath import AnyPath
+from panpath import PanPath
 from pipen.cli import CLIPlugin
 
 from .version import __version__
@@ -106,10 +106,10 @@ class PipenCliBoardPlugin(CLIPlugin):
         args, rest = args[:idx], args[idx + 1:]
         parsed = self.parser.parse_args(args=args)
         parsed.pipeline_args = rest
-        parsed.schema_dir = AnyPath(parsed.schema_dir)
+        parsed.schema_dir = PanPath(parsed.schema_dir)
         if isinstance(parsed.schema_dir, Path):
             parsed.schema_dir.expanduser()
-        parsed.workdir = AnyPath(parsed.workdir)
+        parsed.workdir = PanPath(parsed.workdir)
         if isinstance(parsed.workdir, Path):
             parsed.workdir.expanduser()
         return parsed

@@ -7,6 +7,7 @@ import selectors
 from typing import TYPE_CHECKING
 
 import websocket
+from panpath import PanPath
 from pipen.utils import get_marked, get_logger
 from pipen.pluginmgr import plugin
 
@@ -101,9 +102,9 @@ class PipenBoardPlugin:
             return
 
         data = {}
-        diagram = pipen.outdir.joinpath("diagram.svg")
-        if diagram.is_file():
-            data[SECTION_DIAGRAM] = diagram.read_text()
+        diagram = PanPath(pipen.outdir).joinpath("diagram.svg")
+        if await diagram.a_is_file():
+            data[SECTION_DIAGRAM] = await diagram.a_read_text()
 
         for proc in pipen.procs:
             pg = get_marked(proc, "procgroup")
@@ -119,11 +120,11 @@ class PipenBoardPlugin:
     async def on_complete(self, pipen: Pipen, succeeded: bool):
         data = {"succeeded": succeeded}
         if succeeded:
-            reports_dir = pipen.outdir.joinpath("REPORTS")
+            reports_dir = PanPath(pipen.outdir).joinpath("REPORTS")
             if (
-                reports_dir.joinpath("index.html").is_file()
-                and reports_dir.joinpath("pages").is_dir()
-                and [p for p in reports_dir.joinpath("pages").iterdir()]
+                await reports_dir.joinpath("index.html").a_is_file()
+                and await reports_dir.joinpath("pages").a_is_dir()
+                and [p async for p in reports_dir.joinpath("pages").a_iterdir()]
             ):
                 data[SECTION_REPORTS] = str(reports_dir.parent)
 

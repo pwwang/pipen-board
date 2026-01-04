@@ -10,13 +10,13 @@ import signal
 import textwrap
 import time
 from copy import deepcopy
-from multiprocessing import Process, Pipe
+from multiprocessing import get_context
 from pathlib import Path
 from tempfile import gettempdir
 from typing import TYPE_CHECKING, Any, Mapping, Type
 from urllib.parse import urlparse
 
-from yunpath import AnyPath, CloudPath
+from panpath import PanPath, CloudPath
 from simpleconf import Config
 from slugify import slugify
 from liquid import Liquid
@@ -256,7 +256,7 @@ def _proc_to_argspec(
     return argspec
 
 
-def _load_additional(additional: str, **kwargs) -> Mapping[str, Any]:
+async def _load_additional(additional: str, **kwargs) -> Mapping[str, Any]:
     """Load additional config files
 
     Args:
@@ -272,8 +272,8 @@ def _load_additional(additional: str, **kwargs) -> Mapping[str, Any]:
         additional = f"gh:{additional[5:]}"
 
     parsed = urlparse(additional)
-    cache_dir = Path(gettempdir()) / "pipen-cli-config-additional-configs"
-    cache_dir.mkdir(parents=True, exist_ok=True)
+    cache_dir = PanPath(gettempdir()) / "pipen-cli-config-additional-configs"
+    await cache_dir.a_mkdir(parents=True, exist_ok=True)
     if parsed.scheme in ("http", "https", "ftp", "ftps", "gh"):
         from hashlib import sha256
         from urllib.error import URLError
@@ -295,7 +295,7 @@ def _load_additional(additional: str, **kwargs) -> Mapping[str, Any]:
         url = parsed.geturl()
         cache_key = sha256(url.encode("utf-8")).hexdigest()
         additional = cache_dir / f"{cache_key}-{parsed.path.split('/')[-1]}"
-        if not additional.exists():
+        if not await additional.a_exists():
             try:
                 urlretrieve(url, additional)
             except URLError:
@@ -305,24 +305,24 @@ def _load_additional(additional: str, **kwargs) -> Mapping[str, Any]:
 
     if kwargs:
         # kwargs passed, treat the file as a template
-        additional = AnyPath(additional)
-        tpl = Liquid(additional.read_text(), mode="wild", from_file=False)
+        additional = PanPath(additional)
+        tpl = Liquid(await additional.a_read_text(), mode="wild", from_file=False)
         additional = cache_dir.joinpath(
-            f"{slugify(str(additional.resolve()))}.rendered{additional.suffix}"
+            f"{slugify(str(await additional.a_resolve()))}.rendered{additional.suffix}"
         )
-        additional.write_text(tpl.render(**kwargs))
+        await additional.a_write_text(tpl.render(**kwargs))
 
     else:
-        additional = AnyPath(additional)
+        additional = PanPath(additional)
         if isinstance(additional, CloudPath):
             dig = sha256(str(additional).encode()).hexdigest()
             local_add = cache_dir.joinpath(
                 f"{additional.stem}.{dig}{additional.suffix}"
             )
-            additional.download_to(local_add)
+            await additional.a_copy(local_add)
             additional = local_add
 
-    out = Config.load(additional)
+    out = Config.load(await additional.a_read_text(), loader="tomls")
     if "ADDITIONAL_OPTIONS" in out:
         for val in out["ADDITIONAL_OPTIONS"].values():
             _get_default(val)
@@ -444,7 +444,7 @@ async def _get_config_data(
             else:
                 additional = args.additional
 
-            addi_data = _load_additional(
+            addi_data = await _load_additional(
                 additional,
                 name=name or pipeline.name,
                 pipeline=args.pipeline,
@@ -455,9 +455,21 @@ async def _get_config_data(
     except Exception:
 
         import traceback
+
         return {"error": traceback.format_exc()}
 
     return data
+
+
+def _config_data_worker(conn, args, name):
+    """Worker function for multiprocessing to load config data"""
+    try:
+        msg = json.dumps(asyncio.run(_get_config_data(args, name))).encode()
+    except Exception as exc:
+        msg = json.dumps({"error": str(exc)}).encode()
+
+    conn.send(msg)
+    conn.close()
 
 
 class DataManager:
@@ -473,7 +485,7 @@ class DataManager:
         self._timer = None
         self._command = None
 
-    def _get_config_data(
+    async def _get_config_data(
         self,
         args: Namespace,
         configfile: str,
@@ -485,35 +497,29 @@ class DataManager:
             configfile: The name to the config file
         """
         if configfile and not configfile.startswith("new:") and not args.dev:
-            with args.schema_dir.joinpath(configfile).open() as f:
-                self._config_data = json.load(f)
-                return
+            self._config_data = json.loads(
+                await PanPath(args.workdir).joinpath(configfile).a_read_text()
+            )
+            return
 
         self._config_data = None
+
         if not configfile:
             name = None
         elif configfile.startswith("new:"):
             name = configfile[4:]
         else:
             self._config_data = json.loads(
-                args.schema_dir.joinpath(configfile).read_text()
+                await args.schema_dir.joinpath(configfile).a_read_text()
             )
             name = self._config_data[SECTION_PIPELINE_OPTIONS]["name"]["value"]
 
         if not self._config_data:
             # Use multiprocessing to get a clean environment
             # to load the pipeline to avoid conflicts
-            def target(conn):
-                try:
-                    msg = json.dumps(asyncio.run(_get_config_data(args, name))).encode()
-                except Exception as exc:
-                    msg = json.dumps({"error": str(exc)}).encode()
-
-                conn.send(msg)
-                conn.close()
-
-            parent_conn, child_conn = Pipe()
-            p = Process(target=target, args=(child_conn,))
+            ctx = get_context("spawn")
+            parent_conn, child_conn = ctx.Pipe()
+            p = ctx.Process(target=_config_data_worker, args=(child_conn, args, name))
             p.start()
             data = parent_conn.recv()
             p.join()
@@ -531,7 +537,7 @@ class DataManager:
             name or self._config_data[SECTION_PIPELINE_OPTIONS]["name"]["default"]
         )
 
-    def _get_prev_run(self, args: Namespace, configfile: str | None):
+    async def _get_prev_run(self, args: Namespace, configfile: str | None):
         """Get data for the previous run
 
         Args:
@@ -541,10 +547,11 @@ class DataManager:
                 It could also be "new:<name>" for a new instance.
         """
         out = self._run_data = {SECTION_LOG: None, "FINISHED": True}
-        self._get_config_data(args, configfile=configfile)
+        await self._get_config_data(args, configfile=configfile)
         name = self._config_data[SECTION_PIPELINE_OPTIONS]["name"]["value"]
-        pipeline_dir = args.workdir.joinpath(name)
-        if not pipeline_dir.is_dir():
+        pipeline_dir = PanPath(args.workdir).joinpath(name)
+
+        if not await pipeline_dir.a_is_dir():
             # no previous run, return defaults
             self._run_data = DEFAULT_RUN_DATA
             return
@@ -552,16 +559,16 @@ class DataManager:
         # Get the log
         logfile = pipeline_dir.joinpath("run-latest.log")
         logsdir = pipeline_dir.joinpath(".logs")
-        if logfile.exists() and logfile.is_file():
-            out[SECTION_LOG] = logfile.read_text()
-        elif logsdir.is_dir():
+        if await logfile.a_exists() and await logfile.a_is_file():
+            out[SECTION_LOG] = await logfile.a_read_text()
+        elif await logsdir.a_is_dir():
             # a wrong symlink, use the latest one from .logs
-            logfiles = sorted(logsdir.glob("*.log"))
+            logfiles = sorted([x async for x in logsdir.a_glob("*.log")])
             if not logfiles:
                 # no previous run, return defaults
                 self._run_data = DEFAULT_RUN_DATA
                 return
-            out[SECTION_LOG] = logfiles[-1].read_text()
+            out[SECTION_LOG] = await logfiles[-1].a_read_text()
         else:
             # no previous run, return defaults
             self._run_data = DEFAULT_RUN_DATA
@@ -574,35 +581,37 @@ class DataManager:
         )["value"]
 
         if not outdir:
-            outdir = args.workdir.parent.joinpath(f"{name}-output")
+            outdir = PanPath(args.workdir.parent).joinpath(f"{name}-output")
         else:
-            outdir = AnyPath(outdir)
+            outdir = PanPath(outdir)
 
         report_procs_dir = outdir.joinpath("REPORTS", "pages")
-        if report_procs_dir.is_dir() and [p for p in report_procs_dir.glob("*.js")]:
+        if await report_procs_dir.a_is_dir() and [
+            p async for p in report_procs_dir.a_glob("*.js")
+        ]:
             out[SECTION_REPORTS] = str(outdir)
 
         diagram = outdir.joinpath("diagram.svg")
-        if diagram.is_file():
-            out[SECTION_DIAGRAM] = diagram.read_text()
+        if await diagram.a_is_file():
+            out[SECTION_DIAGRAM] = await diagram.a_read_text()
 
         out[SECTION_PROCESSES] = {}
         out[SECTION_PROCGROUPS] = {}
 
-        def process_proc(proc: str, container: dict):
+        async def process_proc(proc: str, container: dict):
             procdir = pipeline_dir.joinpath(proc)
             container[proc] = {"jobs": []}
-            if not procdir.is_dir():
+            if not await procdir.a_is_dir():
                 container[proc]["status"] = "init"
                 return
 
             for jobdir in sorted(
-                [j for j in procdir.iterdir() if j.name.isdigit()],
+                [j async for j in procdir.a_iterdir() if j.name.isdigit()],
                 key=lambda x: int(x.name),
             ):
                 rcfile = jobdir / "job.rc"
                 try:
-                    rc = int(rcfile.read_text().strip())
+                    rc = int((await rcfile.a_read_text()).strip())
                 except Exception:
                     container[proc]["jobs"].append("failed")
                 else:
@@ -615,12 +624,12 @@ class DataManager:
                 container[proc]["status"] = "succeeded"
 
         for proc in config_data[SECTION_PROCESSES]:
-            process_proc(proc, out[SECTION_PROCESSES])
+            await process_proc(proc, out[SECTION_PROCESSES])
 
         for pg in config_data[SECTION_PROCGROUPS]:
             out[SECTION_PROCGROUPS][pg] = {}
             for proc in config_data[SECTION_PROCGROUPS][pg][SECTION_PROCESSES]:
-                process_proc(proc, out[SECTION_PROCGROUPS][pg])
+                await process_proc(proc, out[SECTION_PROCGROUPS][pg])
 
     def _update_config_by_preset(self, preset: Mapping[str, Any] | None):
         if not preset:
@@ -678,7 +687,7 @@ class DataManager:
             self._run_data = deepcopy(DEFAULT_RUN_DATA)
             self._run_data[SECTION_LOG] = log
 
-    def get_data(
+    async def get_data(
         self,
         args: Namespace,
         configfile: str | None,
@@ -686,7 +695,7 @@ class DataManager:
     ):
         """Get the data"""
         if not self.running:
-            self._get_prev_run(args, configfile=configfile)
+            await self._get_prev_run(args, configfile=configfile)
             self._update_config_by_preset(preset)
             return {
                 "runStarted": False,
@@ -694,7 +703,7 @@ class DataManager:
                 "run": self._run_data,
             }
 
-        self._get_config_data(args, configfile=configfile)
+        await self._get_config_data(args, configfile=configfile)
         self._update_config_by_preset(preset)
         return {
             "runStarted": True,

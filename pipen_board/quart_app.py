@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from panpath import PanPath
 from quart import (
     Request,
     websocket,
@@ -77,7 +78,7 @@ def get_app(args: Namespace):
         command = data["command"]
         overwriteConfig = data["overwriteConfig"]
         config = data["config"]
-        tomlfile = Path(data["tomlfile"])
+        tomlfile = PanPath(data["tomlfile"])
         if not overwriteConfig and tomlfile.exists():
             return {
                 "ok": False,
@@ -88,7 +89,7 @@ def get_app(args: Namespace):
                 ),
             }
         try:
-            tomlfile.write_text(config)
+            await tomlfile.a_write_text(config)
         except Exception as ex:
             return {
                 "ok": False,
