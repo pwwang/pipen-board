@@ -1390,18 +1390,18 @@ requests = ["requests (>=2.18.0,<3.0.0)"]
 
 [[package]]
 name = "googleapis-common-protos"
-version = "1.73.0"
+version = "1.73.1"
 description = "Common protobufs used in Google APIs"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.9"
 groups = ["dev"]
 files = [
-    {file = "googleapis_common_protos-1.73.0-py3-none-any.whl", hash = "sha256:dfdaaa2e860f242046be561e6d6cb5c5f1541ae02cfbcb034371aadb2942b4e8"},
-    {file = "googleapis_common_protos-1.73.0.tar.gz", hash = "sha256:778d07cd4fbeff84c6f7c72102f0daf98fa2bfd3fa8bea426edc545588da0b5a"},
+    {file = "googleapis_common_protos-1.73.1-py3-none-any.whl", hash = "sha256:e51f09eb0a43a8602f5a915870972e6b4a394088415c79d79605a46d8e826ee8"},
+    {file = "googleapis_common_protos-1.73.1.tar.gz", hash = "sha256:13114f0e9d2391756a0194c3a8131974ed7bffb06086569ba193364af59163b6"},
 ]
 
 [package.dependencies]
-protobuf = ">=3.20.2,<4.21.1 || >4.21.1,<4.21.2 || >4.21.2,<4.21.3 || >4.21.3,<4.21.4 || >4.21.4,<4.21.5 || >4.21.5,<7.0.0"
+protobuf = ">=4.25.8,<8.0.0"
 
 [package.extras]
 grpc = ["grpcio (>=1.44.0,<2.0.0)"]
@@ -2391,14 +2391,14 @@ pipen = ">=1.0,<2.0"
 
 [[package]]
 name = "pipen-args"
-version = "1.1.3"
+version = "1.2.0"
 description = "Command-line argument parser for pipen."
 optional = false
 python-versions = "<4.0,>=3.9"
 groups = ["main"]
 files = [
-    {file = "pipen_args-1.1.3-py3-none-any.whl", hash = "sha256:0d70c10624daa6829a9c852d3dee7c589b6282fa57513fd180be40b4a8cf4a12"},
-    {file = "pipen_args-1.1.3.tar.gz", hash = "sha256:b334f37740670becde8d5a3abfef556880d282153e96d734f87c61ed67ab0b78"},
+    {file = "pipen_args-1.2.0-py3-none-any.whl", hash = "sha256:82b4ff6cca87fbc6370123ddc627e1baf85d12051d05a078ac611abbedcc08bb"},
+    {file = "pipen_args-1.2.0.tar.gz", hash = "sha256:b94f8c89fdbf92bbc8f536585cee95921723c8fec502f64a8c017fd74e0f160f"},
 ]
 
 [package.dependencies]
@@ -2699,18 +2699,18 @@ files = [
 
 [[package]]
 name = "proto-plus"
-version = "1.27.1"
+version = "1.27.2"
 description = "Beautiful, Pythonic protocol buffers"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.9"
 groups = ["dev"]
 files = [
-    {file = "proto_plus-1.27.1-py3-none-any.whl", hash = "sha256:e4643061f3a4d0de092d62aa4ad09fa4756b2cbb89d4627f3985018216f9fefc"},
-    {file = "proto_plus-1.27.1.tar.gz", hash = "sha256:912a7460446625b792f6448bade9e55cd4e41e6ac10e27009ef71a7f317fa147"},
+    {file = "proto_plus-1.27.2-py3-none-any.whl", hash = "sha256:6432f75893d3b9e70b9c412f1d2f03f65b11fb164b793d14ae2ca01821d22718"},
+    {file = "proto_plus-1.27.2.tar.gz", hash = "sha256:b2adde53adadf75737c44d3dcb0104fde65250dfc83ad59168b4aa3e574b6a24"},
 ]
 
 [package.dependencies]
-protobuf = ">=3.19.0,<7.0.0"
+protobuf = ">=4.25.8,<8.0.0"
 
 [package.extras]
 testing = ["google-api-core (>=1.31.5)"]
@@ -4117,4 +4117,4 @@ report = ["pipen-report"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.9"
-content-hash = "1f6a8b999e0b660763bd5bc3eb2cf529ac571239509a1a2313634da743104375"
+content-hash = "46fbb862cdab0043cfa55b5061e3940d34ae053a13ebcb1ae742ff55db8e5eee"

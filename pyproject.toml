@@ -16,7 +16,7 @@ quart = "^0.20"
 psutil = "^7"
 websocket-client = "^1.8"
 python-slugify = "^8.0"
-pipen-args = "^1.1"
+pipen-args = "^1.2"
 pipen-log2file = "^1.1"
 # markers = "python_version < \"3.11\"" can not be recognized by poetry
 taskgroup = { version = "^0.2", python = "<3.11" }
