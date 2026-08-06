@@ -1,49 +1,56 @@
-[tool.poetry]
+[project]
 name = "pipen-board"
-version = "1.1.2"
+dynamic = ["version"]
 description = "Visualization configuration and running of pipen pipelines on the web"
-authors = ["pwwang <pwwang@pwwang.com>"]
+authors = [{name = "pwwang", email = "pwwang@pwwang.com"}]
 license = "MIT"
 readme = "README.md"
-exclude = ["pipen_board/frontend/[!build]*", "pipen_board/frontend/index.html"]
+requires-python = ">=3.9"
+dependencies = [
+    "quart>=0.20",
+    "psutil>=7",
+    "websocket-client>=1.8",
+    "python-slugify>=8",
+    "pipen-args>=1.2",
+    "pipen-log2file>=1.1",
+    "taskgroup>=0.2; python_version < '3.11'",
+]
 
-[tool.poetry.build]
-generate-setup-file = true
+[project.optional-dependencies]
+report = ["pipen-report>=1.2"]
+diagram = ["pipen-diagram>=1.1"]
+filters = ["pipen-filters>=1.1"]
+all = ["pipen-report>=1.2", "pipen-diagram>=1.1", "pipen-filters>=1.1"]
 
-[tool.poetry.dependencies]
-python = "^3.9"
-quart = "^0.20"
-psutil = "^7"
-websocket-client = "^1.8"
-python-slugify = "^8.0"
-pipen-args = "^1.2"
-pipen-log2file = "^1.1"
-# markers = "python_version < \"3.11\"" can not be recognized by poetry
-taskgroup = { version = "^0.2", python = "<3.11" }
-pipen-report = { version = "^1.2", optional = true }
-pipen-diagram = { version = "^1.1", optional = true }
-pipen-filters = { version = "^1.1", optional = true }
+[project.urls]
+Homepage = "https://github.com/pwwang/pipen-board"
+Repository = "https://github.com/pwwang/pipen-board"
 
-[tool.poetry.extras]
-report = ["pipen-report"]
-diagram = ["pipen-diagram"]
-filters = ["pipen-filters"]
-all = ["pipen-report", "pipen-diagram", "pipen-filters"]
-
-[tool.poetry.group.dev.dependencies]
-cloudsh = "^0.3"
-python-dotenv = "^1"
-panpath = {version = "^0.4", extras = ["gs", "async-gs"]}
-
-[tool.poetry.plugins.pipen]
+[project.entry-points.pipen]
 board = "pipen_board:pipen_board_plugin"
 
-[tool.poetry.plugins.pipen_cli]
+[project.entry-points.pipen_cli]
 cli-board = "pipen_board:PipenCliBoardPlugin"
 
+[dependency-groups]
+dev = [
+    "cloudsh>=0.3",
+    "python-dotenv>=1",
+    "panpath[gs,async-gs]>=0.4",
+]
+
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "pipen_board/version.py"
+
+[tool.hatch.build]
+exclude = [
+    "pipen_board/frontend/[!build]*",
+    "pipen_board/frontend/index.html",
+]
 
 [tool.black]
 line-length = 88
