@@ -1,12 +1,15 @@
 """Provides PipenCliConfigPlugin"""
 from __future__ import annotations
 
+import asyncio
+import signal
 import sys
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 from pathlib import Path
 
 from panpath import PanPath
-from pipen.cli import CLIPlugin
+from pipen.cli import AsyncCLIPlugin
+from quart.utils import MustReloadError, observe_changes, restart
 
 from .version import __version__
 from .defaults import NAME, logger
@@ -16,7 +19,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from argx import ArgumentParser, Namespace
 
 
-class PipenCliBoardPlugin(CLIPlugin):
+class PipenCliBoardPlugin(AsyncCLIPlugin):
     """Configure and run pipen pipelines from the web"""
 
     name = NAME
@@ -96,7 +99,7 @@ class PipenCliBoardPlugin(CLIPlugin):
             ),
         )
 
-    def parse_args(self, known_parsed, unparsed_argv) -> Namespace:
+    async def parse_args(self, known_parsed, unparsed_argv) -> Namespace:
         """Parse the arguments"""
         # split the args into two parts, separated by `--`
         # the first part is the args for pipen_cli_config
@@ -114,8 +117,9 @@ class PipenCliBoardPlugin(CLIPlugin):
             parsed.workdir.expanduser()
         return parsed
 
-    def exec_command(self, args: Namespace) -> None:
+    async def exec_command(self, args: Namespace) -> None:
         """Execute the command"""
+
         if args.loglevel == "auto":
             logger.setLevel("DEBUG" if args.dev else "INFO")
         else:
@@ -130,13 +134,53 @@ class PipenCliBoardPlugin(CLIPlugin):
         print(" * ")
         print("\n".join(map(lambda x: f" * {x}", self.__doc__.splitlines())))
         print(" * ")
+        print(f" * Running on http://0.0.0.0:{args.port} (CTRL + C to quit)")
 
         app = get_app(args)
         # See https://github.com/pallets/quart/issues/224
         # for customizing logger in the future
-        app.run(
-            host="0.0.0.0",
-            port=args.port,
-            debug=args.dev,
-            use_reloader=args.dev,
-        )
+        if not args.dev:
+            await app.run_task(host="0.0.0.0", port=args.port, debug=False)
+            return
+
+        # In dev mode, reload the server when the package is changed
+        # (mirroring quart's sync `run()` implementation, as `run_task`
+        # does not support `use_reloader`)
+        loop = asyncio.get_running_loop()
+        shutdown_event = asyncio.Event()
+
+        def _signal_handler(*_: Any) -> None:
+            shutdown_event.set()
+
+        for signal_name in {"SIGINT", "SIGTERM", "SIGBREAK"}:
+            if hasattr(signal, signal_name):
+                try:
+                    loop.add_signal_handler(
+                        getattr(signal, signal_name), _signal_handler
+                    )
+                except NotImplementedError:
+                    signal.signal(getattr(signal, signal_name), _signal_handler)
+
+        tasks = [
+            loop.create_task(
+                app.run_task(
+                    host="0.0.0.0",
+                    port=args.port,
+                    debug=True,
+                    shutdown_trigger=shutdown_event.wait,
+                )
+            ),
+            loop.create_task(observe_changes(asyncio.sleep, shutdown_event)),
+        ]
+        reload_ = False
+        try:
+            await asyncio.gather(*tasks)
+        except MustReloadError:
+            reload_ = True
+        finally:
+            # Cancel the tasks to release the sockets before restarting
+            for task in tasks:
+                task.cancel()
+            await asyncio.gather(*tasks, return_exceptions=True)
+        if reload_:
+            restart()
