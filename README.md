@@ -1,8 +1,11 @@
-# pipen-board
-
-Visualize configuration and running of [pipen][1] pipelines on the web.
-
-![pipen-board](https://pwwang.github.io/immunopipe/pipen-board.gif)
+<div align="center">
+    <img src="./logo.png" width="240px" alt="pipen-board logo" />
+    <p style="font-weight:bold;">Visualize configuration and running of
+    <a href="https://github.com/pwwang/pipen" target="_blank">pipen</a>
+    pipelines on the web.
+    </p>
+    <img src="https://pwwang.github.io/immunopipe/latest/pipen-board.gif" width="640px" alt="pipen-board gif" />
+</div>
 
 ## Installation
 
@@ -101,25 +104,25 @@ Available marks:
 ### Metadata for arguments
 
 
-| Name     | Description | Allowed values |
-| -------- | ----------- | -------------- |
-| `action` | Like the `action` argument in [`argx`][2]*. | `store_true`, `store_false`, `ns`, `namespace`, `append`, `extend`, `clear_append`, `clear_extend` (other values are allowed but ignore, they may be effective for CLI use) |
-| `btype`  | Board type (option type specified directly). If specified, `action` will be ignored | `ns`, `choice`, `mchoice`, `array`, `list`, `json`, `int`, `float`, `bool`, `str`, `text`, `auto`* |
-| `type` | Fallback for `action` and `btype` | Same as `btype` |
-| `flag` | Fallback for `action=store_true` | No values needed |
-| `text`/`mline`/`mlines` | Shortcut for `btype=text` | No values needed |
-| `ns`/`namespace` | Shortcut for `btype=ns` | No values needed |
-| `choices`/`choice` | Shortcut for `btype=choice` | No values needed |
-| `mchoices`/`mchoice` | Shortcut for `btype=mchoice` | No values needed |
-| `array`/`list` | Shortcut for `btype=array`/`btype=list` | No values needed |
-| `choices`/`choice` | Shortcut for `btype=choice` | No values needed |
-| `mchoices`/`mchoice` | Shortcut for `btype=mchoice` | No values needed |
-| `order` | The order of the argument in the UI. | Any integer |
-| `readonly` | Whether the argument is readonly. | No values needed (True if specified, otherwise False) |
-| `required` | Whether the argument is required. | No values needed (True if specified, otherwise False) |
-| `placeholder` | The placeholder in the UI for the argument. | Any string |
-| `bitype` | The type of the elements in an array or list. | `int`, `float`, `bool`, `str`, `json`, `auto`* |
-| `itype` | Fallback for `bitype` | Same as `bitype` |
+| Name                    | Description                                                                         | Allowed values                                                                                                                                                              |
+| ----------------------- | ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `action`                | Like the `action` argument in [`argx`][2]*.                                         | `store_true`, `store_false`, `ns`, `namespace`, `append`, `extend`, `clear_append`, `clear_extend` (other values are allowed but ignore, they may be effective for CLI use) |
+| `btype`                 | Board type (option type specified directly). If specified, `action` will be ignored | `ns`, `choice`, `mchoice`, `array`, `list`, `json`, `int`, `float`, `bool`, `str`, `text`, `auto`*                                                                          |
+| `type`                  | Fallback for `action` and `btype`                                                   | Same as `btype`                                                                                                                                                             |
+| `flag`                  | Fallback for `action=store_true`                                                    | No values needed                                                                                                                                                            |
+| `text`/`mline`/`mlines` | Shortcut for `btype=text`                                                           | No values needed                                                                                                                                                            |
+| `ns`/`namespace`        | Shortcut for `btype=ns`                                                             | No values needed                                                                                                                                                            |
+| `choices`/`choice`      | Shortcut for `btype=choice`                                                         | No values needed                                                                                                                                                            |
+| `mchoices`/`mchoice`    | Shortcut for `btype=mchoice`                                                        | No values needed                                                                                                                                                            |
+| `array`/`list`          | Shortcut for `btype=array`/`btype=list`                                             | No values needed                                                                                                                                                            |
+| `choices`/`choice`      | Shortcut for `btype=choice`                                                         | No values needed                                                                                                                                                            |
+| `mchoices`/`mchoice`    | Shortcut for `btype=mchoice`                                                        | No values needed                                                                                                                                                            |
+| `order`                 | The order of the argument in the UI.                                                | Any integer                                                                                                                                                                 |
+| `readonly`              | Whether the argument is readonly.                                                   | No values needed (True if specified, otherwise False)                                                                                                                       |
+| `required`              | Whether the argument is required.                                                   | No values needed (True if specified, otherwise False)                                                                                                                       |
+| `placeholder`           | The placeholder in the UI for the argument.                                         | Any string                                                                                                                                                                  |
+| `bitype`                | The type of the elements in an array or list.                                       | `int`, `float`, `bool`, `str`, `json`, `auto`*                                                                                                                              |
+| `itype`                 | Fallback for `bitype`                                                               | Same as `bitype`                                                                                                                                                            |
 
 - `argx*`: An argument parser for Python, compatible with `argparse`.
 - `auto*`: Automatically infer the type from a string value.
