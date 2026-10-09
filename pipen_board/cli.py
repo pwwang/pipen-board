@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import asyncio
+import os
 import signal
 import sys
 from typing import TYPE_CHECKING, Any
@@ -9,7 +10,13 @@ from pathlib import Path
 
 from panpath import PanPath
 from pipen.cli import AsyncCLIPlugin
-from quart.utils import MustReloadError, observe_changes, restart
+
+try:  # quart < 0.23
+    from quart.utils import MustReloadError, observe_changes, restart
+    _QUART_HAS_RESTART = True
+except ImportError:  # quart >= 0.23 (Python >= 3.13): `restart` -> `run_reloader`
+    from quart.utils import MustReloadError, observe_changes, run_reloader
+    _QUART_HAS_RESTART = False
 
 from .version import __version__
 from .defaults import NAME, logger
@@ -125,6 +132,18 @@ class PipenCliBoardPlugin(AsyncCLIPlugin):
         else:
             logger.setLevel(args.loglevel.upper())
 
+        if (
+            args.dev
+            and not _QUART_HAS_RESTART
+            and os.environ.get("QUART_RUN_MAIN") != "true"
+        ):
+            # quart >= 0.23 supervises the server from a parent process,
+            # re-executing this command as the server with
+            # `QUART_RUN_MAIN=true`. Bail out here so that the banner is
+            # printed only by the process that actually serves.
+            run_reloader()
+            return
+
         print(" * ")
         print(" *        __   __  __.  .     __  __   +  __  __")
         print(" *       |__)||__)|_ |\\ | __ |__)/  \\ /\\ |__)|  \\")
@@ -182,5 +201,10 @@ class PipenCliBoardPlugin(AsyncCLIPlugin):
             for task in tasks:
                 task.cancel()
             await asyncio.gather(*tasks, return_exceptions=True)
-        if reload_:
-            restart()
+        if _QUART_HAS_RESTART:
+            if reload_:
+                restart()
+        elif shutdown_event.is_set():
+            # This process is the child of `run_reloader()` in quart >= 0.23;
+            # exit code 3 stops the parent, 0/falling through re-runs us
+            sys.exit(3)
