@@ -144,16 +144,17 @@ class PipenCliBoardPlugin(AsyncCLIPlugin):
             run_reloader()
             return
 
-        print(" * ")
-        print(" *        __   __  __.  .     __  __   +  __  __")
-        print(" *       |__)||__)|_ |\\ | __ |__)/  \\ /\\ |__)|  \\")
-        print(" *       |   ||   |__| \\|    |__)\\__//--\\| \\ |__/")
-        print(" * ")
-        print(" *                   version: %s" % __version__)
-        print(" * ")
-        print("\n".join(map(lambda x: f" * {x}", self.__doc__.splitlines())))
-        print(" * ")
-        print(f" * Running on http://0.0.0.0:{args.port} (CTRL + C to quit)")
+        print("")
+        print(r"      ___  _______  _____  __    ___  ____  ___   ___  ___ ")
+        print(r"     / _ \/  _/ _ \/ __/ |/ /___/ _ )/ __ \/ _ | / _ \/ _ \ ")
+        print(r"    / ___// // ___/ _//    /___/ _  / /_/ / __ |/ , _/ // /")
+        print(r"   /_/  /___/_/  /___/_/|_/   /____/\____/_/ |_/_/|_/____/ ")
+        print("")
+        print("                        version: %s" % __version__)
+        print("")
+        print("\n".join(map(lambda x: f"    {x}", self.__doc__.splitlines())))
+        print(f"    Running on http://0.0.0.0:{args.port} (CTRL + C to quit)")
+        print("")
 
         app = get_app(args)
         # See https://github.com/pallets/quart/issues/224
